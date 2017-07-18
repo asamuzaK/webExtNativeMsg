@@ -389,7 +389,18 @@
 
     run() {
       const [, , ...args] = process.argv;
-      let browser;
+      if (Array.isArray(args) && args.length) {
+        for (const arg of args) {
+          let value;
+          if (/^--browser=/i.test(arg)) {
+            value = extractArg(arg, /^--browser=(.+)$/i);
+            value && (this._browser = getBrowserData(value));
+          } else if (/^--config-path=/i.test(arg)) {
+            value = extractArg(arg, /^--config-path=(.+)$/i);
+            value && this.setConfigDir(value);
+          }
+        }
+      }
       vars.browser = this._browser;
       vars.configDir = this._configDir;
       vars.hostDesc = this._hostDesc;
@@ -397,20 +408,7 @@
       vars.mainFile = this._mainFile;
       vars.chromeExtIds = this._chromeExtIds;
       vars.webExtIds = this._webExtIds;
-      if (Array.isArray(args) && args.length) {
-        for (const arg of args) {
-          let value;
-          if (/^--browser=/i.test(arg)) {
-            value = extractArg(arg, /^--browser=(.+)$/i);
-            value && (browser = getBrowserData(value));
-            browser && (vars.browser = browser);
-          } else if (/^--config-path=/i.test(arg)) {
-            value = extractArg(arg, /^--config-path=(.+)$/i);
-            value && this.setConfigDir(value);
-          }
-        }
-      }
-      if (browser) {
+      if (this._browser) {
         const dir = getBrowserConfigDir();
         if (!Array.isArray(dir)) {
           throw new TypeError(`Expected Array but got ${getType(dir)}.`);
