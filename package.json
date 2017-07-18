@@ -1,0 +1,20 @@
+{
+  "name": "WebExtensions native messaging",
+  "description": "Native messaging host modules for WebExtensions",
+  "author": "asamuzaK",
+  "homepage": "https://github.com/asamuzaK/webExtNativeMsg",
+  "bugs": "https://github.com/asamuzaK/webExtNativeMsg/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asamuzaK/webExtNativeMsg.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.1.4"
+  },
+  "main": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.0.1"
+}
