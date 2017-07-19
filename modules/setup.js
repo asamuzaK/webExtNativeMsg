@@ -21,6 +21,7 @@
   const DIR_HOME = os.homedir();
   const EXT_CHROME = "chromeExtension";
   const EXT_WEB = "webExtension";
+  const INDENT = 2;
   const IS_MAC = os.platform() === "darwin";
   const IS_WIN = os.platform() === "win32";
   const PERM_DIR = 0o700;
@@ -166,7 +167,7 @@
       name: hostName,
       path: shellPath,
       type: "stdio",
-    }, null, 2);
+    }, null, INDENT);
     const fileName = `${hostName}.json`;
     const filePath = path.resolve(
       IS_WIN && path.join(configPath, fileName) ||
