@@ -49,7 +49,7 @@ Properties:
 * webExtensionIds: {Array} - Array of web extension IDs.
 
 Methods:
-* setConfigDir(dir): Sets config directory. Defaults to `[cwd]/config/`.
+* setConfigDir(dir): Sets config directory. Config directory defaults to `[cwd]/config/`.
   * @param {string} dir - directory path
   * @returns {void}
 * run(): Runs setup script.
