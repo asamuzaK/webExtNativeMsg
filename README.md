@@ -39,6 +39,20 @@ const setup = new Setup({
 setup.run();
 ```
 
+Properties (setup options):
+* hostDescription: {string} - Host description.
+* hostName: {string} - Host name.
+* mainScriptFile: {string} - File name of the main script. Defaults to "index.js".
+* chromeExtensionIds: {Array} - Array of chrome extension IDs.
+* webExtensionIds: {Array} - Array of web extension IDs.
+
+Methods:
+* setConfigDir(dir): Sets config directory. Defaults to "[cwd]/config/".
+  * @param {string} dir - directory path
+  * @returns {void}
+* run(): Runs setup script.
+  * @returns {void}
+
 ### Class Input / Output
 
 Sample:
@@ -72,3 +86,17 @@ const readStdin = chunk => {
   return Promise.all(func).catch(handleReject);
 };
 ```
+
+Input method:
+* decode(chunk): Decode message from buffer.
+  * @param {string|Buffer} chunk - chunk
+  * @returns {?Array} - message array, nullable
+
+Output method:
+* encode(msg): Encode message to buffer.
+  * @param {Object} msg - message
+  * @returns {?Buffer} - buffered message, nullable
+
+### Class ChildProcess / CmdArgs
+
+TBD
