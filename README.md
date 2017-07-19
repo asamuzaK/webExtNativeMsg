@@ -22,6 +22,8 @@ Native messaging host modules for WebExtensions.
 
 ### Class Setup
 
+Creates shell script, application manifest for specified browser.
+
 Sample:
 ```
 const {Setup} = require("webExtNativeMsg/index");
@@ -56,6 +58,7 @@ Methods:
   * @returns {void}
 
 ### Class Input / Output
+
 
 Sample:
 ```
@@ -106,6 +109,8 @@ Output method:
   * @returns {?Buffer} - buffered message, nullable
 
 ### Class ChildProcess / CmdArgs
+
+Spawns child process.
 
 Sample:
 ```
