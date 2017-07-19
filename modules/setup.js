@@ -67,8 +67,8 @@
    * @returns {?Array} - config directory array
    */
   const getBrowserConfigDir = () => {
-    let dir;
     const {browser, configDir} = vars;
+    let dir;
     if (browser) {
       const {alias, aliasLinux, aliasMac, aliasWin} = browser;
       dir = IS_WIN && [...configDir, aliasWin || alias] ||
@@ -101,10 +101,10 @@
    * @returns {string} - shell script path
    */
   const createShellScript = async configPath => {
-    const {hostName, mainFile} = vars;
     if (await !isDir(configPath)) {
       throw new Error(`No such directory: ${configPath}.`);
     }
+    const {hostName, mainFile} = vars;
     if (!isString(mainFile)) {
       throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
     }
@@ -138,14 +138,10 @@
       throw new Error(`Expected Object but got ${getType(browser)}.`);
     }
     if (!isString(hostDesc)) {
-      throw new TypeError(
-        `Expected String but got ${getType(hostDesc)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(hostDesc)}.`);
     }
     if (!isString(hostName)) {
-      throw new TypeError(
-        `Expected String but got ${getType(hostName)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(hostName)}.`);
     }
     const configPath = await createConfig();
     const shellPath = await createShellScript(configPath);
