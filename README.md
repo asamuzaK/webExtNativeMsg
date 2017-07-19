@@ -1,6 +1,6 @@
 # WebExtensions native messaging
 
-Native messaging host modules for WebExtensions.
+Helper modules for WebExtensions native messaging host.
 
 ## Supported browsers
 

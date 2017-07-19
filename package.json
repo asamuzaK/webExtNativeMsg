@@ -1,6 +1,6 @@
 {
   "name": "WebExtensions native messaging",
-  "description": "Native messaging host modules for WebExtensions",
+  "description": "Helper modules for WebExtensions native messaging host",
   "author": "asamuzaK",
   "homepage": "https://github.com/asamuzaK/webExtNativeMsg",
   "bugs": "https://github.com/asamuzaK/webExtNativeMsg/issues",
