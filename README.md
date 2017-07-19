@@ -59,6 +59,7 @@ Methods:
 
 ### Class Input / Output
 
+Decodes / encodes native messages via browser and host.
 
 Sample:
 ```
