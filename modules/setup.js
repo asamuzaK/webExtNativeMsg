@@ -166,7 +166,7 @@
       name: hostName,
       path: shellPath,
       type: "stdio",
-    });
+    }, null, 2);
     const fileName = `${hostName}.json`;
     const filePath = path.resolve(
       IS_WIN && path.join(configPath, fileName) ||
