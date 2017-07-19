@@ -1,5 +1,3 @@
-EN | [JA](./README.ja.md)
-
 # WebExtensions native messaging
 
 Native messaging host modules for WebExtensions.
@@ -26,7 +24,7 @@ Native messaging host modules for WebExtensions.
 
 Sample:
 ```
-const {Setup} = require("webExtNativeMsg/index.js");
+const {Setup} = require("webExtNativeMsg/index");
 
 const setup = new Setup({
   hostDescription: "Description of the host",
@@ -39,15 +37,19 @@ const setup = new Setup({
 setup.run();
 ```
 
-Properties (setup options):
+Construct:
+* new Setup(opt)
+  * @param {Object} opt - options which contains properties below.
+
+Properties:
 * hostDescription: {string} - Host description.
 * hostName: {string} - Host name.
-* mainScriptFile: {string} - File name of the main script. Defaults to "index.js".
+* mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
 * chromeExtensionIds: {Array} - Array of chrome extension IDs.
 * webExtensionIds: {Array} - Array of web extension IDs.
 
 Methods:
-* setConfigDir(dir): Sets config directory. Defaults to "[cwd]/config/".
+* setConfigDir(dir): Sets config directory. Defaults to `[cwd]/config/`.
   * @param {string} dir - directory path
   * @returns {void}
 * run(): Runs setup script.
@@ -57,7 +59,7 @@ Methods:
 
 Sample:
 ```
-const {Input, Output} = require("webExtNativeMsg/index.js");
+const {Input, Output} = require("webExtNativeMsg/index");
 const process = require("process");
 
 const handleReject = e => {
@@ -71,11 +73,11 @@ const writeStdout = async msg => {
   return msg && process.stdout.write(msg);
 };
 
-const input = new Input();
-
 const handleMsg = async msg => {
   // do something
 };
+
+const input = new Input();
 
 const readStdin = chunk => {
   const arr = input.decode(chunk);
@@ -85,18 +87,64 @@ const readStdin = chunk => {
   });
   return Promise.all(func).catch(handleReject);
 };
+
+process.stdin.on("data", readStdin);
 ```
 
+Construct:
+* new Input();
+* new Output();
+
 Input method:
-* decode(chunk): Decode message from buffer.
+* decode(chunk): Decodes message from buffer.
   * @param {string|Buffer} chunk - chunk
   * @returns {?Array} - message array, nullable
 
 Output method:
-* encode(msg): Encode message to buffer.
+* encode(msg): Encodes message to buffer.
   * @param {Object} msg - message
   * @returns {?Buffer} - buffered message, nullable
 
 ### Class ChildProcess / CmdArgs
 
-TBD
+Sample:
+```
+const {ChildProcess, CmdArgs} = require("webExtNativeMsg/index");
+const process = require("process");
+
+const arg = "-a -b -c";
+const cmdArgs = (new CmdArgs(arg)).toArray();
+
+const app = "/path/to/myApp.exe";
+const file = "/path/to/myFile.txt";
+const pos = false;
+const opt = {
+  cwd: null,
+  encoding: "utf8",
+  env: process.env,
+};
+
+const proc = new ChildProcess(app, cmdArgs, opt);
+
+proc.spawn(file, pos);
+```
+
+Construct:
+* new CmdArgs(arg)
+  * @param {string|Array} arg - argument input
+* new ChildProcess(app, args, opt)
+  * @param {string} app - application path
+  * @param {string|Array} args - command arguments
+  * @param {Object} opt - options. Defaults to `{cwd: null, env: process.env}`.
+
+CmdArgs methods:
+* toArray(): Arguments to array.
+  * @returns {Array} - arguments array
+* toString(): Arguments array to string.
+  * @returns {string} - arguments string
+
+ChildProcess method:
+* spawn(file, pos): Spawn child process. Async.
+  * @param {string} file - file path
+  * @param {boolean} pos - put file path after cmd args. Defaults to `false`.
+  * @returns {Object} - child process
