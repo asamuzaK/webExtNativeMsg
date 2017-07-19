@@ -313,6 +313,13 @@
 
   /* setup class */
   class Setup {
+    /**
+     * setup options
+     * @param {Object} opt - options
+     * @param {string} opt.mainScriptFile - file name of the main script
+     * @param {Array} opt.chromeExtensionIds - Array of chrome extension IDs
+     * @param {Array} opt.webExtensionIds - Array of web extension IDs
+     */
     constructor(opt = {}) {
       const {
         hostDescription: hostDesc, hostName, mainScriptFile: mainFile,
@@ -387,6 +394,10 @@
       vars.configDir = this._configDir;
     }
 
+    /**
+     * run setup
+     * @returns {void}
+     */
     run() {
       const [, , ...args] = process.argv;
       if (Array.isArray(args) && args.length) {
