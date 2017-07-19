@@ -139,9 +139,9 @@ Construct:
 
 CmdArgs methods:
 * toArray(): Arguments to array.
-  * @returns {Array} - arguments array
+  * @returns {Array} - arguments array or empty array
 * toString(): Arguments array to string.
-  * @returns {string} - arguments string
+  * @returns {string} - arguments string or empty string
 
 ChildProcess method:
 * spawn(file, pos): Spawn child process. Async.
