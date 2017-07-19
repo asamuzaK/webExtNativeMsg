@@ -8,12 +8,10 @@
   const {getType, isString, stringifyPositiveInt} = require("./common");
   const {promisify} = require("util");
   const fs = require("fs");
-  const os = require("os");
   const path = require("path");
 
   /* constants */
-  const DIR_HOME = os.homedir();
-  const IS_WIN = os.platform() === "win32";
+  const {DIR_HOME, IS_WIN} = require("./constant");
   const MASK_BIT = 0o111;
   const PERM_DIR = 0o777;
   const PERM_FILE = 0o666;

@@ -3,14 +3,9 @@
  */
 "use strict";
 {
-  /* api */
-  const os = require("os");
-
   /* constants */
-  const DIR_HOME = os.homedir();
+  const {DIR_HOME, EXT_CHROME, EXT_WEB} = require("./constant");
   const DIR_HOST_MAC = [DIR_HOME, "Library", "Application Support"];
-  const EXT_CHROME = "chromeExtension";
-  const EXT_WEB = "webExtension";
   const HKCU_SOFTWARE = ["HKEY_CURRENT_USER", "SOFTWARE"];
   const HOST_DIR_LABEL = "NativeMessagingHosts";
 

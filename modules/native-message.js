@@ -5,12 +5,10 @@
 {
   /* api */
   const {isString} = require("./common");
-  const os = require("os");
 
   /* constants */
+  const {CHAR, IS_BE} = require("./constant");
   const BYTE_LEN = 4;
-  const CHAR = "utf8";
-  const IS_BE = os.endianness() === "BE";
 
   /* Input */
   class Input {

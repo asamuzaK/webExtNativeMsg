@@ -10,20 +10,15 @@
   const {
     createDir, createFile, getAbsPath, isDir, isFile,
   } = require("./file-util");
-  const os = require("os");
   const path = require("path");
   const process = require("process");
   const readline = require("readline");
 
   /* constants */
-  const CHAR = "utf8";
+  const {
+    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
+  } = require("./constant");
   const DIR_CWD = process.cwd();
-  const DIR_HOME = os.homedir();
-  const EXT_CHROME = "chromeExtension";
-  const EXT_WEB = "webExtension";
-  const INDENT = 2;
-  const IS_MAC = os.platform() === "darwin";
-  const IS_WIN = os.platform() === "win32";
   const PERM_DIR = 0o700;
   const PERM_EXEC = 0o700;
   const PERM_FILE = 0o600;
