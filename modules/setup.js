@@ -316,6 +316,8 @@
     /**
      * setup options
      * @param {Object} opt - options
+     * @param {string} opt.hostDescription - host description
+     * @param {string} opt.hostName - host name
      * @param {string} opt.mainScriptFile - file name of the main script
      * @param {Array} opt.chromeExtensionIds - Array of chrome extension IDs
      * @param {Array} opt.webExtensionIds - Array of web extension IDs
