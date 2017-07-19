@@ -106,23 +106,21 @@
       throw new Error(`No such directory: ${configPath}.`);
     }
     if (!isString(mainFile)) {
-      throw new TypeError(
-        `Expected String but got ${getType(mainFile)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
     }
     const shellExt = IS_WIN && "cmd" || "sh";
     const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
     const indexPath = path.resolve(path.join(DIR_CWD, mainFile));
-    let file;
-    if (await isFile(indexPath)) {
-      const node = process.argv0;
-      const cmd = `${node} ${indexPath}`;
-      const content = IS_WIN && `@echo off\n${cmd}\n` ||
-                      `#!/usr/bin/env bash\n${cmd}\n`;
-      file = await createFile(
-        shellPath, content, {encoding: CHAR, flag: "w", mode: PERM_EXEC}
-      );
+    if (await !isFile(indexPath)) {
+      throw new Error(`No such file: ${indexPath}.`);
     }
+    const node = process.argv0;
+    const cmd = `${node} ${indexPath}`;
+    const content = IS_WIN && `@echo off\n${cmd}\n` ||
+                    `#!/usr/bin/env bash\n${cmd}\n`;
+    const file = await createFile(
+      shellPath, content, {encoding: CHAR, flag: "w", mode: PERM_EXEC}
+    );
     if (!file) {
       throw new Error(`Failed to create ${shellPath}.`);
     }
