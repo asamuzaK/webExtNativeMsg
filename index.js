@@ -3,13 +3,15 @@
  */
 "use strict";
 {
-  const {versions: {node}} = require("process");
+  /* check for nodejs version */
+  const {versions: {node: nodeVersion}} = require("process");
+  const NODE_MAJOR = 8;
 
-  let [nodeMajor] = node.split(".");
+  let [nodeMajor] = nodeVersion.split(".");
   nodeMajor = Number(nodeMajor);
 
-  if (!Number.isInteger(nodeMajor) || nodeMajor < 8) {
-    throw new Error("Only runs in node >= 8");
+  if (!Number.isInteger(nodeMajor) || nodeMajor < NODE_MAJOR) {
+    throw new Error(`Only runs in node >= ${NODE_MAJOR}`);
   }
 
   /* api */
