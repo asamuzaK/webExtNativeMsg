@@ -28,12 +28,18 @@ Sample:
 ```
 const {Setup} = require("webExtNativeMsg/index");
 
+const postSetup = info => {
+  const {configDirPath, shellScriptPath, manifestPath} = info;
+  // do something
+};
+
 const setup = new Setup({
   hostDescription: "Description of the host",
   hostName: "hostname",
   mainScriptFile: "index.js",
   chromeExtensionIds: ["chrome-extension://xxxxxx"],
   webExtensionIds: ["mywebextension@asamuzak.jp"],
+  callback: postSetup,
 });
 
 setup.run();
