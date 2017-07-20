@@ -29,9 +29,12 @@
     callback: null,
     chromeExtIds: null,
     configDir: null,
+    configPath: null,
     hostDesc: null,
     hostName: null,
     mainFile: null,
+    manifestPath: null,
+    shellPath: null,
     webExtIds: null,
   };
 
@@ -76,6 +79,18 @@
   };
 
   /**
+   * handle setup callback
+   * @returns {void}
+   */
+  const handleSetupCallback = () => {
+    const {
+      callback, configPath: configDirPath, shellPath: shellScriptPath,
+      manifestPath,
+    } = vars;
+    callback && callback({configDirPath, shellScriptPath, manifestPath});
+  };
+
+  /**
    * create config directory
    * @returns {string} - config directory path
    */
@@ -89,6 +104,7 @@
       throw new Error(`Failed to create ${path.join(dir)}.`);
     }
     console.info(`Created: ${configPath}`);
+    vars.configPath = configPath;
     return configPath;
   };
 
@@ -122,6 +138,7 @@
       throw new Error(`Failed to create ${shellPath}.`);
     }
     console.info(`Created: ${shellPath}`);
+    vars.shellPath = shellPath;
     return shellPath;
   };
 
@@ -130,9 +147,7 @@
    * @returns {void}
    */
   const createFiles = async () => {
-    const {
-      browser, callback, hostDesc, hostName, chromeExtIds, webExtIds,
-    } = vars;
+    const {browser, hostDesc, hostName, chromeExtIds, webExtIds} = vars;
     if (!browser) {
       throw new Error(`Expected Object but got ${getType(browser)}.`);
     }
@@ -191,6 +206,7 @@
       proc.on("close", code => {
         if (code === 0) {
           console.info(`Created: ${regKey}`);
+          handleSetupCallback();
         } else {
           console.warn(`${reg} exited with ${code}.`);
         }
@@ -209,11 +225,8 @@
       throw new Error(`Failed to create ${filePath}.`);
     }
     console.info(`Created: ${filePath}`);
-    callback && callback({
-      configDirPath: configPath,
-      shellScriptPath: shellPath,
-      manifestPath: filePath,
-    });
+    vars.manifestPath = filePath;
+    !IS_WIN && handleSetupCallback();
   };
 
   /* readline */
