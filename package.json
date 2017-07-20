@@ -1,5 +1,5 @@
 {
-  "name": "WebExtensions native messaging",
+  "name": "webExtNativeMsg",
   "description": "Helper modules for WebExtensions native messaging host",
   "author": "asamuzaK",
   "homepage": "https://github.com/asamuzaK/webExtNativeMsg",
