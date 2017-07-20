@@ -10,6 +10,7 @@
   const {
     createDir, createFile, getAbsPath, isDir, isFile,
   } = require("./file-util");
+  const {promisify} = require("util");
   const path = require("path");
   const process = require("process");
   const readline = require("readline");
@@ -75,6 +76,15 @@
   };
 
   /**
+   * console creatad file info
+   * @param {string} file - file path
+   * @returns {void}
+   */
+  const consoleCreatedFileInfo = file => {
+    isString(file) && console.info(`Created: ${file}`);
+  };
+
+  /**
    * create config directory
    * @returns {string} - config directory path
    */
@@ -87,7 +97,7 @@
     if (await !isDir(configPath)) {
       throw new Error(`Failed to create ${path.join(dir)}.`);
     }
-    console.info(`Created: ${configPath}`);
+    await consoleCreatedFileInfo(configPath);
     return configPath;
   };
 
@@ -120,7 +130,7 @@
     if (!file) {
       throw new Error(`Failed to create ${shellPath}.`);
     }
-    console.info(`Created: ${shellPath}`);
+    await consoleCreatedFileInfo(shellPath);
     return shellPath;
   };
 
@@ -187,7 +197,7 @@
       });
       proc.on("close", code => {
         if (code === 0) {
-          console.info(`Created: ${regKey}`);
+          consoleCreatedFileInfo(regKey);
         } else {
           console.warn(`${reg} exited with ${code}.`);
         }
@@ -205,7 +215,7 @@
     if (!file) {
       throw new Error(`Failed to create ${filePath}.`);
     }
-    console.info(`Created: ${filePath}`);
+    await consoleCreatedFileInfo(filePath);
     return filePath;
   };
 
@@ -214,6 +224,8 @@
     input: process.stdin,
     output: process.stdout,
   });
+
+  const rlQuestion = promisify(rl.question);
 
   /**
    * abort setup
@@ -228,10 +240,11 @@
   /**
    * handle browser config directory input
    * @param {string} ans - user input
-   * @returns {void}
+   * @returns {AsyncFunction|Function}
    */
   const handleBrowserConfigDir = ans => {
     const dir = getBrowserConfigDir();
+    let func;
     if (!Array.isArray(dir)) {
       throw new TypeError(`Expected Array but got ${getType(dir)}.`);
     }
@@ -240,22 +253,24 @@
       ans = ans.trim();
       if (/^y(?:es)?$/i.test(ans)) {
         rl.close();
-        createAppManifest().catch(logError);
+        func = createAppManifest();
       } else {
-        abortSetup(msg);
+        func = abortSetup(msg);
       }
     } else {
-      abortSetup(msg);
+      func = abortSetup(msg);
     }
+    return func || null;
   };
 
   /**
    * handle browser input
    * @param {string} ans - user input
-   * @returns {void}
+   * @returns {AsyncFunction|function}
    */
   const handleBrowserInput = ans => {
     const msg = "Browser not specified.";
+    let func;
     if (isString(ans)) {
       ans = ans.trim();
       if (ans.length) {
@@ -268,22 +283,23 @@
           }
           const dirPath = path.join(...dir);
           if (isDir(dirPath)) {
-            rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
-                        handleBrowserConfigDir);
+            func = rlQuestion(`${dirPath} already exists. Overwrite? [y/n]\n`,
+                              handleBrowserConfigDir);
           } else {
             rl.close();
-            createAppManifest().catch(logError);
+            func = createAppManifest();
           }
         } else {
           // TODO: Add custom setup
-          abortSetup(`${ans} not supported.`);
+          func = abortSetup(`${ans} not supported.`);
         }
       } else {
-        abortSetup(msg);
+        func = abortSetup(msg);
       }
     } else {
-      abortSetup(msg);
+      func = abortSetup(msg);
     }
+    return func || null;
   };
 
   /**
@@ -392,6 +408,7 @@
      */
     run() {
       const [, , ...args] = process.argv;
+      const func = [];
       if (Array.isArray(args) && args.length) {
         for (const arg of args) {
           let value;
@@ -400,7 +417,7 @@
             value && (this._browser = getBrowserData(value));
           } else if (/^--config-path=/i.test(arg)) {
             value = extractArg(arg, /^--config-path=(.+)$/i);
-            value && this.setConfigDir(value);
+            value && func.push(this.setConfigDir(value));
           }
         }
       }
@@ -418,11 +435,11 @@
         }
         const dirPath = path.join(...dir);
         if (isDir(dirPath)) {
-          rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
-                      handleBrowserConfigDir);
+          func.push(rlQquestion(`${dirPath} already exists. Overwrite? [y/n]\n`,
+                                handleBrowserConfigDir));
         } else {
           rl.close();
-          createAppManifest().catch(logError);
+          func.push(createAppManifest());
         }
       } else {
         const arr = [];
@@ -438,9 +455,10 @@
             arr.push(item);
           }
         }
-        rl.question(`${msg}[${arr.join(" ")}]\n`, handleBrowserInput);
+        func.push(rlQuestion(`${msg}[${arr.join(" ")}]\n`, handleBrowserInput));
       }
     }
+    return Promise.all(func).catch(logError);
   }
 
   module.exports = {
