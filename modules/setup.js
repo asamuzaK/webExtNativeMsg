@@ -26,11 +26,12 @@
   /* variables */
   const vars = {
     browser: null,
+    callback: null,
+    chromeExtIds: null,
     configDir: null,
     hostDesc: null,
     hostName: null,
     mainFile: null,
-    chromeExtIds: null,
     webExtIds: null,
   };
 
@@ -125,11 +126,13 @@
   };
 
   /**
-   * create app manifest
-   * @returns {string} - app manifest path
+   * create files
+   * @returns {void}
    */
-  const createAppManifest = async () => {
-    const {browser, hostDesc, hostName, chromeExtIds, webExtIds} = vars;
+  const createFiles = async () => {
+    const {
+      browser, callback, hostDesc, hostName, chromeExtIds, webExtIds,
+    } = vars;
     if (!browser) {
       throw new Error(`Expected Object but got ${getType(browser)}.`);
     }
@@ -206,7 +209,11 @@
       throw new Error(`Failed to create ${filePath}.`);
     }
     console.info(`Created: ${filePath}`);
-    return filePath;
+    callback && callback({
+      configDirPath: configPath,
+      shellScriptPath: shellPath,
+      manifestPath: filePath,
+    });
   };
 
   /* readline */
@@ -240,7 +247,7 @@
       ans = ans.trim();
       if (/^y(?:es)?$/i.test(ans)) {
         rl.close();
-        createAppManifest().catch(logError);
+        createFiles().catch(logError);
       } else {
         abortSetup(msg);
       }
@@ -272,7 +279,7 @@
                         handleBrowserConfigDir);
           } else {
             rl.close();
-            createAppManifest().catch(logError);
+            createFiles().catch(logError);
           }
         } else {
           // TODO: Add custom setup
@@ -315,7 +322,7 @@
     constructor(opt = {}) {
       const {
         hostDescription: hostDesc, hostName, mainScriptFile: mainFile,
-        chromeExtensionIds: chromeExtIds, webExtensionIds: webExtIds,
+        chromeExtensionIds: chromeExtIds, webExtensionIds: webExtIds, callback,
       } = opt;
       this._browser = null;
       this._configDir = [DIR_CWD, "config"];
@@ -326,6 +333,7 @@
                            chromeExtIds || null;
       this._webExtIds = Array.isArray(webExtIds) && webExtIds.length &&
                         webExtIds || null;
+      this._callback = typeof callback === "function" && callback || null;
     }
 
     /* getter / setter */
@@ -363,6 +371,13 @@
     set webExtensionIds(arr) {
       this._webExtIds = Array.isArray(arr) && arr.length && arr || null;
       vars.webExtIds = this._webExtIds;
+    }
+    get callback() {
+      return this._callback;
+    }
+    set callback(func) {
+      this._callback = typeof func === "function" && func || null;
+      vars.callback = this._callback;
     }
 
     /**
@@ -405,6 +420,7 @@
         }
       }
       vars.browser = this._browser;
+      vars.callback = this._callback;
       vars.configDir = this._configDir;
       vars.hostDesc = this._hostDesc;
       vars.hostName = this._hostName;
@@ -422,7 +438,7 @@
                       handleBrowserConfigDir);
         } else {
           rl.close();
-          createAppManifest().catch(logError);
+          createFiles().catch(logError);
         }
       } else {
         const arr = [];

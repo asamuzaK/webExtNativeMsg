@@ -49,6 +49,15 @@ Properties:
 * mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
 * chromeExtensionIds: {Array} - Array of chrome extension IDs.
 * webExtensionIds: {Array} - Array of web extension IDs.
+* callback: {Function} - A function that will be called when setup is done.
+  * The function will be passed an argument containing information about the paths of the created files.
+    ```
+    {
+      configDirPath: {string} - Config dir path.
+      shellScriptPath: {string} - Shell script path.
+      manifestPath: {string} - Application manifest path.
+    }
+    ```
 
 Methods:
 * setConfigDir(dir): Sets config directory. Config directory defaults to `[cwd]/config/`.
