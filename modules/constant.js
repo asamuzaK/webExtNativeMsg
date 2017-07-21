@@ -15,6 +15,6 @@
     IS_BE: os.endianness() === "BE",
     IS_LE: os.endianness() === "LE",
     IS_MAC: os.platform() === "darwin",
-    IS_WIN = os.platform() === "win32",
+    IS_WIN: os.platform() === "win32",
   };
 }
