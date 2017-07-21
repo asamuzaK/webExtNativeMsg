@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/asamuzaK/webExtNativeMsg.svg?branch=master)](https://travis-ci.org/asamuzaK/webExtNativeMsg)
+
 # WebExtensions native messaging
 
 Helper modules for WebExtensions native messaging host.
