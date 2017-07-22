@@ -69,11 +69,14 @@
   const getBrowserConfigDir = () => {
     const {browser, configDir} = vars;
     let dir;
-    if (browser) {
+    if (browser && Array.isArray(configDir)) {
       const {alias, aliasLinux, aliasMac, aliasWin} = browser;
-      dir = IS_WIN && [...configDir, aliasWin || alias] ||
-            IS_MAC && [...configDir, aliasMac || alias] ||
-            [...configDir, aliasLinux || alias];
+      if (isString(alias)) {
+        dir =
+          IS_WIN && [...configDir, isString(aliasWin) && aliasWin || alias] ||
+          IS_MAC && [...configDir, isString(aliasMac) && aliasMac || alias] ||
+          [...configDir, isString(aliasLinux) && aliasLinux || alias];
+      }
     }
     return dir || null;
   };
@@ -118,6 +121,9 @@
       throw new Error(`No such directory: ${configPath}.`);
     }
     const {hostName, mainFile} = vars;
+    if (!isString(hostName)) {
+      throw new TypeError(`Expected String but got ${getType(hostName)}.`);
+    }
     if (!isString(mainFile)) {
       throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
     }
