@@ -1,8 +1,9 @@
 "use strict";
 {
+  const {describe, it} = require("mocha");
   const {assert} = require("chai");
   const {ChildProcess, CmdArgs, Input, Output, Setup} = require("../index");
-  const {CHAR, IS_BE} = require("../modules/constant");
+  const {IS_BE} = require("../modules/constant");
 
   /* ChildProcess */
   // FIXME
