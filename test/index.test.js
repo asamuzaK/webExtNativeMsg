@@ -35,31 +35,45 @@
 
   /* Input */
   describe("Input", () => {
-    const BYTE_LEN = 4;
     const input = new Input();
 
     /* method */
     it("should decode buffer to array of message", () => {
-      const buf = Buffer.from(JSON.stringify("test"));
-      const len = Buffer.alloc(BYTE_LEN);
-      IS_BE && len.writeUIntBE(buf.length, 0, BYTE_LEN) ||
-      len.writeUIntLE(buf.length, 0, BYTE_LEN);
-      assert.deepEqual(input.decode(Buffer.concat([len, buf])), ["test"]);
+      if (IS_BE) {
+        assert.deepEqual(
+          /* eslint-disable no-magic-numbers */
+          input.decode(Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])),
+          /* eslint-disable no-magic-numbers */
+          ["test"]
+        );
+      } else {
+        assert.deepEqual(
+          /* eslint-disable no-magic-numbers */
+          input.decode(Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])),
+          /* eslint-disable no-magic-numbers */
+          ["test"]
+        );
+      }
     });
   });
 
   /* Output */
   describe("Output", () => {
-    const BYTE_LEN = 4;
     const output = new Output();
 
     /* method */
     it("should encode message to buffer", () => {
-      const buf = Buffer.from(JSON.stringify("test"));
-      const len = Buffer.alloc(BYTE_LEN);
-      IS_BE && len.writeUIntBE(buf.length, 0, BYTE_LEN) ||
-      len.writeUIntLE(buf.length, 0, BYTE_LEN);
-      assert.deepEqual(output.encode("test"), Buffer.concat([len, buf]));
+      if (IS_BE) {
+        assert.deepEqual(
+          output.encode("test"),
+          Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])
+        );
+      } else {
+        assert.deepEqual(
+          output.encode("test"),
+          Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])
+        );
+      }
     });
   });
 
