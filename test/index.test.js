@@ -2,14 +2,16 @@
 {
   const {describe, it} = require("mocha");
   const {assert} = require("chai");
-  const {ChildProcess, CmdArgs, Input, Output, Setup} = require("../index");
+  const {CmdArgs, Input, Output, Setup} = require("../index");
   const {IS_BE} = require("../modules/constant");
 
   /* ChildProcess */
   // FIXME
+  /*
   describe("ChildProcess", () => {
     const childProcess = new ChildProcess();
   });
+  */
 
   /* CmdArgs */
   describe("CmdArgs", () => {
@@ -114,9 +116,9 @@
     });
 
     it("should set callback function", () => {
-      const myCallback = () => {};
+      const myCallback = a => a;
       setup.callback = myCallback;
-      assert.strictEqual(typeof setup.callback, "function");
+      assert.typeOf(setup.callback, "function");
     });
 
     /* methods */
