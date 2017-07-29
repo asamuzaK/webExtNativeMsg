@@ -7,13 +7,13 @@
 
   /* ChildProcess */
   describe("ChildProcess", () => {
-    const childProcess = new ChildProcess();
     it("should throw if given command is not executable", async () => {
-      await childProcess.spawn().catch(e => {
-        assert.equal(e.message, "null is not executable.");
+      await (new ChildProcess()).spawn().catch(e => {
+        assert.deepEqual(e.message, "null is not executable.");
       });
     });
-    // FIXME: add test for childProcess.spawn() which passes
+
+    // FIXME: add test for ChildProcess.spawn() which passes
     /*
     it("should pass", async () => {});
     */
@@ -71,27 +71,27 @@
     });
 
     /* getters */
-    it("should get hostDescription in string", () => {
+    it("should get hostDescription value in string", () => {
       assert.strictEqual(setup.hostDescription, "My host description");
     });
 
-    it("should get hostName in string", () => {
+    it("should get hostName value in string", () => {
       assert.strictEqual(setup.hostName, "myhost");
     });
 
-    it("should get mainScriptFile in string", () => {
+    it("should get mainScriptFile value in string", () => {
       assert.strictEqual(setup.mainScriptFile, "index.js");
     });
 
-    it("should get null if chromeExtensionIds is not given", () => {
+    it("should get null if chromeExtensionIds arg is not given", () => {
       assert.isNull(setup.chromeExtensionIds, null);
     });
 
-    it("should get null if webExtensionIds is not given", () => {
+    it("should get null if webExtensionIds arg is not given", () => {
       assert.isNull(setup.webExtensionIds, null);
     });
 
-    it("should get null if callback is not given", () => {
+    it("should get null if callback arg is not given", () => {
       assert.isNull(setup.callback, null);
     });
 
@@ -147,7 +147,7 @@
          }
        });
 
-    // FIXME: add test for run()
+    // FIXME: add test for setup.run()
     /*
     it("run", () => {
     });
