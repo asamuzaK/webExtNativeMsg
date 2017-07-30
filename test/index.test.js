@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 "use strict";
 {
   /* api */
@@ -55,16 +56,12 @@
     it("should decode buffer to array of message", () => {
       if (IS_BE) {
         assert.deepEqual(
-          /* eslint-disable no-magic-numbers */
           input.decode(Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])),
-          /* eslint-disable no-magic-numbers */
           ["test"]
         );
       } else {
         assert.deepEqual(
-          /* eslint-disable no-magic-numbers */
           input.decode(Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])),
-          /* eslint-disable no-magic-numbers */
           ["test"]
         );
       }
