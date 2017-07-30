@@ -20,6 +20,12 @@ Helper modules for WebExtensions native messaging host.
 *1: Shares host with Firefox.
 *2: Shares host with Chrome.
 
+## Install
+
+```
+npm install web-ext-native-msg
+```
+
 ## Usage
 
 ### Class Setup
