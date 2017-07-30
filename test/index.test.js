@@ -4,7 +4,9 @@
   const {assert} = require("chai");
   const {ChildProcess, CmdArgs, Input, Output, Setup} = require("../index");
   const {DIR_HOME, IS_BE, IS_WIN} = require("../modules/constant");
+  const fs = require("fs");
   const path = require("path");
+  const PERM_EXEC = 0o700;
 
   /* ChildProcess */
   describe("ChildProcess", () => {
@@ -17,6 +19,7 @@
     it("should exit with 0", async () => {
       const app = path.resolve(IS_WIN && path.join("test", "bin", "test.cmd") ||
                                path.join("test", "bin", "test.sh"));
+      await fs.chmodSync(app, PERM_EXEC);
       const proc = await (new ChildProcess(app)).spawn();
       proc.on("close", code => {
         assert.strictEqual(code, 0);
