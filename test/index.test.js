@@ -1,18 +1,19 @@
 "use strict";
 {
-  const {describe, it} = require("mocha");
-  const {assert} = require("chai");
   const {ChildProcess, CmdArgs, Input, Output, Setup} = require("../index");
-  const {DIR_HOME, IS_BE, IS_WIN} = require("../modules/constant");
+  const {assert} = require("chai");
+  const {describe, it} = require("mocha");
   const fs = require("fs");
   const path = require("path");
+
+  const {DIR_HOME, IS_BE, IS_WIN} = require("../modules/constant");
   const PERM_EXEC = 0o700;
 
   /* ChildProcess */
   describe("ChildProcess", () => {
     it("should throw if given command is not executable", async () => {
       await (new ChildProcess()).spawn().catch(e => {
-        assert.deepEqual(e.message, "null is not executable.");
+        assert.strictEqual(e.message, "null is not executable.");
       });
     });
 
@@ -37,7 +38,7 @@
     });
 
     it("should get arguments in string", () => {
-      assert.deepEqual(cmdArgs.toString(), "-a -b \"c d\"");
+      assert.strictEqual(cmdArgs.toString(), "-a -b \"c d\"");
     });
   });
 
