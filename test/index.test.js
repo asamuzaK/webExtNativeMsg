@@ -1,12 +1,18 @@
 "use strict";
 {
+  /* api */
   const {ChildProcess, CmdArgs, Input, Output, Setup} = require("../index");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
   const fs = require("fs");
+  const os = require("os");
   const path = require("path");
+  const process = require("process");
 
-  const {DIR_HOME, IS_BE, IS_WIN} = require("../modules/constant");
+  /* constants */
+  const DIR_HOME = os.homedir();
+  const IS_BE = os.endianness() === "BE";
+  const IS_WIN = os.platform() === "win32";
   const PERM_EXEC = 0o700;
 
   /* ChildProcess */
@@ -159,16 +165,18 @@
       }
     });
 
-    it("should throw if setConfigDir dir is not subdirectory of user's home",
-       () => {
-         try {
-           setup.setConfigDir("/foo/bar/");
-         } catch (e) {
-           assert.strictEqual(
-             e.message, `Config path is not sub directory of ${DIR_HOME}.`
-           );
-         }
-       });
+    it(
+      "should throw if setConfigDir dir is not subdirectory of user's home dir",
+      () => {
+        try {
+          setup.setConfigDir("/foo/bar/");
+        } catch (e) {
+          assert.strictEqual(
+            e.message, `Config path is not sub directory of ${DIR_HOME}.`
+          );
+        }
+      }
+    );
 
     // FIXME: add test for setup.run()
     /*
