@@ -3,7 +3,8 @@
   const {describe, it} = require("mocha");
   const {assert} = require("chai");
   const {ChildProcess, CmdArgs, Input, Output, Setup} = require("../index");
-  const {DIR_HOME, IS_BE} = require("../modules/constant");
+  const {DIR_HOME, IS_BE, IS_WIN} = require("../modules/constant");
+  const path = require("path");
 
   /* ChildProcess */
   describe("ChildProcess", () => {
@@ -13,10 +14,14 @@
       });
     });
 
-    // FIXME: add test for ChildProcess.spawn() which passes
-    /*
-    it("should pass", async () => {});
-    */
+    it("should exit with 0", async () => {
+      const app = path.resolve(IS_WIN && path.join("test", "bin", "test.cmd") ||
+                               path.join("test", "bin", "test.sh"));
+      const proc = await (new ChildProcess(app)).spawn();
+      proc.on("close", code => {
+        assert.strictEqual(code, 0);
+      });
+    });
   });
 
   /* CmdArgs */
