@@ -34,7 +34,7 @@ Creates shell script, application manifest for specified browser.
 
 Sample:
 ```
-const {Setup} = require("webExtNativeMsg/index");
+const {Setup} = require("web-ext-native-msg");
 
 const postSetup = info => {
   const {configDirPath, shellScriptPath, manifestPath} = info;
@@ -86,7 +86,7 @@ Decode / encode native messages exchanged between browser and host.
 
 Sample:
 ```
-const {Input, Output} = require("webExtNativeMsg/index");
+const {Input, Output} = require("web-ext-native-msg");
 const process = require("process");
 
 const handleReject = e => {
@@ -138,7 +138,7 @@ Spawns child process.
 
 Sample:
 ```
-const {ChildProcess, CmdArgs} = require("webExtNativeMsg/index");
+const {ChildProcess, CmdArgs} = require("web-ext-native-msg");
 const process = require("process");
 
 const arg = "-a -b -c";
