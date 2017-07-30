@@ -370,10 +370,10 @@
       this._hostName = isString(name) && name || null;
       vars.hostName = this._hostName;
     }
-    get mainFile() {
+    get mainScriptFile() {
       return this._mainFile;
     }
-    set mainFile(name) {
+    set mainScriptFile(name) {
       this._mainFile = isString(name) && name || null;
       vars.mainFile = this._mainFile;
     }

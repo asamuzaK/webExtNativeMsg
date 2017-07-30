@@ -262,6 +262,11 @@
     ],
     "radix": ["error", "as-needed"],
     "require-await": "off",
+    "require-jsdoc": ["error", {
+      "require": {
+        "FunctionDeclaration": true,
+      }
+    }],
     "require-yield": "error",
     "semi": ["error", "always"],
     "semi-style": ["error", "last"],
