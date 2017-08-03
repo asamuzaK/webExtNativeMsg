@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/asamuzaK/webExtNativeMsg.svg?branch=master)](https://travis-ci.org/asamuzaK/webExtNativeMsg)
+[![devDependency Status](https://david-dm.org/asamuzaK/webExtNativeMsg/dev-status.svg)](https://david-dm.org/asamuzaK/webExtNativeMsg#info=devDependencies)
 
 # WebExtensions native messaging
 
