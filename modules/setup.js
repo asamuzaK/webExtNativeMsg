@@ -133,7 +133,7 @@
     if (await !isFile(indexPath)) {
       throw new Error(`No such file: ${indexPath}.`);
     }
-    const node = process.argv0;
+    const node = process.execPath;
     const cmd = `${node} ${indexPath}`;
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!/usr/bin/env bash\n${cmd}\n`;
