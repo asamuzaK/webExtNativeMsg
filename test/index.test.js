@@ -109,15 +109,15 @@
     });
 
     it("should get null if chromeExtensionIds arg is not given", () => {
-      assert.isNull(setup.chromeExtensionIds, null);
+      assert.isNull(setup.chromeExtensionIds);
     });
 
     it("should get null if webExtensionIds arg is not given", () => {
-      assert.isNull(setup.webExtensionIds, null);
+      assert.isNull(setup.webExtensionIds);
     });
 
     it("should get null if callback arg is not given", () => {
-      assert.isNull(setup.callback, null);
+      assert.isNull(setup.callback);
     });
 
     /* setters */
