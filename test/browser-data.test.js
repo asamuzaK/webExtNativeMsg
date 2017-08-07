@@ -6,11 +6,11 @@
   const {describe, it} = require("mocha");
 
   describe("browserData", () => {
-    describe("Firefox", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "firefox");
-      });
+    it("should contain firefox property", async () => {
+      assert.property(browserData, "firefox");
+    });
 
+    describe("Firefox", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.firefox, ["alias", "type"]);
       });
@@ -21,11 +21,11 @@
       });
     });
 
-    describe("Cyberfox", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "cyberfox");
-      });
+    it("should contain cyberfox property", async () => {
+      assert.property(browserData, "cyberfox");
+    });
 
+    describe("Cyberfox", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.cyberfox, ["alias", "type"]);
       });
@@ -40,11 +40,11 @@
       });
     });
 
-    describe("Waterfox", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "waterfox");
-      });
+    it("should contain waterfox property", async () => {
+      assert.property(browserData, "waterfox");
+    });
 
+    describe("Waterfox", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.waterfox, ["alias", "type"]);
       });
@@ -59,11 +59,11 @@
       });
     });
 
-    describe("Chrome", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "chrome");
-      });
+    it("should contain chrome property", async () => {
+      assert.property(browserData, "chrome");
+    });
 
+    describe("Chrome", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.chrome, ["alias", "type"]);
       });
@@ -74,11 +74,11 @@
       });
     });
 
-    describe("Chromium", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "chromium");
-      });
+    it("should contain chromium property", async () => {
+      assert.property(browserData, "chromium");
+    });
 
+    describe("Chromium", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.chromium, ["alias", "type"]);
       });
@@ -89,11 +89,11 @@
       });
     });
 
-    describe("Kinza", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "kinza");
-      });
+    it("should contain kinza property", async () => {
+      assert.property(browserData, "kinza");
+    });
 
+    describe("Kinza", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.kinza, ["alias", "type"]);
       });
@@ -108,11 +108,11 @@
       });
     });
 
-    describe("Opera", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "opera");
-      });
+    it("should contain opera property", async () => {
+      assert.property(browserData, "opera");
+    });
 
+    describe("Opera", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.opera, ["alias", "type"]);
       });
@@ -127,11 +127,11 @@
       });
     });
 
-    describe("Vivaldi", () => {
-      it("should contain property", async () => {
-        assert.property(browserData, "vivaldi");
-      });
+    it("should contain vivaldi property", async () => {
+      assert.property(browserData, "vivaldi");
+    });
 
+    describe("Vivaldi", () => {
       it("should contain alias and type keys", async () => {
         assert.containsAllKeys(browserData.vivaldi, ["alias", "type"]);
       });
