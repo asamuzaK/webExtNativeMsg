@@ -23,10 +23,13 @@
     escapeChar, getType, isString, logError, logMsg, logWarn,
     stringifyPositiveInt, stripHtmlTags, throwErr,
   } = require("./modules/common");
-
+  const {
+    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE, IS_MAC, IS_WIN,
+  } = require("./modules/constant");
   module.exports = {
     ChildProcess, CmdArgs, Input, Output, Setup,
     browserData, escapeChar, getType, isString, logError, logMsg, logWarn,
     stringifyPositiveInt, stripHtmlTags, throwErr,
+    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE, IS_MAC, IS_WIN,
   };
 }

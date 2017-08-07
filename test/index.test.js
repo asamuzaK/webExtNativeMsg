@@ -5,6 +5,7 @@
     ChildProcess, CmdArgs, Input, Output, Setup,
     browserData, escapeChar, getType, isString, logError, logMsg, logWarn,
     stringifyPositiveInt, stripHtmlTags, throwErr,
+    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE, IS_MAC, IS_WIN,
   } = require("../index");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
@@ -80,6 +81,44 @@
 
     it("should be type of function", () => {
       assert.typeOf(throwErr, "function");
+    });
+  });
+
+  describe("Constants", () => {
+    it("should be string", () => {
+      assert.isString(CHAR);
+    });
+
+    it("should be string", () => {
+      assert.isString(DIR_HOME);
+    });
+
+    it("should be string", () => {
+      assert.isString(EXT_CHROME);
+    });
+
+    it("should be string", () => {
+      assert.isString(EXT_WEB);
+    });
+
+    it("should be finite", () => {
+      assert.isFinite(INDENT);
+    });
+
+    it("should be boolean", () => {
+      assert.isBoolean(IS_BE);
+    });
+
+    it("should be boolean", () => {
+      assert.isBoolean(IS_LE);
+    });
+
+    it("should be boolean", () => {
+      assert.isBoolean(IS_MAC);
+    });
+
+    it("should be boolean", () => {
+      assert.isBoolean(IS_WIN);
     });
   });
 }
