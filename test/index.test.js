@@ -1,8 +1,10 @@
-/* eslint-disable no-magic-numbers */
 "use strict";
 {
   /* api */
-  const {ChildProcess, CmdArgs, Input, Output, Setup} = require("../index");
+  const {
+    ChildProcess, CmdArgs, Input, Output, Setup,
+    browserData,
+  } = require("../index");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
 
@@ -31,6 +33,13 @@
     it("should create an instance of Setup", async () => {
       const setup = new Setup();
       assert.instanceOf(setup, Setup);
+    });
+  });
+
+  /* Static Data */
+  describe("Static Data", () => {
+    it("should get browser data object", async () => {
+      assert.property(browserData, "firefox");
     });
   });
 }
