@@ -14,23 +14,25 @@
   describe("Input", () => {
     const input = new Input();
 
-    it("should create an instance", async () => {
+    it("should create an instance", () => {
       assert.instanceOf(input, Input);
     });
 
     /* method */
-    it("should decode buffer to array of message", () => {
-      if (IS_BE) {
-        assert.deepEqual(
-          input.decode(Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])),
-          ["test"]
-        );
-      } else {
-        assert.deepEqual(
-          input.decode(Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])),
-          ["test"]
-        );
-      }
+    describe("decode", () => {
+      it("should decode buffer to array of message", () => {
+        if (IS_BE) {
+          assert.deepEqual(
+            input.decode(Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])),
+            ["test"]
+          );
+        } else {
+          assert.deepEqual(
+            input.decode(Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])),
+            ["test"]
+          );
+        }
+      });
     });
   });
 
@@ -38,23 +40,25 @@
   describe("Output", () => {
     const output = new Output();
 
-    it("should create an instance", async () => {
+    it("should create an instance", () => {
       assert.instanceOf(output, Output);
     });
 
     /* method */
-    it("should encode message to buffer", () => {
-      if (IS_BE) {
-        assert.deepEqual(
-          output.encode("test"),
-          Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])
-        );
-      } else {
-        assert.deepEqual(
-          output.encode("test"),
-          Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])
-        );
-      }
+    describe("encode", () => {
+      it("should encode message to buffer", () => {
+        if (IS_BE) {
+          assert.deepEqual(
+            output.encode("test"),
+            Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])
+          );
+        } else {
+          assert.deepEqual(
+            output.encode("test"),
+            Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])
+          );
+        }
+      });
     });
   });
 }

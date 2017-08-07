@@ -16,7 +16,7 @@
       hostName: "myhost",
     });
 
-    it("should create an instance", async () => {
+    it("should create an instance", () => {
       assert.instanceOf(setup, Setup);
     });
 
@@ -78,26 +78,17 @@
     });
 
     /* methods */
-    it("should throw if setConfigDir dir is not given", () => {
-      try {
-        setup.setConfigDir();
-      } catch (e) {
-        assert.strictEqual(e.message, "Failed to normalize undefined");
-      }
-    });
+    describe("setConfigDir", () => {
+      it("should throw if dir is not given", () => {
+        assert.throws(() => setup.setConfigDir(),
+                      "Failed to normalize undefined");
+      });
 
-    it(
-      "should throw if setConfigDir dir is not subdirectory of user's home dir",
-      () => {
-        try {
-          setup.setConfigDir("/foo/bar/");
-        } catch (e) {
-          assert.strictEqual(
-            e.message, `Config path is not sub directory of ${DIR_HOME}.`
-          );
-        }
-      }
-    );
+      it("should throw if dir is not subdirectory of user's home dir", () => {
+        assert.throws(() => setup.setConfigDir("/foo/bar/"),
+                      `Config path is not sub directory of ${DIR_HOME}.`);
+      });
+    });
 
     // FIXME: add test for setup.run()
     /*
