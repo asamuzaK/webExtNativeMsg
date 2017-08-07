@@ -19,9 +19,14 @@
   const {Input, Output} = require("./modules/native-message");
   const {Setup} = require("./modules/setup");
   const {browserData} = require("./modules/browser-data");
+  const {
+    escapeChar, getType, isString, logError, logMsg, logWarn,
+    stringifyPositiveInt, stripHtmlTags, throwErr,
+  } = require("./modules/common");
 
   module.exports = {
     ChildProcess, CmdArgs, Input, Output, Setup,
-    browserData,
+    browserData, escapeChar, getType, isString, logError, logMsg, logWarn,
+    stringifyPositiveInt, stripHtmlTags, throwErr,
   };
 }
