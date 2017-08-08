@@ -4,7 +4,7 @@
 {
   /* api */
   const {
-    convUriToFilePath, createDir, createFile, getAbsPath,
+    convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
     isExecutable, isFile, isSubDir, removeDir, readFile,
   } = require("../modules/file-util");
@@ -16,10 +16,10 @@
   const process = require("process");
 
   /* constants */
-  const IS_WIN = os.platform() === "win32";
+  const {IS_WIN} = require("../modules/constant");
   const PERM_EXEC = 0o700;
 
-  describe("convUriToFilePath", () => {
+  describe("convertUriToFilePath", () => {
     it("should get string", () => {
       const p = path.resolve("test");
       let u;
@@ -28,17 +28,17 @@
       } else {
         u = `file://${p}`;
       }
-      assert.strictEqual(convUriToFilePath(u), p);
+      assert.strictEqual(convertUriToFilePath(u), p);
     });
 
     it("should throw if string is not given", () => {
-      assert.throws(() => convUriToFilePath(),
+      assert.throws(() => convertUriToFilePath(),
                     "Expected String but got Undefined");
     });
 
     it("should get null if protocol does not match", () => {
       const uri = "http://example.com";
-      assert.isNull(convUriToFilePath(uri));
+      assert.isNull(convertUriToFilePath(uri));
     });
   });
 

@@ -4,7 +4,7 @@
 {
   /* api */
   const {
-    escapeChar, getType, isString, logError, logMsg, logWarn,
+    escapeChar, getType, isString, logErr, logMsg, logWarn,
     stringifyPositiveInt, stripHtmlTags, throwErr,
   } = require("../modules/common");
   const {assert} = require("chai");
@@ -70,9 +70,9 @@
 
   // FIXME
   /*
-  describe("logError", () => {
+  describe("logErr", () => {
     it("should be type of function", () => {
-      assert.typeOf(logError, "function");
+      assert.typeOf(logErr, "function");
     });
   });
 

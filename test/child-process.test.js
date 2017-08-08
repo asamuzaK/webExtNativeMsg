@@ -6,11 +6,10 @@
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
   const fs = require("fs");
-  const os = require("os");
   const path = require("path");
 
   /* constants */
-  const IS_WIN = os.platform() === "win32";
+  const {IS_WIN} = require("../modules/constant");
   const PERM_EXEC = 0o700;
 
   /* ChildProcess */

@@ -6,7 +6,7 @@
   /* api */
   const {ChildProcess} = require("./child-process");
   const {browserData} = require("./browser-data");
-  const {escapeChar, getType, isString, logError} = require("./common");
+  const {escapeChar, getType, isString, logErr} = require("./common");
   const {
     createDir, createFile, getAbsPath, isDir, isFile,
   } = require("./file-util");
@@ -266,7 +266,7 @@
       ans = ans.trim();
       if (/^y(?:es)?$/i.test(ans)) {
         rl.close();
-        createFiles().catch(logError);
+        createFiles().catch(logErr);
       } else {
         abortSetup(msg);
       }
@@ -298,7 +298,7 @@
                         handleBrowserConfigDir);
           } else {
             rl.close();
-            createFiles().catch(logError);
+            createFiles().catch(logErr);
           }
         } else {
           // TODO: Add custom setup
@@ -457,7 +457,7 @@
                       handleBrowserConfigDir);
         } else {
           rl.close();
-          createFiles().catch(logError);
+          createFiles().catch(logErr);
         }
       } else {
         const arr = [];

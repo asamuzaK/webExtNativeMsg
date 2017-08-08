@@ -5,10 +5,9 @@
   const {Input, Output} = require("../modules/native-message");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
-  const os = require("os");
 
-  /* constants */
-  const IS_BE = os.endianness() === "BE";
+  /* constant */
+  const {IS_BE} = require("../modules/constant");
 
   /* Input */
   describe("Input", () => {

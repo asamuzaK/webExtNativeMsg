@@ -20,23 +20,20 @@
   const {Setup} = require("./modules/setup");
   const {browserData} = require("./modules/browser-data");
   const {
-    escapeChar, getType, isString, logError, logMsg, logWarn,
+    escapeChar, getType, isString, logErr, logMsg, logWarn,
     stringifyPositiveInt, stripHtmlTags, throwErr,
   } = require("./modules/common");
   const {
-    convUriToFilePath, createDir, createFile, getAbsPath,
+    convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
     isExecutable, isFile, isSubDir, removeDir, readFile,
   } = require("./modules/file-util");
-  const {
-    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE, IS_MAC, IS_WIN,
-  } = require("./modules/constant");
+
   module.exports = {
     ChildProcess, CmdArgs, Input, Output, Setup,
-    browserData, convUriToFilePath, createDir, createFile, escapeChar,
+    browserData, convertUriToFilePath, createDir, createFile, escapeChar,
     getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat, getType,
-    isDir, isExecutable, isFile, isString, isSubDir, logError, logMsg, logWarn,
+    isDir, isExecutable, isFile, isString, isSubDir, logErr, logMsg, logWarn,
     readFile, removeDir, stringifyPositiveInt, stripHtmlTags, throwErr,
-    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE, IS_MAC, IS_WIN,
   };
 }

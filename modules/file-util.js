@@ -22,7 +22,7 @@
    * @param {string} uri - URI
    * @returns {?string} - file path
    */
-  const convUriToFilePath = uri => {
+  const convertUriToFilePath = uri => {
     if (!isString(uri)) {
       throw new TypeError(`Expected String but got ${getType(uri)}.`);
     }
@@ -223,7 +223,7 @@
   };
 
   module.exports = {
-    convUriToFilePath, createDir, createFile, getAbsPath,
+    convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
     isExecutable, isFile, isSubDir, removeDir, readFile,
   };

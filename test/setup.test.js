@@ -4,10 +4,9 @@
   const {Setup} = require("../modules/setup");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
-  const os = require("os");
 
-  /* constants */
-  const DIR_HOME = os.homedir();
+  /* constant */
+  const {DIR_HOME} = require("../modules/constant");
 
   /* Setup */
   describe("Setup", () => {

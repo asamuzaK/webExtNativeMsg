@@ -21,7 +21,7 @@
    * @param {!Object} e - Error
    * @returns {boolean} - false
    */
-  const logError = e => {
+  const logErr = e => {
     console.error(e);
     return false;
   };
@@ -96,7 +96,7 @@
   };
 
   module.exports = {
-    escapeChar, getType, isString, logError, logMsg, logWarn,
+    escapeChar, getType, isString, logErr, logMsg, logWarn,
     stringifyPositiveInt, stripHtmlTags, throwErr,
   };
 }
