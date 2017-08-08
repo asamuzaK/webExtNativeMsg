@@ -30,8 +30,8 @@
 
       it("should spawn child process", async () => {
         const app = path.resolve(
-          IS_WIN && path.join("test", "bin", "test.cmd") ||
-          path.join("test", "bin", "test.sh")
+          IS_WIN && path.join("test", "file", "test.cmd") ||
+          path.join("test", "file", "test.sh")
         );
         await fs.chmodSync(app, PERM_EXEC);
         const proc = await (new ChildProcess(app)).spawn();

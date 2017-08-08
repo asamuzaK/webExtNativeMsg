@@ -16,6 +16,16 @@
       const re = /(b)/ig;
       assert.strictEqual(escapeChar(c, re), "a\\bc");
     });
+
+    it("should get null if string is not given", () => {
+      const re = /(b)/ig;
+      assert.isNull(escapeChar(1, re));
+    });
+
+    it("should get null if regexp is not given", () => {
+      const c = "abc";
+      assert.isNull(escapeChar(c));
+    });
   });
 
   describe("getType", () => {
@@ -85,11 +95,11 @@
     });
 
     it("should get null if given argument is not positive integer", () => {
-      assert.strictEqual(stringifyPositiveInt(), null);
+      assert.isNull(stringifyPositiveInt());
     });
 
     it("should get null if 0 is given", () => {
-      assert.strictEqual(stringifyPositiveInt(0), null);
+      assert.isNull(stringifyPositiveInt(0));
     });
 
     it("should treat 0 as positive integer if second argument is true", () => {
