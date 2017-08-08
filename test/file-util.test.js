@@ -21,8 +21,14 @@
 
   describe("convUriToFilePath", () => {
     it("should get string", () => {
-      const uri = "file:///test.txt";
-      assert.strictEqual(convUriToFilePath(uri), "test.txt");
+      const p = path.resolve("test");
+      let u;
+      if (IS_WIN) {
+        u = `file:///${p}`;
+      } else {
+        u = `file://${p}`;
+      }
+      assert.strictEqual(convUriToFilePath(u), p);
     });
 
     it("should throw if string is not given", () => {
