@@ -3,10 +3,9 @@
   /* api */
   const {
     ChildProcess, CmdArgs, Input, Output, Setup,
-    browserData, convertUriToFilePath, createDir, createFile, escapeChar,
-    getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat, getType,
-    isDir, isExecutable, isFile, isString, isSubDir, logErr, logMsg, logWarn,
-    readFile, removeDir, stringifyPositiveInt, stripHtmlTags, throwErr,
+    browserData, convertUriToFilePath, createDir, createFile, getAbsPath,
+    getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
+    isFile, isSubDir, readFile, removeDir,
   } = require("../index");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
@@ -61,10 +60,6 @@
     });
 
     it("should be type of function", () => {
-      assert.typeOf(escapeChar, "function");
-    });
-
-    it("should be type of function", () => {
       assert.typeOf(getAbsPath, "function");
     });
 
@@ -81,10 +76,6 @@
     });
 
     it("should be type of function", () => {
-      assert.typeOf(getType, "function");
-    });
-
-    it("should be type of function", () => {
       assert.typeOf(isDir, "function");
     });
 
@@ -97,23 +88,7 @@
     });
 
     it("should be type of function", () => {
-      assert.typeOf(isString, "function");
-    });
-
-    it("should be type of function", () => {
       assert.typeOf(isSubDir, "function");
-    });
-
-    it("should be type of function", () => {
-      assert.typeOf(logErr, "function");
-    });
-
-    it("should be type of function", () => {
-      assert.typeOf(logMsg, "function");
-    });
-
-    it("should be type of function", () => {
-      assert.typeOf(logWarn, "function");
     });
 
     it("should be type of function", () => {
@@ -122,18 +97,6 @@
 
     it("should be type of function", () => {
       assert.typeOf(removeDir, "function");
-    });
-
-    it("should be type of function", () => {
-      assert.typeOf(stringifyPositiveInt, "function");
-    });
-
-    it("should be type of function", () => {
-      assert.typeOf(stripHtmlTags, "function");
-    });
-
-    it("should be type of function", () => {
-      assert.typeOf(throwErr, "function");
     });
   });
 }

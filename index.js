@@ -20,10 +20,6 @@
   const {Setup} = require("./modules/setup");
   const {browserData} = require("./modules/browser-data");
   const {
-    escapeChar, getType, isString, logErr, logMsg, logWarn,
-    stringifyPositiveInt, stripHtmlTags, throwErr,
-  } = require("./modules/common");
-  const {
     convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
     isExecutable, isFile, isSubDir, removeDir, readFile,
@@ -31,9 +27,8 @@
 
   module.exports = {
     ChildProcess, CmdArgs, Input, Output, Setup,
-    browserData, convertUriToFilePath, createDir, createFile, escapeChar,
-    getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat, getType,
-    isDir, isExecutable, isFile, isString, isSubDir, logErr, logMsg, logWarn,
-    readFile, removeDir, stringifyPositiveInt, stripHtmlTags, throwErr,
+    browserData, convertUriToFilePath, createDir, createFile, getAbsPath,
+    getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
+    isFile, isSubDir, readFile, removeDir,
   };
 }
