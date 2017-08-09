@@ -3,7 +3,7 @@
   /* api */
   const {
     ChildProcess, CmdArgs, Input, Output, Setup,
-    browserData, convertUriToFilePath, createDir, createFile, getAbsPath,
+    convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
     isFile, isSubDir, readFile, removeDir,
   } = require("../index");
@@ -35,13 +35,6 @@
     it("should be instance of Setup", () => {
       const setup = new Setup();
       assert.instanceOf(setup, Setup);
-    });
-  });
-
-  /* Data */
-  describe("Data", () => {
-    it("should be an object", () => {
-      assert.property(browserData, "firefox");
     });
   });
 
