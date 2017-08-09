@@ -18,23 +18,11 @@
   const SUBST = "index";
 
   /**
-   * get file name from native file path
-   * @param {string} file - file path
-   * @param {string} subst - substitute file name
-   * @returns {string} - file name
-   */
-  const getFileNameFromFilePath = (file, subst = SUBST) => {
-    const name = isString(file) &&
-                   /^([^.]+)(?:\..+)?$/.exec(path.basename(file));
-    return name && name[1] || subst;
-  };
-
-  /**
    * convert URI to native file path
    * @param {string} uri - URI
    * @returns {?string} - file path
    */
-  const convUriToFilePath = uri => {
+  const convertUriToFilePath = uri => {
     if (!isString(uri)) {
       throw new TypeError(`Expected String but got ${getType(uri)}.`);
     }
@@ -132,7 +120,21 @@
   };
 
   /**
-   * remove the directory
+   * get file name from native file path
+   * @param {string} file - file path
+   * @param {string} subst - substitute file name
+   * @returns {string} - file name
+   */
+  const getFileNameFromFilePath = (file, subst = SUBST) => {
+    let name;
+    if (isString(file) && isFile(file)) {
+      name = /^([^.]+)(?:\..+)?$/.exec(path.basename(file));
+    }
+    return name && name[1] || subst;
+  };
+
+  /**
+   * remove the directory and it's files
    * @param {string} dir - directory path
    * @param {string} baseDir - base directory path
    * @returns {void}
@@ -221,7 +223,7 @@
   };
 
   module.exports = {
-    convUriToFilePath, createDir, createFile, getAbsPath,
+    convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
     isExecutable, isFile, isSubDir, removeDir, readFile,
   };

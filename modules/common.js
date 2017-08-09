@@ -21,7 +21,7 @@
    * @param {!Object} e - Error
    * @returns {boolean} - false
    */
-  const logError = e => {
+  const logErr = e => {
     console.error(e);
     return false;
   };
@@ -81,7 +81,7 @@
     str.replace(re, (m, c) => `\\${c}`) || null;
 
   /**
-   * strip HTML tags and decode HTML escaped characters
+   * strip HTML tags and decode HTML entities
    * @param {string} v - value
    * @returns {string} - converted value
    */
@@ -91,11 +91,12 @@
         .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
     }
     return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
-      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"")
+      .replace(/&amp;/g, "&");
   };
 
   module.exports = {
-    escapeChar, getType, isString, logError, logMsg, logWarn,
+    escapeChar, getType, isString, logErr, logMsg, logWarn,
     stringifyPositiveInt, stripHtmlTags, throwErr,
   };
 }

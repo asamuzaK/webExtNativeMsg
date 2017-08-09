@@ -178,3 +178,102 @@ ChildProcess method:
   * @param {string} file - file path
   * @param {boolean} pos - put file path after cmd args. Defaults to `false`.
   * @returns {Object} - child process
+
+## Function convertUriToFilePath(uri)
+
+Converts URI to native file path.
+
+* @param {string} uri - URI
+* @returns {?string} - file path, nullable
+
+## Function getAbsPath(file)
+
+Get absolute path.
+
+* @param {string} file - file path
+* @returns {?string} - absolute file path, nullable
+
+## Function getFileNameFromFilePath(file, subst)
+
+Get file name from native file path.
+
+* @param {string} file - file path
+* @param {string} subst - substitute file name, defaults to `index`
+* @returns {string} - file name
+
+## Function getStat(file)
+
+Get file stat.
+
+* @param {string} file - file path
+* @returns {Object} - file stat, nullable
+
+## Function removeDir(dir, baseDir)
+
+Remove the directory and it's files.
+Note: `dir` should be subdirectory of `baseDir`.
+
+* @param {string} dir - directory path
+* @param {string} baseDir - base directory path
+* @returns {void}
+
+## Function createDir(arr, mode)
+
+Create a directory.
+Note: first argument should be array of directory label, like `["path", "to", "dir"]`.
+
+* @param {Array} arr - directory array
+* @param {string|number} mode - permission
+* @returns {?string} - directory path
+
+## Async Function createFile(file, value, opt)
+
+Create a file.
+
+* @param {string} file - file path
+* @param {string|Buffer|Uint8Array} value - value to write
+* @param {Object} opt - option
+* @param {string} [opt.encoding] - encoding, defaults to `null`
+* @param {string} [opt.flag] - flag, defaults to `"w"`
+* @param {number|string} [opt.mode] - file permission, defaults to `0o666`
+* @returns {?string} - file path, nullable
+
+## Async Function readFile(file, opt)
+
+Read a file.
+
+* @param {string} file - file path
+* @param {Object} opt - option
+* @param {string} [opt.encoding] - encoding, defaults to `null`
+* @param {string} [opt.flag] - flag, defaults to `"r"`
+* @returns {string|Buffer} - file content
+
+## Function isDir(dir)
+
+The directory is a directory or not.
+
+* @param {string} dir - directory path
+* @returns {boolean} - result
+
+## Function isSubDir(dir, baseDir)
+
+The directory is a subdirectory of a certain directory or not.
+
+* @param {string} dir - directory path
+* @param {string} baseDir - base directory path
+* @returns {boolean} - result
+
+## Function isFile(file)
+
+The file is a file or not.
+
+* @param {string} file - file path
+* @returns {boolean} - result
+
+## Function isExecutable(file, mask)
+
+The file is executable or not.
+
+* @param {string} file - file path
+* @param {number} mask - mask bit, defaults to `0o111`
+* @returns {boolean} - result
