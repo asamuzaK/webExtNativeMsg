@@ -1,5 +1,3 @@
-// FIXME
-/* eslint-disable no-unused-vars */
 "use strict";
 {
   /* api */
@@ -18,6 +16,9 @@
   /* constants */
   const {IS_WIN} = require("../modules/constant");
   const PERM_EXEC = 0o700;
+  const PERM_FILE = 0o600;
+  const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
+                 os.tmpdir();
 
   describe("convertUriToFilePath", () => {
     it("should get string", () => {
@@ -42,14 +43,80 @@
     });
   });
 
-  // FIXME:
-  /*
   describe("createDir", () => {
+    it("should get string", () => {
+      const dirArr = [TMPDIR, "webextnativemsg"];
+      const dirString = path.join(TMPDIR, "webextnativemsg");
+      const dir = createDir(dirArr);
+      assert.strictEqual(dir, dirString);
+      fs.rmdirSync(dir);
+    });
+
+    it("should get null if given array is empty", () => {
+      assert.isNull(createDir([]));
+    });
+
+    it("should throw if given argument is not an array", () => {
+      assert.throws(() => createDir(), "Expected Array but got Undefined.");
+    });
   });
 
   describe("createFile", () => {
+    it("should get string", async () => {
+      const dirPath = path.join(TMPDIR, "webextnativemsg");
+      fs.mkdirSync(dirPath);
+      const filePath = path.join(dirPath, "test.txt");
+      const value = "test file.\n";
+      const file = await createFile(filePath, value, {
+        encoding: "utf8", flag: "w", mode: PERM_FILE,
+      });
+      assert.strictEqual(file, filePath);
+      fs.unlinkSync(file);
+      fs.rmdirSync(dirPath);
+    });
+
+    it("should throw if first argument is not a string", () => {
+      createFile().catch(e => {
+        assert.strictEqual(e.message, "Expected String but got Undefined.");
+      });
+    });
+
+    it(
+      "should throw if second argument is not string, buffer, uint8array",
+      () => {
+        const file = path.join(TMPDIR, "webextnativemsg", "test.txt");
+        createFile(file).catch(e => {
+          assert.strictEqual(
+            e.message,
+            "Expected String, Buffer, Uint8Array but got Undefined."
+          );
+        });
+      }
+    );
   });
-  */
+
+  describe("removeDir", () => {
+    it("should remove dir and it's files", async () => {
+      const dirPath = path.join(TMPDIR, "webextnativemsg");
+      fs.mkdirSync(dirPath);
+      const filePath = path.join(dirPath, "test.txt");
+      const value = "test file.\n";
+      await createFile(filePath, value, {
+        encoding: "utf8", flag: "w", mode: PERM_FILE,
+      });
+      removeDir(dirPath, TMPDIR);
+      const res = await Promise.all([
+        fs.existsSync(filePath),
+        fs.existsSync(dirPath),
+      ]);
+      assert.deepEqual(res, [false, false]);
+    });
+
+    it("should throw if dir is not subdirectory of base dir", () => {
+      const foo = path.resolve("foo");
+      assert.throws(() => removeDir(foo, TMPDIR));
+    });
+  });
 
   describe("getAbsPath", () => {
     it("should get string", () => {
@@ -156,12 +223,6 @@
       assert.strictEqual(isSubDir(d, b), false);
     });
   });
-
-  // FIXME:
-  /*
-  describe("removeDir", () => {
-  });
-  */
 
   describe("readFile", () => {
     it("should get file", async () => {
