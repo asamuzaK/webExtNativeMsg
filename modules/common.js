@@ -64,7 +64,7 @@
   /**
    * stringify positive integer
    * @param {number} i - integer
-   * @param {boolean} zero - treat 0 as a positive integer
+   * @param {boolean} [zero] - treat 0 as a positive integer
    * @returns {?string} - stringified integer
    */
   const stringifyPositiveInt = (i, zero = false) =>

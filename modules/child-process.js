@@ -99,8 +99,8 @@
     /**
      * command, arguments and option
      * @param {string} cmd - command
-     * @param {string|Array} args - command arguments
-     * @param {Object} opt - option
+     * @param {string|Array} [args] - command arguments
+     * @param {Object} [opt] - options
      */
     constructor(cmd, args, opt) {
       this._cmd = isString(cmd) && cmd || null;
@@ -112,8 +112,8 @@
 
     /**
      * spawn child process
-     * @param {string} file - file
-     * @param {boolean} pos - file after cmd args
+     * @param {string} [file] - file
+     * @param {boolean} [pos] - file after cmd args
      * @returns {Object} - child process
      */
     async spawn(file, pos = false) {

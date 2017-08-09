@@ -99,7 +99,7 @@
    * NOTE: On Windows, fs.statSync(file).mode returns 33206 for executable
    * files like `.exe`, which is 100666 in octal.
    * @param {string} file - file path
-   * @param {number} mask - mask bit
+   * @param {number} [mask] - mask bit
    * @returns {boolean} - result
    */
   const isExecutable = (file, mask = MASK_BIT) => {
@@ -122,7 +122,7 @@
   /**
    * get file name from native file path
    * @param {string} file - file path
-   * @param {string} subst - substitute file name
+   * @param {string} [subst] - substitute file name
    * @returns {string} - file name
    */
   const getFileNameFromFilePath = (file, subst = SUBST) => {
@@ -158,7 +158,7 @@
   /**
    * create a directory
    * @param {Array} arr - directory array
-   * @param {string|number} mode - permission
+   * @param {string|number} [mode] - permission
    * @returns {?string} - directory path
    */
   const createDir = (arr, mode = PERM_DIR) => {
@@ -182,7 +182,7 @@
    * create a file
    * @param {string} file - file path
    * @param {string|Buffer|Uint8Array} value - value to write
-   * @param {Object} opt - option
+   * @param {Object} [opt] - options
    * @param {string} [opt.encoding] - encoding
    * @param {string} [opt.flag] - flag
    * @param {number|string} [opt.mode] - file permission
@@ -208,7 +208,7 @@
   /**
    * read a file
    * @param {string} file - file path
-   * @param {Object} opt - option
+   * @param {Object} [opt] - options
    * @param {string} [opt.encoding] - encoding
    * @param {string} [opt.flag] - flag
    * @returns {string|Buffer} - file content
