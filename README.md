@@ -226,7 +226,7 @@ Note: first argument should be array of directory label, like `["path", "to", "d
 * @param {string|number} mode - permission
 * @returns {?string} - directory path
 
-## Async Function createFile(file, value, opt)
+### Async Function createFile(file, value, opt)
 
 Create a file.
 
@@ -238,7 +238,7 @@ Create a file.
 * @param {number|string} [opt.mode] - file permission, defaults to `0o666`
 * @returns {?string} - file path, nullable
 
-## Async Function readFile(file, opt)
+### Async Function readFile(file, opt)
 
 Read a file.
 
