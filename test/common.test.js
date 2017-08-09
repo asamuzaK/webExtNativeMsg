@@ -1,5 +1,3 @@
-// FIXME
-/* eslint-disable no-unused-vars */
 "use strict";
 {
   /* api */
