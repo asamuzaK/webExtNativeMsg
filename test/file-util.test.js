@@ -228,9 +228,7 @@
     it("should get file", async () => {
       const p = path.resolve(path.join("test", "file", "test.txt"));
       const opt = {encoding: "utf8", flag: "r"};
-      const file = await readFile(p, opt).catch(e => {
-        throw e;
-      });
+      const file = await readFile(p, opt);
       assert.strictEqual(file, "test file\n");
     });
   });
