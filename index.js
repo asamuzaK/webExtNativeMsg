@@ -20,8 +20,8 @@
   const {Setup} = require("./modules/setup");
   const {
     convertUriToFilePath, createDir, createFile, getAbsPath,
-    getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
-    isExecutable, isFile, isSubDir, removeDir, readFile,
+    getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
+    isFile, isSubDir, removeDir, readFile,
   } = require("./modules/file-util");
 
   module.exports = {

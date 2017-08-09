@@ -134,7 +134,7 @@
   };
 
   /**
-   * remove the directory
+   * remove the directory and it's files
    * @param {string} dir - directory path
    * @param {string} baseDir - base directory path
    * @returns {void}
