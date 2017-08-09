@@ -140,13 +140,14 @@ Spawns child process.
 Sample:
 ```
 const {ChildProcess, CmdArgs} = require("web-ext-native-msg");
+const path = require("path");
 const process = require("process");
 
 const arg = "-a -b -c";
 const cmdArgs = (new CmdArgs(arg)).toArray();
 
-const app = "/path/to/myApp.exe";
-const file = "/path/to/myFile.txt";
+const app = path.resolve(path.join("path", "to", "myApp.exe"));
+const file = path.resolve(path.join("path", "to", "myFile.txt"));
 const pos = false;
 const opt = {
   cwd: null,
@@ -154,9 +155,9 @@ const opt = {
   env: process.env,
 };
 
-const proc = new ChildProcess(app, cmdArgs, opt);
-
-proc.spawn(file, pos);
+const proc = (new ChildProcess(app, cmdArgs, opt)).spawn(file, pos).catch(e => {
+  throw e;
+});
 ```
 
 Construct:
