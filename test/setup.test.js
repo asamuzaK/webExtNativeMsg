@@ -1,9 +1,12 @@
+// FIXME
+/* eslint-disable no-unused-vars */
 "use strict";
 {
   /* api */
   const {Setup} = require("../modules/setup");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
+  const sinon = require("sinon");
 
   /* constant */
   const {DIR_HOME} = require("../modules/constant");
@@ -20,60 +23,64 @@
     });
 
     /* getters */
-    it("should get hostDescription value in string", () => {
-      assert.strictEqual(setup.hostDescription, "My host description");
-    });
+    describe("getters", () => {
+      it("should get hostDescription value in string", () => {
+        assert.strictEqual(setup.hostDescription, "My host description");
+      });
 
-    it("should get hostName value in string", () => {
-      assert.strictEqual(setup.hostName, "myhost");
-    });
+      it("should get hostName value in string", () => {
+        assert.strictEqual(setup.hostName, "myhost");
+      });
 
-    it("should get mainScriptFile value in string", () => {
-      assert.strictEqual(setup.mainScriptFile, "index.js");
-    });
+      it("should get mainScriptFile value in string", () => {
+        assert.strictEqual(setup.mainScriptFile, "index.js");
+      });
 
-    it("should get null if chromeExtensionIds arg is not given", () => {
-      assert.isNull(setup.chromeExtensionIds);
-    });
+      it("should get null if chromeExtensionIds arg is not given", () => {
+        assert.isNull(setup.chromeExtensionIds);
+      });
 
-    it("should get null if webExtensionIds arg is not given", () => {
-      assert.isNull(setup.webExtensionIds);
-    });
+      it("should get null if webExtensionIds arg is not given", () => {
+        assert.isNull(setup.webExtensionIds);
+      });
 
-    it("should get null if callback arg is not given", () => {
-      assert.isNull(setup.callback);
+      it("should get null if callback arg is not given", () => {
+        assert.isNull(setup.callback);
+      });
     });
 
     /* setters */
-    it("should set hostDescription in given string", () => {
-      setup.hostDescription = "My new host description";
-      assert.strictEqual(setup.hostDescription, "My new host description");
-    });
+    describe("setters", () => {
+      it("should set hostDescription in given string", () => {
+        setup.hostDescription = "My new host description";
+        assert.strictEqual(setup.hostDescription, "My new host description");
+      });
 
-    it("should set hostName in given string", () => {
-      setup.hostName = "mynewhost";
-      assert.strictEqual(setup.hostName, "mynewhost");
-    });
+      it("should set hostName in given string", () => {
+        setup.hostName = "mynewhost";
+        assert.strictEqual(setup.hostName, "mynewhost");
+      });
 
-    it("should set mainScriptFile in given string", () => {
-      setup.mainScriptFile = "main.js";
-      assert.strictEqual(setup.mainScriptFile, "main.js");
-    });
+      it("should set mainScriptFile in given string", () => {
+        setup.mainScriptFile = "main.js";
+        assert.strictEqual(setup.mainScriptFile, "main.js");
+      });
 
-    it("should set chromeExtensionIds in given array", () => {
-      setup.chromeExtensionIds = ["chrome://abc"];
-      assert.deepEqual(setup.chromeExtensionIds, ["chrome://abc"]);
-    });
+      it("should set chromeExtensionIds in given array", () => {
+        setup.chromeExtensionIds = ["chrome://abc"];
+        assert.deepEqual(setup.chromeExtensionIds, ["chrome://abc"]);
+      });
 
-    it("should set webExtensionIds in given array", () => {
-      setup.webExtensionIds = ["myapp@webextension"];
-      assert.deepEqual(setup.webExtensionIds, ["myapp@webextension"]);
-    });
+      it("should set webExtensionIds in given array", () => {
+        setup.webExtensionIds = ["myapp@webextension"];
+        assert.deepEqual(setup.webExtensionIds, ["myapp@webextension"]);
+      });
 
-    it("should set callback in given function", () => {
-      const myCallback = a => a;
-      setup.callback = myCallback;
-      assert.strictEqual(setup.callback.name, "myCallback");
+      it("should set callback in given function", () => {
+        const myCallback = a => a;
+        setup.callback = myCallback;
+        assert.strictEqual(setup.callback.name, "myCallback");
+      });
     });
 
     /* methods */
@@ -91,7 +98,22 @@
 
     // FIXME: add test for setup.run()
     /*
-    it("run", () => {
+    describe("run", () => {
+      const setup = new Setup();
+      const sandbox = sinon.sandbox.create();
+
+      beforeEach(() => {
+        sandbox.stub(setup, "run");
+      });
+
+      afterEach(() => {
+        sandbox.restore();
+      });
+
+      it("should be asked a question", () => {
+        setup.run();
+        // assert rl.question is called, but how?
+      });
     });
     */
   });
