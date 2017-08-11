@@ -102,13 +102,13 @@
       });
 
       after(() => {
+        setupReadline.close();
         sandbox.restore();
       });
 
       it("should ask a question", () => {
         setup.run();
         assert.strictEqual(setupReadline.question.calledOnce, true);
-        setupReadline.close();
       });
     });
   });

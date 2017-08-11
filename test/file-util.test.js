@@ -7,7 +7,7 @@
     isExecutable, isFile, isSubDir, removeDir, readFile,
   } = require("../modules/file-util");
   const {assert} = require("chai");
-  const {describe, it} = require("mocha");
+  const {after, describe, it} = require("mocha");
   const fs = require("fs");
   const os = require("os");
   const path = require("path");
@@ -44,12 +44,16 @@
   });
 
   describe("createDir", () => {
+    const dirArr = [TMPDIR, "webextnativemsg"];
+    const dirString = path.join(TMPDIR, "webextnativemsg");
+
+    after(() => {
+      fs.rmdirSync(dirString);
+    });
+
     it("should get string", () => {
-      const dirArr = [TMPDIR, "webextnativemsg"];
-      const dirString = path.join(TMPDIR, "webextnativemsg");
       const dir = createDir(dirArr);
       assert.strictEqual(dir, dirString);
-      fs.rmdirSync(dir);
     });
 
     it("should get null if given array is empty", () => {
