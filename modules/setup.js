@@ -480,5 +480,6 @@
 
   module.exports = {
     Setup,
+    setupReadline: rl,
   };
 }

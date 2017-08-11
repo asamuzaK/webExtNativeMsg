@@ -1,11 +1,9 @@
-// FIXME
-/* eslint-disable no-unused-vars */
 "use strict";
 {
   /* api */
-  const {Setup} = require("../modules/setup");
+  const {Setup, setupReadline} = require("../modules/setup");
   const {assert} = require("chai");
-  const {describe, it} = require("mocha");
+  const {after, before, describe, it} = require("mocha");
   const sinon = require("sinon");
 
   /* constant */
@@ -96,25 +94,22 @@
       });
     });
 
-    // FIXME: add test for setup.run()
-    /*
     describe("run", () => {
-      const setup = new Setup();
       const sandbox = sinon.sandbox.create();
 
-      beforeEach(() => {
-        sandbox.stub(setup, "run");
+      before(() => {
+        sandbox.spy(setupReadline, "question");
       });
 
-      afterEach(() => {
+      after(() => {
         sandbox.restore();
       });
 
-      it("should be asked a question", () => {
+      it("should ask a question", () => {
         setup.run();
-        // assert rl.question is called, but how?
+        assert.strictEqual(setupReadline.question.calledOnce, true);
+        setupReadline.close();
       });
     });
-    */
   });
 }
