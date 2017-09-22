@@ -21,7 +21,7 @@
   const {
     convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
-    isFile, isSubDir, removeDir, readFile,
+    isFile, isSubDir, readFile, removeDir,
   } = require("./modules/file-util");
 
   module.exports = {
