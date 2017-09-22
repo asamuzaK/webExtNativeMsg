@@ -414,7 +414,7 @@
       }
       const homeDir = escapeChar(DIR_HOME, /(\\)/g);
       const reHomeDir = new RegExp(`^(?:${homeDir}|~)`);
-      const subDir = (configPath.replace(reHomeDir, "")).split(path.sep)
+      const subDir = configPath.replace(reHomeDir, "").split(path.sep)
         .filter(i => i);
       this._configDir = subDir.length && [DIR_HOME, ...subDir] || [DIR_HOME];
       vars.configDir = this._configDir;
