@@ -4,7 +4,7 @@
 "use strict";
 {
   /* api */
-  const {ChildProcess} = require("./child-process");
+  const {ChildProcess, CmdArgs} = require("./child-process");
   const {browserData} = require("./browser-data");
   const {escapeChar, getType, isString, logErr} = require("./common");
   const {
@@ -134,7 +134,7 @@
       throw new Error(`No such file: ${indexPath}.`);
     }
     const node = process.execPath;
-    const cmd = `${node} ${indexPath}`;
+    const cmd = (new CmdArgs([node, indexPath])).toString();
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!/usr/bin/env bash\n${cmd}\n`;
     const file = await createFile(
