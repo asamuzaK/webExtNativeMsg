@@ -4,7 +4,6 @@
   const {
     Setup, extractArg, getBrowserData, quoteArg, setupReadline,
   } = require("../modules/setup");
-  const {browserData} = require("../modules/browser-data");
   const {assert} = require("chai");
   const {after, before, describe, it} = require("mocha");
   const sinon = require("sinon");
