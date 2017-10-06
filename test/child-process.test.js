@@ -43,22 +43,32 @@
 
   /* CmdArgs */
   describe("CmdArgs", () => {
-    const cmdArgs = new CmdArgs("-a -b \"c d\"");
+    const cmdStr = new CmdArgs("-a -b \"c d\"");
+    const cmdArr = new CmdArgs(["-a", "-b", "c d"]);
 
     it("should create an instance", () => {
-      assert.instanceOf(cmdArgs, CmdArgs);
+      assert.instanceOf(cmdStr, CmdArgs);
+    });
+    it("should create an instance", () => {
+      assert.instanceOf(cmdArr, CmdArgs);
     });
 
     /* methods */
     describe("toArray", () => {
       it("should get arguments in array", () => {
-        assert.deepEqual(cmdArgs.toArray(), ["-a", "-b", "c d"]);
+        assert.deepEqual(cmdStr.toArray(), ["-a", "-b", "c d"]);
+      });
+      it("should get arguments in array", () => {
+        assert.deepEqual(cmdArr.toArray(), ["-a", "-b", "c d"]);
       });
     });
 
     describe("toString", () => {
       it("should get arguments in string", () => {
-        assert.strictEqual(cmdArgs.toString(), "-a -b \"c d\"");
+        assert.strictEqual(cmdStr.toString(), "-a -b \"c d\"");
+      });
+      it("should get arguments in string", () => {
+        assert.strictEqual(cmdArr.toString(), "-a -b \"c d\"");
       });
     });
   });

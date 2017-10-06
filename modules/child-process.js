@@ -70,7 +70,7 @@
      * argument input
      * @param {string|Array} input - input
      */
-    constructor(...input) {
+    constructor(input) {
       this._input = input;
     }
 
@@ -79,9 +79,14 @@
      * @returns {Array} - arguments array
      */
     toArray() {
-      const args = Array.isArray(this._input) &&
-                   this._input.map(extractArg) || [];
-      return args.length && args.reduce((a, b) => a.concat(b)) || [];
+      let arr;
+      if (Array.isArray(this._input)) {
+        arr = this._input;
+      } else if (isString(this._input)) {
+        const args = [this._input].map(extractArg);
+        arr = args.length && args.reduce((a, b) => a.concat(b)) || [];
+      }
+      return arr || [];
     }
 
     /**
