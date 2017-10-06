@@ -4,7 +4,7 @@
 "use strict";
 {
   /* api */
-  const {ChildProcess, CmdArgs} = require("./child-process");
+  const {ChildProcess} = require("./child-process");
   const {browserData} = require("./browser-data");
   const {escapeChar, getType, isString, logErr} = require("./common");
   const {
@@ -112,6 +112,18 @@
   };
 
   /**
+   * quote arg
+   * @param {string} arg - argument
+   * @returns {string} - argument
+   */
+  const quoteArg = arg => {
+    if (isString(arg) && arg.includes(" ")) {
+      arg = `"${escapeChar(arg, /(")/g)}"`;
+    }
+    return arg;
+  };
+
+  /**
    * create shell script
    * @param {string} configPath - config directory path
    * @returns {string} - shell script path
@@ -134,7 +146,7 @@
       throw new Error(`No such file: ${indexPath}.`);
     }
     const node = process.execPath;
-    const cmd = (new CmdArgs([node, indexPath])).toString();
+    const cmd = `${quoteArg(node)} ${quoteArg(indexPath)}`;
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!/usr/bin/env bash\n${cmd}\n`;
     const file = await createFile(
@@ -480,6 +492,9 @@
 
   module.exports = {
     Setup,
+    extractArg,
+    getBrowserData,
+    quoteArg,
     setupReadline: rl,
   };
 }

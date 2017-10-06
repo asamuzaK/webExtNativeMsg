@@ -1,13 +1,67 @@
 "use strict";
 {
   /* api */
-  const {Setup, setupReadline} = require("../modules/setup");
+  const {
+    Setup, extractArg, getBrowserData, quoteArg, setupReadline,
+  } = require("../modules/setup");
+  const {browserData} = require("../modules/browser-data");
   const {assert} = require("chai");
   const {after, before, describe, it} = require("mocha");
   const sinon = require("sinon");
 
   /* constant */
   const {DIR_HOME} = require("../modules/constant");
+
+  /* getBrowserData */
+  describe("getBrowserData", () => {
+    it("should get object if key matches", () => {
+      assert.isObject(getBrowserData("firefox"));
+    });
+
+    it("should get object if key matches", () => {
+      assert.isObject(getBrowserData("chrome"));
+    });
+
+    it("should get null if no argument", () => {
+      assert.isNull(getBrowserData());
+    });
+
+    it("should get null if key does not match", () => {
+      assert.isNull(getBrowserData("foo"));
+    });
+  });
+
+  /* quoteArg */
+  describe("quoteArg", () => {
+    it("should be quoted if arg contains spaces", () => {
+      assert.strictEqual(quoteArg("a b"), "\"a b\"");
+    });
+
+    it("should be quoted if arg contains spaces", () => {
+      assert.strictEqual(quoteArg("a b \"c d\""), "\"a b \\\"c d\\\"\"");
+    });
+
+    it("should not be quoted if arg does not contain any space", () => {
+      assert.strictEqual(quoteArg("abc"), "abc");
+    });
+  });
+
+  /* extractArg */
+  describe("extractArg", () => {
+    it("should get value", () => {
+      assert.strictEqual(
+        extractArg("--browser=firefox", /^--browser=(.+)$/i),
+        "firefox"
+      );
+    });
+    it("should get value", () => {
+      assert.strictEqual(
+        extractArg("--config-path=\"C:\\Program Files\"",
+                   /^--config-path=(.+)$/i),
+        "\"C:\\Program Files\""
+      );
+    });
+  });
 
   /* Setup */
   describe("Setup", () => {
