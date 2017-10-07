@@ -53,6 +53,7 @@
         "firefox"
       );
     });
+
     it("should get value", () => {
       assert.strictEqual(
         extractArg("--config-path=\"C:\\Program Files\"",

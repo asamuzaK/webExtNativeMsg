@@ -49,6 +49,7 @@
     it("should create an instance", () => {
       assert.instanceOf(cmdStr, CmdArgs);
     });
+
     it("should create an instance", () => {
       assert.instanceOf(cmdArr, CmdArgs);
     });
@@ -58,6 +59,7 @@
       it("should get arguments in array", () => {
         assert.deepEqual(cmdStr.toArray(), ["-a", "-b", "c d"]);
       });
+
       it("should get arguments in array", () => {
         assert.deepEqual(cmdArr.toArray(), ["-a", "-b", "c d"]);
       });
@@ -67,6 +69,7 @@
       it("should get arguments in string", () => {
         assert.strictEqual(cmdStr.toString(), "-a -b \"c d\"");
       });
+
       it("should get arguments in string", () => {
         assert.strictEqual(cmdArr.toString(), "-a -b \"c d\"");
       });
