@@ -38,6 +38,18 @@
           assert.strictEqual(code, 0);
         });
       });
+
+      it("should spawn child process", async () => {
+        const app = path.resolve(
+          IS_WIN && path.join("test", "file", "test 2.cmd") ||
+          path.join("test", "file", "test 2.sh")
+        );
+        await fs.chmodSync(app, PERM_EXEC);
+        const proc = await (new ChildProcess(app)).spawn();
+        proc.on("close", code => {
+          assert.strictEqual(code, 0);
+        });
+      });
     });
   });
 

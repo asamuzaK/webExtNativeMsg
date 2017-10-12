@@ -6,7 +6,7 @@
   /* api */
   const {ChildProcess} = require("./child-process");
   const {browserData} = require("./browser-data");
-  const {escapeChar, getType, isString, logErr} = require("./common");
+  const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
   const {
     createDir, createFile, getAbsPath, isDir, isFile,
   } = require("./file-util");
@@ -109,18 +109,6 @@
     console.info(`Created: ${configPath}`);
     vars.configPath = configPath;
     return configPath;
-  };
-
-  /**
-   * quote arg
-   * @param {string} arg - argument
-   * @returns {string} - argument
-   */
-  const quoteArg = arg => {
-    if (isString(arg) && arg.includes(" ")) {
-      arg = `"${escapeChar(arg, /(")/g)}"`;
-    }
-    return arg;
   };
 
   /**
@@ -494,7 +482,6 @@
     Setup,
     extractArg,
     getBrowserData,
-    quoteArg,
     setupReadline: rl,
   };
 }

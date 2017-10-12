@@ -4,7 +4,7 @@
 "use strict";
 {
   /* api */
-  const {escapeChar, getType, isString} = require("./common");
+  const {escapeChar, getType, isString, quoteArg} = require("./common");
   const {isExecutable} = require("./file-util");
   const childProcess = require("child_process");
   const process = require("process");
@@ -126,11 +126,15 @@
         throw new Error(`${this._cmd} is not executable.`);
       }
       const cmd = this._cmd;
-      const fileArg = (new CmdArgs(file)).toArray();
-      const args = isString(file) && (
-        pos && this._args.concat(fileArg) || fileArg.concat(this._args)
-      ) || this._args;
       const opt = this._opt;
+      let args;
+      if (isString(file)) {
+        const filePath = quoteArg(file);
+        const fileArg = (new CmdArgs(filePath)).toArray();
+        args = pos && this._args.concat(fileArg) || fileArg.concat(this._args);
+      } else {
+        args = this._args;
+      }
       return childProcess.spawn(cmd, args, opt);
     }
   }

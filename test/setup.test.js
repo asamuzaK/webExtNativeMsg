@@ -2,7 +2,7 @@
 {
   /* api */
   const {
-    Setup, extractArg, getBrowserData, quoteArg, setupReadline,
+    Setup, extractArg, getBrowserData, setupReadline,
   } = require("../modules/setup");
   const {assert} = require("chai");
   const {after, before, describe, it} = require("mocha");
@@ -27,21 +27,6 @@
 
     it("should get null if key does not match", () => {
       assert.isNull(getBrowserData("foo"));
-    });
-  });
-
-  /* quoteArg */
-  describe("quoteArg", () => {
-    it("should be quoted if arg contains spaces", () => {
-      assert.strictEqual(quoteArg("a b"), "\"a b\"");
-    });
-
-    it("should be quoted if arg contains spaces", () => {
-      assert.strictEqual(quoteArg("a b \"c d\""), "\"a b \\\"c d\\\"\"");
-    });
-
-    it("should not be quoted if arg does not contain any space", () => {
-      assert.strictEqual(quoteArg("abc"), "abc");
     });
   });
 

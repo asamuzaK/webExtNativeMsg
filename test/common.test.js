@@ -2,7 +2,7 @@
 {
   /* api */
   const {
-    escapeChar, getType, isString, logErr, logMsg, logWarn,
+    escapeChar, getType, isString, logErr, logMsg, logWarn, quoteArg,
     stringifyPositiveInt, stripHtmlTags, throwErr,
   } = require("../modules/common");
   const {assert} = require("chai");
@@ -84,6 +84,20 @@
     it("should get false", () => {
       const e = "Log warn test";
       assert.strictEqual(logWarn(e), false);
+    });
+  });
+
+  describe("quoteArg", () => {
+    it("should be quoted if arg contains spaces", () => {
+      assert.strictEqual(quoteArg("a b"), "\"a b\"");
+    });
+
+    it("should be quoted if arg contains spaces", () => {
+      assert.strictEqual(quoteArg("a b \"c d\""), "\"a b \\\"c d\\\"\"");
+    });
+
+    it("should not be quoted if arg does not contain any space", () => {
+      assert.strictEqual(quoteArg("abc"), "abc");
     });
   });
 
