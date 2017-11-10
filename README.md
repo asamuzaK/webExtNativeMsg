@@ -76,9 +76,9 @@ Properties:
 
 Methods:
 * setConfigDir(dir): Sets config directory.
-  On Windows, config directory defaults to `C:\Users\[UserName]\AppData\Roaming\[hostName]\config`.
-  On Mac, `~/Library/Application Support/[hostName]/config`.
-  On Linux, `~/.config/[hostName]/config`.
+  On Windows, config directory defaults to `C:\Users\[UserName]\AppData\Roaming\[hostName]\config\`.
+  On Mac, `~/Library/Application Support/[hostName]/config/`.
+  On Linux, `~/.config/[hostName]/config/`.
   * @param {string} dir - directory path
   * @returns {void}
 * run(): Runs setup script.
