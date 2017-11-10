@@ -407,17 +407,16 @@
      * @returns {void}
      */
     setConfigDir(dir) {
-      const configPath = getAbsPath(dir);
-      if (!configPath) {
+      const dirPath = getAbsPath(dir);
+      if (!dirPath) {
         throw new Error(`Failed to normalize ${dir}`);
       }
-      if (!configPath.startsWith(DIR_HOME)) {
+      if (!dirPath.startsWith(DIR_HOME)) {
         throw new Error(`Config path is not sub directory of ${DIR_HOME}.`);
       }
       const homeDir = escapeChar(DIR_HOME, /(\\)/g);
-      const reHomeDir = new RegExp(`^(?:${homeDir}|~)`);
-      const subDir = configPath.replace(reHomeDir, "").split(path.sep)
-        .filter(i => i);
+      const reg = new RegExp(`^(?:${homeDir}|~)`);
+      const subDir = dirPath.replace(reg, "").split(path.sep).filter(i => i);
       this._configDir = subDir.length && [DIR_HOME, ...subDir] || [DIR_HOME];
       vars.configDir = this._configDir;
     }
