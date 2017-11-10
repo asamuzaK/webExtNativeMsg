@@ -16,11 +16,8 @@
 
   /* constants */
   const {
-    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
+    CHAR, DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
   } = require("./constant");
-  const DIR_CONFIG = IS_WIN && [DIR_HOME, "AppData", "Roaming"] ||
-                     IS_MAC && [DIR_HOME, "Library", "Application Support"] ||
-                     [DIR_HOME, ".config"];
   const DIR_CWD = process.cwd();
   const PERM_DIR = 0o700;
   const PERM_EXEC = 0o700;

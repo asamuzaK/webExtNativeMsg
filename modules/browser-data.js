@@ -4,8 +4,7 @@
 "use strict";
 {
   /* constants */
-  const {DIR_HOME, EXT_CHROME, EXT_WEB} = require("./constant");
-  const DIR_HOST_MAC = [DIR_HOME, "Library", "Application Support"];
+  const {DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB} = require("./constant");
   const HKCU_SOFTWARE = ["HKEY_CURRENT_USER", "SOFTWARE"];
   const HOST_DIR_LABEL = "NativeMessagingHosts";
 
@@ -15,7 +14,7 @@
     firefox: {
       alias: "firefox",
       hostLinux: [DIR_HOME, ".mozilla", "native-messaging-hosts"],
-      hostMac: [...DIR_HOST_MAC, "Mozilla", HOST_DIR_LABEL],
+      hostMac: [...DIR_CONFIG, "Mozilla", HOST_DIR_LABEL],
       regWin: [...HKCU_SOFTWARE, "Mozilla", HOST_DIR_LABEL],
       type: EXT_WEB,
     },
@@ -38,15 +37,15 @@
     /* blink */
     chrome: {
       alias: "chrome",
-      hostLinux: [DIR_HOME, ".config", "google-chrome", HOST_DIR_LABEL],
-      hostMac: [...DIR_HOST_MAC, "Google", "Chrome", HOST_DIR_LABEL],
+      hostLinux: [...DIR_CONFIG, "google-chrome", HOST_DIR_LABEL],
+      hostMac: [...DIR_CONFIG, "Google", "Chrome", HOST_DIR_LABEL],
       regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
       type: EXT_CHROME,
     },
     chromium: {
       alias: "chromium",
-      hostLinux: [DIR_HOME, ".config", "chromium", HOST_DIR_LABEL],
-      hostMac: [...DIR_HOST_MAC, "Chromium", HOST_DIR_LABEL],
+      hostLinux: [...DIR_CONFIG, "chromium", HOST_DIR_LABEL],
+      hostMac: [...DIR_CONFIG, "Chromium", HOST_DIR_LABEL],
       regWin: null,
       type: EXT_CHROME,
     },
@@ -63,15 +62,15 @@
       aliasMac: "chrome",
       aliasWin: "chrome",
       hostLinux: null,
-      hostMac: [...DIR_HOST_MAC, "Google", "Chrome", HOST_DIR_LABEL],
+      hostMac: [...DIR_CONFIG, "Google", "Chrome", HOST_DIR_LABEL],
       regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
       type: EXT_CHROME,
     },
     vivaldi: {
       alias: "vivaldi",
       aliasWin: "chrome",
-      hostLinux: [DIR_HOME, ".config", "vivaldi", HOST_DIR_LABEL],
-      hostMac: [...DIR_HOST_MAC, "Vivaldi", HOST_DIR_LABEL],
+      hostLinux: [...DIR_CONFIG, "vivaldi", HOST_DIR_LABEL],
+      hostMac: [...DIR_CONFIG, "Vivaldi", HOST_DIR_LABEL],
       regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
       type: EXT_CHROME,
     },
