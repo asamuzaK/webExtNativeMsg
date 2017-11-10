@@ -16,7 +16,7 @@
 
   /* constants */
   const {
-    CHAR, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
+    CHAR, DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
   } = require("./constant");
   const DIR_CWD = process.cwd();
   const PERM_DIR = 0o700;
@@ -344,7 +344,9 @@
         chromeExtensionIds: chromeExtIds, webExtensionIds: webExtIds, callback,
       } = opt;
       this._browser = null;
-      this._configDir = [DIR_CWD, "config"];
+      this._configDir = isString(hostName) &&
+                        [...DIR_CONFIG, hostName, "config"] ||
+                        [DIR_CWD, "config"];
       this._hostDesc = isString(hostDesc) && hostDesc || null;
       this._hostName = isString(hostName) && hostName || null;
       this._mainFile = isString(mainFile) && mainFile || "index.js";
