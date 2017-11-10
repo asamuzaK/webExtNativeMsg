@@ -118,7 +118,13 @@
   const handleOldConfig = ans => {
     if (isString(ans)) {
       ans = ans.trim();
-      /^y(?:es)?$/i.test(ans) && removeDir(OLD_CONFIG, DIR_CWD);
+      if (/^y(?:es)?$/i.test(ans)) {
+        try {
+          removeDir(OLD_CONFIG, DIR_CWD);
+        } catch (e) {
+          logError(`Failed to remove directory: ${e.message}`);
+        }
+      }
     }
     rl.close();
     handleSetupCallback();
