@@ -8,7 +8,7 @@
   const {browserData} = require("./browser-data");
   const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
   const {
-    createDir, createFile, getAbsPath, isDir, isFile,
+    createDir, createFile, getAbsPath, isDir, isFile, removeDir,
   } = require("./file-util");
   const path = require("path");
   const process = require("process");
@@ -19,6 +19,7 @@
     CHAR, DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
   } = require("./constant");
   const DIR_CWD = process.cwd();
+  const OLD_CONFIG = path.join(DIR_CWD, "config");
   const PERM_DIR = 0o700;
   const PERM_EXEC = 0o700;
   const PERM_FILE = 0o600;
@@ -36,6 +37,22 @@
     manifestPath: null,
     shellPath: null,
     webExtIds: null,
+  };
+
+  /* readline */
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  /**
+   * abort setup
+   * @param {string} msg - message
+   * @returns {void}
+   */
+  const abortSetup = msg => {
+    console.info(`Setup aborted: ${msg}`);
+    process.exit(1);
   };
 
   /**
@@ -91,6 +108,36 @@
       manifestPath,
     } = vars;
     callback && callback({configDirPath, shellScriptPath, manifestPath});
+  };
+
+  /**
+   * handle old config
+   * @param {string} ans - user input
+   * @returns {void}
+   */
+  const handleOldConfig = ans => {
+    if (isString(ans)) {
+      ans = ans.trim();
+      /^y(?:es)?$/i.test(ans) && removeDir(OLD_CONFIG, DIR_CWD);
+    }
+    rl.close();
+    handleSetupCallback();
+  };
+
+  /**
+   * check old config
+   * @returns {void}
+   */
+  const checkOldConfig = () => {
+    const {configDir} = vars;
+    if (Array.isArray(configDir) && path.join(...configDir) !== OLD_CONFIG &&
+        isDir(OLD_CONFIG)) {
+      rl.question(`Found old config directory ${OLD_CONFIG}. Remove? [y/n]\n`,
+                  handleOldConfig);
+    } else {
+      rl.close();
+      handleSetupCallback();
+    }
   };
 
   /**
@@ -212,7 +259,7 @@
       proc.on("close", code => {
         if (code === 0) {
           console.info(`Created: ${regKey}`);
-          handleSetupCallback();
+          checkOldConfig();
         } else {
           console.warn(`${reg} exited with ${code}.`);
         }
@@ -232,23 +279,7 @@
     }
     console.info(`Created: ${filePath}`);
     vars.manifestPath = filePath;
-    !IS_WIN && handleSetupCallback();
-  };
-
-  /* readline */
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  /**
-   * abort setup
-   * @param {string} msg - message
-   * @returns {void}
-   */
-  const abortSetup = msg => {
-    console.info(`Setup aborted: ${msg}`);
-    process.exit(1);
+    !IS_WIN && checkOldConfig();
   };
 
   /**
@@ -265,7 +296,6 @@
     if (isString(ans)) {
       ans = ans.trim();
       if (/^y(?:es)?$/i.test(ans)) {
-        rl.close();
         createFiles().catch(logErr);
       } else {
         abortSetup(msg);
@@ -297,7 +327,6 @@
             rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                         handleBrowserConfigDir);
           } else {
-            rl.close();
             createFiles().catch(logErr);
           }
         } else {
@@ -457,7 +486,6 @@
           rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                       handleBrowserConfigDir);
         } else {
-          rl.close();
           createFiles().catch(logErr);
         }
       } else {
@@ -481,8 +509,17 @@
 
   module.exports = {
     Setup,
+    checkOldConfig,
+    createConfig,
+    createFiles,
+    createShellScript,
     extractArg,
+    getBrowserConfigDir,
     getBrowserData,
+    handleBrowserConfigDir,
+    handleBrowserInput,
+    handleOldConfig,
+    handleSetupCallback,
     setupReadline: rl,
   };
 }
