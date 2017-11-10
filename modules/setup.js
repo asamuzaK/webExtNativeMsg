@@ -122,7 +122,7 @@
         try {
           removeDir(OLD_CONFIG, DIR_CWD);
         } catch (e) {
-          logError(`Failed to remove directory: ${e.message}`);
+          logErr(`Failed to remove directory: ${e.message}`);
         }
       }
     }
