@@ -52,6 +52,7 @@
    */
   const abortSetup = msg => {
     console.info(`Setup aborted: ${msg}`);
+    rl && rl.close();
     process.exit(1);
   };
 
@@ -304,9 +305,11 @@
       if (/^y(?:es)?$/i.test(ans)) {
         createFiles().catch(logErr);
       } else {
+        rl.close();
         abortSetup(msg);
       }
     } else {
+      rl.close();
       abortSetup(msg);
     }
   };
@@ -337,12 +340,15 @@
           }
         } else {
           // TODO: Add custom setup
+          rl.close();
           abortSetup(`${ans} not supported.`);
         }
       } else {
+        rl.close();
         abortSetup(msg);
       }
     } else {
+      rl.close();
       abortSetup(msg);
     }
   };
@@ -515,6 +521,7 @@
 
   module.exports = {
     Setup,
+    abortSetup,
     checkOldConfig,
     createConfig,
     createFiles,

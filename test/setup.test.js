@@ -2,7 +2,7 @@
 {
   /* api */
   const {
-    Setup, extractArg, getBrowserData, setupReadline,
+    Setup, abortSetup, extractArg, getBrowserData, setupReadline,
   } = require("../modules/setup");
   const {assert} = require("chai");
   const {after, before, describe, it} = require("mocha");
@@ -45,6 +45,30 @@
                    /^--config-path=(.+)$/i),
         "\"C:\\Program Files\""
       );
+    });
+  });
+
+  /* abortSetup */
+  describe("abort setup", () => {
+    const sandbox = sinon.createSandbox();
+
+    before(() => {
+      sandbox.stub(process, "exit");
+    });
+
+    after(() => {
+      sandbox.restore();
+    });
+
+    it("should exit with message", () => {
+      sinon.stub(console, "info");
+      const msg = "test";
+      abortSetup(msg);
+      const {calledOnce: consoleCalledOnce} = console.info;
+      const {calledOnce: exitCalledOnce} = process.exit;
+      console.info.restore();
+      assert.strictEqual(consoleCalledOnce, true);
+      assert.strictEqual(exitCalledOnce, true);
     });
   });
 
@@ -134,10 +158,10 @@
     });
 
     describe("run", () => {
-      const sandbox = sinon.sandbox.create();
+      const sandbox = sinon.createSandbox();
 
       before(() => {
-        sandbox.spy(setupReadline, "question");
+        sandbox.stub(setupReadline, "question");
       });
 
       after(() => {
