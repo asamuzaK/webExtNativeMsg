@@ -2,7 +2,8 @@
 {
   /* api */
   const {
-    Setup, abortSetup, extractArg, getBrowserData, setupReadline,
+    Setup, abortSetup, extractArg, getBrowserData,
+    handleBrowserConfigDir, handleBrowserInput, setupReadline,
   } = require("../modules/setup");
   const {assert} = require("chai");
   const {after, before, describe, it} = require("mocha");
@@ -172,6 +173,83 @@
       it("should ask a question", () => {
         setup.run();
         assert.strictEqual(setupReadline.question.calledOnce, true);
+      });
+    });
+  });
+
+  /* readline */
+  describe("readline", () => {
+    const setup = new Setup({
+      hostDescription: "My host description",
+      hostName: "myhost",
+    });
+    const sandbox = sinon.createSandbox();
+
+    before(() => {
+      sandbox.stub(setupReadline, "question");
+    });
+
+    after(() => {
+      setupReadline.close();
+      sandbox.restore();
+    });
+
+    setup.run();
+
+    describe("handle browser input", () => {
+      it("should ask question", () => {
+        handleBrowserInput("firefox");
+        assert.strictEqual(setupReadline.question.called, true);
+      });
+
+      it("should abort", () => {
+        sinon.stub(process, "exit");
+        sinon.stub(console, "info");
+        handleBrowserInput();
+        const {called: consoleCalled} = console.info;
+        const {called: exitCalled} = process.exit;
+        console.info.restore();
+        process.exit.restore();
+        assert.strictEqual(consoleCalled, true);
+        assert.strictEqual(exitCalled, true);
+      });
+
+      it("should abort", () => {
+        sinon.stub(process, "exit");
+        sinon.stub(console, "info");
+        handleBrowserInput("foo");
+        const {called: consoleCalled} = console.info;
+        const {called: exitCalled} = process.exit;
+        console.info.restore();
+        process.exit.restore();
+        assert.strictEqual(consoleCalled, true);
+        assert.strictEqual(exitCalled, true);
+      });
+
+      it("should abort", () => {
+        sinon.stub(process, "exit");
+        sinon.stub(console, "info");
+        handleBrowserInput("");
+        const {called: consoleCalled} = console.info;
+        const {called: exitCalled} = process.exit;
+        console.info.restore();
+        process.exit.restore();
+        assert.strictEqual(consoleCalled, true);
+        assert.strictEqual(exitCalled, true);
+      });
+    });
+
+    describe("handle browser config", () => {
+      it("should abort", () => {
+        sinon.stub(process, "exit");
+        sinon.stub(console, "info");
+        handleBrowserConfigDir("n");
+        const {called: consoleCalled} = console.info;
+        const {called: exitCalled} = process.exit;
+        console.info.restore();
+        process.exit.restore();
+        assert.strictEqual(consoleCalled, true);
+        assert.strictEqual(exitCalled, true);
       });
     });
   });
