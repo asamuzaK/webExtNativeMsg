@@ -3,7 +3,8 @@
   /* api */
   const {
     Setup, abortSetup, extractArg, getBrowserData,
-    handleBrowserConfigDir, handleBrowserInput, setupReadline,
+    handleBrowserConfigDir, handleBrowserInput, handleSetupCallback,
+    setupReadline, setupVars,
   } = require("../modules/setup");
   const {assert} = require("chai");
   const {after, before, describe, it} = require("mocha");
@@ -70,6 +71,22 @@
       console.info.restore();
       assert.strictEqual(consoleCalledOnce, true);
       assert.strictEqual(exitCalledOnce, true);
+    });
+  });
+
+  /* handleSetupCallback */
+  describe("handle setup callback", () => {
+    it("should call callback", () => {
+      setupVars.configPath = "config";
+      setupVars.manifestPath = "manifest";
+      setupVars.shellPath = "shell";
+      setupVars.callback = obj => {
+        const {configDirPath, manifestPath, shellScriptPath} = obj;
+        assert.strictEqual(configDirPath, "config");
+        assert.strictEqual(shellScriptPath, "shell");
+        assert.strictEqual(manifestPath, "manifest");
+      };
+      handleSetupCallback();
     });
   });
 
