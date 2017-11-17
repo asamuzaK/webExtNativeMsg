@@ -179,10 +179,6 @@
 
   /* readline */
   describe("readline", () => {
-    const setup = new Setup({
-      hostDescription: "My host description",
-      hostName: "myhost",
-    });
     const sandboxReadline = sinon.createSandbox();
 
     before(() => {
@@ -192,8 +188,6 @@
     after(() => {
       sandboxReadline.restore();
     });
-
-    setup.run();
 
     describe("handle browser input", () => {
       // FIXME:
