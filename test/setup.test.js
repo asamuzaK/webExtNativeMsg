@@ -226,36 +226,36 @@
         sinon.stub(process, "exit");
         sinon.stub(console, "info");
         handleBrowserInput();
-        const {called: consoleCalled} = console.info;
-        const {called: exitCalled} = process.exit;
+        const {calledOnce: consoleCalledOnce} = console.info;
+        const {calledOnce: exitCalledOnce} = process.exit;
         console.info.restore();
         process.exit.restore();
-        assert.strictEqual(consoleCalled, true);
-        assert.strictEqual(exitCalled, true);
+        assert.strictEqual(consoleCalledOnce, true);
+        assert.strictEqual(exitCalledOnce, true);
       });
 
       it("should abort", () => {
         sinon.stub(process, "exit");
         sinon.stub(console, "info");
         handleBrowserInput("foo");
-        const {called: consoleCalled} = console.info;
-        const {called: exitCalled} = process.exit;
+        const {calledOnce: consoleCalledOnce} = console.info;
+        const {calledOnce: exitCalledOnce} = process.exit;
         console.info.restore();
         process.exit.restore();
-        assert.strictEqual(consoleCalled, true);
-        assert.strictEqual(exitCalled, true);
+        assert.strictEqual(consoleCalledOnce, true);
+        assert.strictEqual(exitCalledOnce, true);
       });
 
       it("should abort", () => {
         sinon.stub(process, "exit");
         sinon.stub(console, "info");
         handleBrowserInput("");
-        const {called: consoleCalled} = console.info;
-        const {called: exitCalled} = process.exit;
+        const {calledOnce: consoleCalledOnce} = console.info;
+        const {calledOnce: exitCalledOnce} = process.exit;
         console.info.restore();
         process.exit.restore();
-        assert.strictEqual(consoleCalled, true);
-        assert.strictEqual(exitCalled, true);
+        assert.strictEqual(consoleCalledOnce, true);
+        assert.strictEqual(exitCalledOnce, true);
       });
     });
 
