@@ -52,23 +52,14 @@
 
   /* abortSetup */
   describe("abort setup", () => {
-    const sandbox = sinon.createSandbox();
-
-    before(() => {
-      sandbox.stub(process, "exit");
-    });
-
-    after(() => {
-      sandbox.restore();
-    });
-
     it("should exit with message", () => {
       sinon.stub(console, "info");
-      const msg = "test";
-      abortSetup(msg);
+      sinon.stub(process, "exit");
+      abortSetup("test");
       const {calledOnce: consoleCalledOnce} = console.info;
       const {calledOnce: exitCalledOnce} = process.exit;
       console.info.restore();
+      process.exit.restore();
       assert.strictEqual(consoleCalledOnce, true);
       assert.strictEqual(exitCalledOnce, true);
     });
@@ -176,20 +167,12 @@
     });
 
     describe("run", () => {
-      const sandbox = sinon.createSandbox();
-
-      before(() => {
-        sandbox.stub(setupReadline, "question");
-      });
-
-      after(() => {
-        setupReadline.close();
-        sandbox.restore();
-      });
-
       it("should ask a question", () => {
+        sinon.stub(setupReadline, "question");
         setup.run();
-        assert.strictEqual(setupReadline.question.calledOnce, true);
+        const {calledOnce} = setupReadline.question;
+        setupReadline.question.restore();
+        assert.strictEqual(calledOnce, true);
       });
     });
   });
@@ -200,15 +183,14 @@
       hostDescription: "My host description",
       hostName: "myhost",
     });
-    const sandbox = sinon.createSandbox();
+    const sandboxReadline = sinon.createSandbox();
 
     before(() => {
-      sandbox.stub(setupReadline, "question");
+      sandboxReadline.stub(setupReadline, "question");
     });
 
     after(() => {
-      setupReadline.close();
-      sandbox.restore();
+      sandboxReadline.restore();
     });
 
     setup.run();
