@@ -3,11 +3,11 @@
   /* api */
   const {
     Setup, abortSetup, extractArg, getBrowserData,
-    handleBrowserConfigDir, handleBrowserInput, handleSetupCallback,
+    handleBrowserInput, handleSetupCallback,
     setupReadline, setupVars,
   } = require("../modules/setup");
   const {assert} = require("chai");
-  const {after, before, describe, it} = require("mocha");
+  const {describe, it} = require("mocha");
   const sinon = require("sinon");
 
   /* constant */
@@ -78,6 +78,44 @@
         assert.strictEqual(manifestPath, "manifest");
       };
       handleSetupCallback();
+    });
+  });
+
+  describe("handle browser input", () => {
+    it("should abort", () => {
+      sinon.stub(process, "exit");
+      sinon.stub(console, "info");
+      handleBrowserInput();
+      const {calledOnce: consoleCalledOnce} = console.info;
+      const {calledOnce: exitCalledOnce} = process.exit;
+      console.info.restore();
+      process.exit.restore();
+      assert.strictEqual(consoleCalledOnce, true);
+      assert.strictEqual(exitCalledOnce, true);
+    });
+
+    it("should abort", () => {
+      sinon.stub(process, "exit");
+      sinon.stub(console, "info");
+      handleBrowserInput("foo");
+      const {calledOnce: consoleCalledOnce} = console.info;
+      const {calledOnce: exitCalledOnce} = process.exit;
+      console.info.restore();
+      process.exit.restore();
+      assert.strictEqual(consoleCalledOnce, true);
+      assert.strictEqual(exitCalledOnce, true);
+    });
+
+    it("should abort", () => {
+      sinon.stub(process, "exit");
+      sinon.stub(console, "info");
+      handleBrowserInput("");
+      const {calledOnce: consoleCalledOnce} = console.info;
+      const {calledOnce: exitCalledOnce} = process.exit;
+      console.info.restore();
+      process.exit.restore();
+      assert.strictEqual(consoleCalledOnce, true);
+      assert.strictEqual(exitCalledOnce, true);
     });
   });
 
@@ -175,81 +213,5 @@
         assert.strictEqual(calledOnce, true);
       });
     });
-  });
-
-  /* readline */
-  describe("readline", () => {
-    const sandboxReadline = sinon.createSandbox();
-
-    before(() => {
-      sandboxReadline.stub(setupReadline, "question");
-    });
-
-    after(() => {
-      sandboxReadline.restore();
-    });
-
-    describe("handle browser input", () => {
-      // FIXME:
-      /*
-      it("should ask question", () => {
-        handleBrowserInput("firefox");
-        assert.strictEqual(setupReadline.question.called, true);
-      });
-      */
-
-      it("should abort", () => {
-        sinon.stub(process, "exit");
-        sinon.stub(console, "info");
-        handleBrowserInput();
-        const {calledOnce: consoleCalledOnce} = console.info;
-        const {calledOnce: exitCalledOnce} = process.exit;
-        console.info.restore();
-        process.exit.restore();
-        assert.strictEqual(consoleCalledOnce, true);
-        assert.strictEqual(exitCalledOnce, true);
-      });
-
-      it("should abort", () => {
-        sinon.stub(process, "exit");
-        sinon.stub(console, "info");
-        handleBrowserInput("foo");
-        const {calledOnce: consoleCalledOnce} = console.info;
-        const {calledOnce: exitCalledOnce} = process.exit;
-        console.info.restore();
-        process.exit.restore();
-        assert.strictEqual(consoleCalledOnce, true);
-        assert.strictEqual(exitCalledOnce, true);
-      });
-
-      it("should abort", () => {
-        sinon.stub(process, "exit");
-        sinon.stub(console, "info");
-        handleBrowserInput("");
-        const {calledOnce: consoleCalledOnce} = console.info;
-        const {calledOnce: exitCalledOnce} = process.exit;
-        console.info.restore();
-        process.exit.restore();
-        assert.strictEqual(consoleCalledOnce, true);
-        assert.strictEqual(exitCalledOnce, true);
-      });
-    });
-
-    // FIXME:
-    /*
-    describe("handle browser config", () => {
-      it("should abort", () => {
-        sinon.stub(process, "exit");
-        sinon.stub(console, "info");
-        handleBrowserConfigDir("n");
-        const {called: consoleCalled} = console.info;
-        const {called: exitCalled} = process.exit;
-        console.info.restore();
-        process.exit.restore();
-        assert.strictEqual(consoleCalled, true);
-        assert.strictEqual(exitCalled, true);
-      });
-    });
-    */
   });
 }
