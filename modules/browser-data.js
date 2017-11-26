@@ -49,6 +49,14 @@
       regWin: null,
       type: EXT_CHROME,
     },
+    CentBrowser: {
+      alias: "centbrowser",
+      aliasWin: "chrome",
+      hostLinux: null,
+      hostMac: null,
+      regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+      type: EXT_CHROME,
+    },
     kinza: {
       alias: "kinza",
       aliasWin: "chrome",
