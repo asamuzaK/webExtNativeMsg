@@ -49,7 +49,7 @@
       regWin: null,
       type: EXT_CHROME,
     },
-    CentBrowser: {
+    centbrowser: {
       alias: "centbrowser",
       aliasWin: "chrome",
       hostLinux: null,
