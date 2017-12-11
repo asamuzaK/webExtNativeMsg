@@ -58,6 +58,18 @@
       assert.strictEqual(convertUriToFilePath(u), p);
     });
 
+    it("should get string", () => {
+      const p = path.resolve("/foo/bar/baz");
+      let u;
+      if (IS_WIN) {
+        const reg = new RegExp(`\\${path.sep}`, "g");
+        u = (new URL(`file://localhost/${p.replace(reg, "/")}`)).href;
+      } else {
+        u = (new URL(`file://localhost${p}`)).href;
+      }
+      assert.strictEqual(convertUriToFilePath(u), p);
+    });
+
     it("should throw if string is not given", () => {
       assert.throws(() => convertUriToFilePath(),
                     "Expected String but got Undefined");
