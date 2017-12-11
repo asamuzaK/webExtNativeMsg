@@ -1,6 +1,7 @@
 "use strict";
 {
   /* api */
+  const {URL} = require("url");
   const {
     convertUriToFilePath, createDir, createFile, getAbsPath,
     getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
@@ -22,34 +23,37 @@
 
   describe("convertUriToFilePath", () => {
     it("should get string", () => {
-      const p = path.resolve("test");
+      const p = path.resolve("foo/bar");
       let u;
       if (IS_WIN) {
-        u = `file:///${p}`;
+        const reg = new RegExp(`\\${path.sep}`, "g");
+        u = (new URL(`file:///${p.replace(reg, "/")}`)).href;
       } else {
-        u = `file://${p}`;
+        u = (new URL(`file://${p}`)).href;
       }
       assert.strictEqual(convertUriToFilePath(u), p);
     });
 
     it("should get string", () => {
-      const p = path.resolve("test/foo");
+      const p = path.resolve("foo/bar baz");
       let u;
       if (IS_WIN) {
-        u = `file:///${p}`;
+        const reg = new RegExp(`\\${path.sep}`, "g");
+        u = (new URL(`file:///${p.replace(reg, "/")}`)).href;
       } else {
-        u = `file://${p}`;
+        u = (new URL(`file://${p}`)).href;
       }
       assert.strictEqual(convertUriToFilePath(u), p);
     });
 
     it("should get string", () => {
-      const p = path.resolve("test dir/foo");
+      const p = path.resolve("/foo/bar/baz");
       let u;
       if (IS_WIN) {
-        u = `file:///${p}`;
+        const reg = new RegExp(`\\${path.sep}`, "g");
+        u = (new URL(`file:///${p.replace(reg, "/")}`)).href;
       } else {
-        u = `file://${p}`;
+        u = (new URL(`file://${p}`)).href;
       }
       assert.strictEqual(convertUriToFilePath(u), p);
     });
