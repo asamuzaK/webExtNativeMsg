@@ -32,6 +32,28 @@
       assert.strictEqual(convertUriToFilePath(u), p);
     });
 
+    it("should get string", () => {
+      const p = path.resolve("test/foo");
+      let u;
+      if (IS_WIN) {
+        u = `file:///${p}`;
+      } else {
+        u = `file://${p}`;
+      }
+      assert.strictEqual(convertUriToFilePath(u), p);
+    });
+
+    it("should get string", () => {
+      const p = path.resolve("test dir/foo");
+      let u;
+      if (IS_WIN) {
+        u = `file:///${p}`;
+      } else {
+        u = `file://${p}`;
+      }
+      assert.strictEqual(convertUriToFilePath(u), p);
+    });
+
     it("should throw if string is not given", () => {
       assert.throws(() => convertUriToFilePath(),
                     "Expected String but got Undefined");
