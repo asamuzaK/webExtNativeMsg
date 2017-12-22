@@ -30,10 +30,7 @@
     let file;
     if (protocol === "file:" && pathname) {
       if (IS_WIN) {
-        const arr = pathname.split("/");
-        file = arr.reduce((p, c) =>
-          p && path.join(p, decodeURIComponent(c)) || decodeURIComponent(c)
-        );
+        file = decodeURIComponent(pathname).slice(1).replace(/\//g, path.sep);
       } else {
         file = decodeURIComponent(pathname);
       }
