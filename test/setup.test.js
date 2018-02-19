@@ -151,10 +151,6 @@
         assert.strictEqual(setup.mainScriptFile, "index.js");
       });
 
-      it("should get false if useNpmStart arg is not given", () => {
-        assert.isFalse(setup.useNpmStart);
-      });
-
       it("should get null if chromeExtensionIds arg is not given", () => {
         assert.isNull(setup.chromeExtensionIds);
       });
@@ -183,11 +179,6 @@
       it("should set mainScriptFile in given string", () => {
         setup.mainScriptFile = "main.js";
         assert.strictEqual(setup.mainScriptFile, "main.js");
-      });
-
-      it("should set useNpmStart in boolean", () => {
-        setup.useNpmStart = true;
-        assert.isTrue(setup.useNpmStart);
       });
 
       it("should set chromeExtensionIds in given array", () => {
