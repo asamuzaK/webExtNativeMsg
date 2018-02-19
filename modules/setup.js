@@ -181,32 +181,29 @@
     if (!isString(hostName)) {
       throw new TypeError(`Expected String but got ${getType(hostName)}.`);
     }
-    if (!isString(mainFile)) {
-      throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
-    }
     const shellExt = IS_WIN && "cmd" || "sh";
     const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
+    const appPath = process.execPath;
+    const {name: appName} = path.parse(appPath);
     let cmd;
     if (useNpmStart) {
       cmd = "npm start";
-    } else if (isString(appFile)) {
-      const filePath = path.resolve(path.join(DIR_CWD, appFile));
-      if (await !isFile(filePath)) {
-        throw new Error(`No such file: ${filePath}.`);
-      }
+    } else if (isString(appFile) && appFile === appName) {
       if (isString(appFileCmdArg)) {
         const cmdArg = (new CmdArgs(appFileCmdArg)).toString();
-        cmd = `${quoteArg(filePath)} ${cmdArg}`;
+        cmd = `${quoteArg(appPath)} ${cmdArg}`;
       } else {
-        cmd = `${quoteArg(filePath)}`;
+        cmd = quoteArg(appPath);
       }
     } else {
+      if (!isString(mainFile)) {
+        throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
+      }
       const filePath = path.resolve(path.join(DIR_CWD, mainFile));
       if (await !isFile(filePath)) {
         throw new Error(`No such file: ${filePath}.`);
       }
-      const node = process.execPath;
-      cmd = `${quoteArg(node)} ${quoteArg(filePath)}`;
+      cmd = `${quoteArg(appPath)} ${quoteArg(filePath)}`;
     }
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!/usr/bin/env bash\n${cmd}\n`;
