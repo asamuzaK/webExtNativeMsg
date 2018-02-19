@@ -4,7 +4,7 @@
 "use strict";
 {
   /* api */
-  const {ChildProcess, CmdArgs} = require("./child-process");
+  const {ChildProcess} = require("./child-process");
   const {browserData} = require("./browser-data");
   const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
   const {
@@ -26,8 +26,6 @@
 
   /* variables */
   const vars = {
-    appFile: null,
-    appFileCmdArg: null,
     browser: null,
     callback: null,
     chromeExtIds: null,
@@ -177,33 +175,26 @@
     if (await !isDir(configPath)) {
       throw new Error(`No such directory: ${configPath}.`);
     }
-    const {appFile, appFileCmdArg, hostName, mainFile, useNpmStart} = vars;
+    const {hostName, mainFile, useNpmStart} = vars;
     if (!isString(hostName)) {
       throw new TypeError(`Expected String but got ${getType(hostName)}.`);
     }
     const shellExt = IS_WIN && "cmd" || "sh";
     const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
     const appPath = process.execPath;
-    const {name: appName} = path.parse(appPath);
     let cmd;
     if (useNpmStart) {
       cmd = "npm start";
-    } else if (isString(appFile) && appFile === appName) {
-      if (isString(appFileCmdArg)) {
-        const cmdArg = (new CmdArgs(appFileCmdArg)).toString();
-        cmd = `${quoteArg(appPath)} ${cmdArg}`;
-      } else {
-        cmd = quoteArg(appPath);
-      }
     } else {
       if (!isString(mainFile)) {
         throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
       }
       const filePath = path.resolve(path.join(DIR_CWD, mainFile));
-      if (await !isFile(filePath)) {
-        throw new Error(`No such file: ${filePath}.`);
+      if (await isFile(filePath)) {
+        cmd = `${quoteArg(appPath)} ${quoteArg(filePath)}`;
+      } else {
+        cmd = quoteArg(appPath);
       }
-      cmd = `${quoteArg(appPath)} ${quoteArg(filePath)}`;
     }
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!/usr/bin/env bash\n${cmd}\n`;
@@ -389,8 +380,6 @@
     /**
      * setup options
      * @param {Object} [opt] - options
-     * @param {string} [opt.appFile] - application file name to execute
-     * @param {string|Array} [opt.appFileCmdArg] - command args for appFile
      * @param {string} [opt.hostDescription] - host description
      * @param {string} [opt.hostName] - host name
      * @param {string} [opt.mainScriptFile] - file name of the main script
@@ -400,46 +389,26 @@
      */
     constructor(opt = {}) {
       const {
-        appFile, appFileCmdArg, hostDescription: hostDesc, hostName,
-        mainScriptFile: mainFile, useNpmStart,
-        chromeExtensionIds: chromeExtIds, webExtensionIds: webExtIds, callback,
+        hostDescription, hostName, mainScriptFile, useNpmStart,
+        chromeExtensionIds, webExtensionIds, callback,
       } = opt;
-      this._appFile = isString(appFile) && appFile || null;
-      this._appFileCmdArg = (isString(appFileCmdArg) ||
-                             Array.isArray(appFileCmdArg)) && appFileCmdArg ||
-                            null;
       this._browser = null;
       this._configDir = isString(hostName) &&
                         [...DIR_CONFIG, hostName, "config"] ||
                         [DIR_CWD, "config"];
-      this._hostDesc = isString(hostDesc) && hostDesc || null;
+      this._hostDesc = isString(hostDescription) && hostDescription || null;
       this._hostName = isString(hostName) && hostName || null;
-      this._mainFile = isString(mainFile) && mainFile || "index.js";
+      this._mainFile = isString(mainScriptFile) && mainScriptFile || "index.js";
       this._useNpmStart = !!useNpmStart;
-      this._chromeExtIds = Array.isArray(chromeExtIds) && chromeExtIds.length &&
-                           chromeExtIds || null;
-      this._webExtIds = Array.isArray(webExtIds) && webExtIds.length &&
-                        webExtIds || null;
+      this._chromeExtIds = Array.isArray(chromeExtensionIds) &&
+                           chromeExtensionIds.length && chromeExtensionIds ||
+                           null;
+      this._webExtIds = Array.isArray(webExtensionIds) &&
+                        webExtensionIds.length && webExtensionIds || null;
       this._callback = typeof callback === "function" && callback || null;
     }
 
     /* getter / setter */
-    get appFile() {
-      return this._appFile;
-    }
-    set appFile(name) {
-      this._appFile = isString(name) && name || null;
-      vars.appFile = this._appFile;
-    }
-    get appFileCmdArg() {
-      return this._appFileCmdArg;
-    }
-    set appFileCmdArg(name) {
-      this._appFileCmdArg = isString(name) && name ||
-                            Array.isArray(name) && name ||
-                            null;
-      vars.appFileCmdArg = this._appFileCmdArg;
-    }
     get hostDescription() {
       return this._hostDesc;
     }

@@ -155,14 +155,6 @@
         assert.isFalse(setup.useNpmStart);
       });
 
-      it("should get null if appFile arg is not given", () => {
-        assert.isNull(setup.appFile);
-      });
-
-      it("should get null if appFileCmdArg arg is not given", () => {
-        assert.isNull(setup.appFileCmdArg);
-      });
-
       it("should get null if chromeExtensionIds arg is not given", () => {
         assert.isNull(setup.chromeExtensionIds);
       });
@@ -178,21 +170,6 @@
 
     /* setters */
     describe("setters", () => {
-      it("should set appFile in given string", () => {
-        setup.appFile = "index.exe";
-        assert.strictEqual(setup.appFile, "index.exe");
-      });
-
-      it("should set appFileCmdArg in given string", () => {
-        setup.appFileCmdArg = "-a -b --c=\"d e\"";
-        assert.strictEqual(setup.appFileCmdArg, "-a -b --c=\"d e\"");
-      });
-
-      it("should set appFileCmdArg in given array", () => {
-        setup.appFileCmdArg = ["-a", "-b", "--c=\"d e\""];
-        assert.deepEqual(setup.appFileCmdArg, ["-a", "-b", "--c=\"d e\""]);
-      });
-
       it("should set hostDescription in given string", () => {
         setup.hostDescription = "My new host description";
         assert.strictEqual(setup.hostDescription, "My new host description");
