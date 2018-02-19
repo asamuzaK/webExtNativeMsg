@@ -61,8 +61,6 @@ Construct:
   * @param {Object} [opt] - options which contains optional properties below.
 
 Properties:
-* appFile: {string} - Application file name to execute. Set this property when you want to use packaged application (built via `pkg` or else) instead of Node.js.
-* appFileCmdArg: {string|Array} - Command args for appFile.
 * hostDescription: {string} - Host description.
 * hostName: {string} - Host name.
 * mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
