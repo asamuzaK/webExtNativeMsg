@@ -64,7 +64,6 @@ Properties:
 * hostDescription: {string} - Host description.
 * hostName: {string} - Host name.
 * mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
-* useNpmStart: {boolean} - Sets `npm start` for shell script command if `true`. Defaults to `false`.
 * chromeExtensionIds: {Array} - Array of chrome extension IDs.
 * webExtensionIds: {Array} - Array of web extension IDs.
 * callback: {Function} - A function that will be called when setup is done.

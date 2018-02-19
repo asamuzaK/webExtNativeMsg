@@ -36,7 +36,6 @@
     mainFile: null,
     manifestPath: null,
     shellPath: null,
-    useNpmStart: false,
     webExtIds: null,
   };
 
@@ -175,26 +174,22 @@
     if (await !isDir(configPath)) {
       throw new Error(`No such directory: ${configPath}.`);
     }
-    const {hostName, mainFile, useNpmStart} = vars;
+    const {hostName, mainFile} = vars;
     if (!isString(hostName)) {
       throw new TypeError(`Expected String but got ${getType(hostName)}.`);
+    }
+    if (!isString(mainFile)) {
+      throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
     }
     const shellExt = IS_WIN && "cmd" || "sh";
     const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
     const appPath = process.execPath;
+    const filePath = path.resolve(path.join(DIR_CWD, mainFile));
     let cmd;
-    if (useNpmStart) {
-      cmd = "npm start";
+    if (await isFile(filePath)) {
+      cmd = `${quoteArg(appPath)} ${quoteArg(filePath)}`;
     } else {
-      if (!isString(mainFile)) {
-        throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
-      }
-      const filePath = path.resolve(path.join(DIR_CWD, mainFile));
-      if (await isFile(filePath)) {
-        cmd = `${quoteArg(appPath)} ${quoteArg(filePath)}`;
-      } else {
-        cmd = quoteArg(appPath);
-      }
+      cmd = quoteArg(appPath);
     }
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!/usr/bin/env bash\n${cmd}\n`;
@@ -383,14 +378,13 @@
      * @param {string} [opt.hostDescription] - host description
      * @param {string} [opt.hostName] - host name
      * @param {string} [opt.mainScriptFile] - file name of the main script
-     * @param {boolean} [opt.useNpmStart] - `npm start` for shell script command
      * @param {Array} [opt.chromeExtensionIds] - Array of chrome extension IDs
      * @param {Array} [opt.webExtensionIds] - Array of web extension IDs
      */
     constructor(opt = {}) {
       const {
-        hostDescription, hostName, mainScriptFile, useNpmStart,
-        chromeExtensionIds, webExtensionIds, callback,
+        callback, hostDescription, hostName, mainScriptFile, 
+        chromeExtensionIds, webExtensionIds,
       } = opt;
       this._browser = null;
       this._configDir = isString(hostName) &&
@@ -399,7 +393,6 @@
       this._hostDesc = isString(hostDescription) && hostDescription || null;
       this._hostName = isString(hostName) && hostName || null;
       this._mainFile = isString(mainScriptFile) && mainScriptFile || "index.js";
-      this._useNpmStart = !!useNpmStart;
       this._chromeExtIds = Array.isArray(chromeExtensionIds) &&
                            chromeExtensionIds.length && chromeExtensionIds ||
                            null;
@@ -429,13 +422,6 @@
     set mainScriptFile(name) {
       this._mainFile = isString(name) && name || null;
       vars.mainFile = this._mainFile;
-    }
-    get useNpmStart() {
-      return this._useNpmStart;
-    }
-    set useNpmStart(bool) {
-      this._useNpmStart = !!bool;
-      vars.useNpmStart = this._useNpmStart;
     }
     get chromeExtensionIds() {
       return this._chromeExtIds;
@@ -511,7 +497,6 @@
       vars.mainFile = this._mainFile;
       vars.chromeExtIds = this._chromeExtIds;
       vars.webExtIds = this._webExtIds;
-      vars.useNpmStart = this._useNpmStart;
       if (this._browser) {
         const dir = getBrowserConfigDir();
         if (!Array.isArray(dir)) {
