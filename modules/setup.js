@@ -383,7 +383,7 @@
      */
     constructor(opt = {}) {
       const {
-        callback, hostDescription, hostName, mainScriptFile, 
+        callback, hostDescription, hostName, mainScriptFile,
         chromeExtensionIds, webExtensionIds,
       } = opt;
       this._browser = null;
