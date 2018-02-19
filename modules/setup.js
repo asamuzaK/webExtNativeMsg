@@ -4,7 +4,7 @@
 "use strict";
 {
   /* api */
-  const {ChildProcess} = require("./child-process");
+  const {ChildProcess, CmdArgs} = require("./child-process");
   const {browserData} = require("./browser-data");
   const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
   const {
@@ -26,6 +26,8 @@
 
   /* variables */
   const vars = {
+    appFile: null,
+    appFileCmdArg: null,
     browser: null,
     callback: null,
     chromeExtIds: null,
@@ -36,6 +38,7 @@
     mainFile: null,
     manifestPath: null,
     shellPath: null,
+    useNpmStart: false,
     webExtIds: null,
   };
 
@@ -174,7 +177,7 @@
     if (await !isDir(configPath)) {
       throw new Error(`No such directory: ${configPath}.`);
     }
-    const {hostName, mainFile} = vars;
+    const {appFile, appFileCmdArg, hostName, mainFile, useNpmStart} = vars;
     if (!isString(hostName)) {
       throw new TypeError(`Expected String but got ${getType(hostName)}.`);
     }
@@ -183,12 +186,28 @@
     }
     const shellExt = IS_WIN && "cmd" || "sh";
     const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
-    const indexPath = path.resolve(path.join(DIR_CWD, mainFile));
-    if (await !isFile(indexPath)) {
-      throw new Error(`No such file: ${indexPath}.`);
+    let cmd;
+    if (useNpmStart) {
+      cmd = "npm start";
+    } else if (isString(appFile)) {
+      const filePath = path.resolve(path.join(DIR_CWD, appFile));
+      if (await !isFile(filePath)) {
+        throw new Error(`No such file: ${filePath}.`);
+      }
+      if (isString(appFileCmdArg)) {
+        const cmdArg = (new CmdArgs(appFileCmdArg)).toString();
+        cmd = `${quoteArg(filePath)} ${cmdArg}`;
+      } else {
+        cmd = `${quoteArg(filePath)}`;
+      }
+    } else {
+      const filePath = path.resolve(path.join(DIR_CWD, mainFile));
+      if (await !isFile(filePath)) {
+        throw new Error(`No such file: ${filePath}.`);
+      }
+      const node = process.execPath;
+      cmd = `${quoteArg(node)} ${quoteArg(filePath)}`;
     }
-    const node = process.execPath;
-    const cmd = `${quoteArg(node)} ${quoteArg(indexPath)}`;
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!/usr/bin/env bash\n${cmd}\n`;
     const file = await createFile(
@@ -373,17 +392,25 @@
     /**
      * setup options
      * @param {Object} [opt] - options
+     * @param {string} [opt.appFile] - application file name to execute
+     * @param {string|Array} [opt.appFileCmdArg] - command args for appFile
      * @param {string} [opt.hostDescription] - host description
      * @param {string} [opt.hostName] - host name
      * @param {string} [opt.mainScriptFile] - file name of the main script
+     * @param {boolean} [opt.useNpmStart] - `npm start` for shell script command
      * @param {Array} [opt.chromeExtensionIds] - Array of chrome extension IDs
      * @param {Array} [opt.webExtensionIds] - Array of web extension IDs
      */
     constructor(opt = {}) {
       const {
-        hostDescription: hostDesc, hostName, mainScriptFile: mainFile,
+        appFile, appFileCmdArg, hostDescription: hostDesc, hostName,
+        mainScriptFile: mainFile, useNpmStart,
         chromeExtensionIds: chromeExtIds, webExtensionIds: webExtIds, callback,
       } = opt;
+      this._appFile = isString(appFile) && appFile || null;
+      this._appFileCmdArg = (isString(appFileCmdArg) ||
+                             Array.isArray(appFileCmdArg)) && appFileCmdArg ||
+                            null;
       this._browser = null;
       this._configDir = isString(hostName) &&
                         [...DIR_CONFIG, hostName, "config"] ||
@@ -391,6 +418,7 @@
       this._hostDesc = isString(hostDesc) && hostDesc || null;
       this._hostName = isString(hostName) && hostName || null;
       this._mainFile = isString(mainFile) && mainFile || "index.js";
+      this._useNpmStart = !!useNpmStart;
       this._chromeExtIds = Array.isArray(chromeExtIds) && chromeExtIds.length &&
                            chromeExtIds || null;
       this._webExtIds = Array.isArray(webExtIds) && webExtIds.length &&
@@ -399,6 +427,22 @@
     }
 
     /* getter / setter */
+    get appFile() {
+      return this._appFile;
+    }
+    set appFile(name) {
+      this._appFile = isString(name) && name || null;
+      vars.appFile = this._appFile;
+    }
+    get appFileCmdArg() {
+      return this._appFileCmdArg;
+    }
+    set appFileCmdArg(name) {
+      this._appFileCmdArg = isString(name) && name ||
+                            Array.isArray(name) && name ||
+                            null;
+      vars.appFileCmdArg = this._appFileCmdArg;
+    }
     get hostDescription() {
       return this._hostDesc;
     }
@@ -419,6 +463,13 @@
     set mainScriptFile(name) {
       this._mainFile = isString(name) && name || null;
       vars.mainFile = this._mainFile;
+    }
+    get useNpmStart() {
+      return this._useNpmStart;
+    }
+    set useNpmStart(bool) {
+      this._useNpmStart = !!bool;
+      vars.useNpmStart = this._useNpmStart;
     }
     get chromeExtensionIds() {
       return this._chromeExtIds;
@@ -471,7 +522,13 @@
       if (Array.isArray(args) && args.length) {
         for (const arg of args) {
           let value;
-          if (/^--browser=/i.test(arg)) {
+          if (/^--app-file=/i.test(arg)) {
+            value = extractArg(arg, /^--app-file=(.+)$/i);
+            value && (this._appFile = value);
+          } else if (/^--app-file-cmd-arg=/i.test(arg)) {
+            value = extractArg(arg, /^--app-file-cmd-arg=(.+)$/i);
+            value && (this._appFileCmdArg = value);
+          } else if (/^--browser=/i.test(arg)) {
             value = extractArg(arg, /^--browser=(.+)$/i);
             value && (this._browser = getBrowserData(value));
           } else if (/^--config-path=/i.test(arg)) {
@@ -488,6 +545,7 @@
       vars.mainFile = this._mainFile;
       vars.chromeExtIds = this._chromeExtIds;
       vars.webExtIds = this._webExtIds;
+      vars.useNpmStart = this._useNpmStart;
       if (this._browser) {
         const dir = getBrowserConfigDir();
         if (!Array.isArray(dir)) {
