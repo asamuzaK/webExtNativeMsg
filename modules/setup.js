@@ -474,13 +474,7 @@
       if (Array.isArray(args) && args.length) {
         for (const arg of args) {
           let value;
-          if (/^--app-file=/i.test(arg)) {
-            value = extractArg(arg, /^--app-file=(.+)$/i);
-            value && (this._appFile = value);
-          } else if (/^--app-file-cmd-arg=/i.test(arg)) {
-            value = extractArg(arg, /^--app-file-cmd-arg=(.+)$/i);
-            value && (this._appFileCmdArg = value);
-          } else if (/^--browser=/i.test(arg)) {
+          if (/^--browser=/i.test(arg)) {
             value = extractArg(arg, /^--browser=(.+)$/i);
             value && (this._browser = getBrowserData(value));
           } else if (/^--config-path=/i.test(arg)) {
