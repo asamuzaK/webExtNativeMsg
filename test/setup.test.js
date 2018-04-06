@@ -3,15 +3,17 @@
   /* api */
   const {
     Setup, abortSetup, extractArg, getBrowserData,
-    handleBrowserInput, handleSetupCallback,
-    setupReadline, setupVars,
+    handleBrowserInput, handleSetupCallback, setupReadline,
   } = require("../modules/setup");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
+  const rewire = require("rewire");
   const sinon = require("sinon");
 
   /* constant */
   const {DIR_HOME} = require("../modules/constant");
+
+  const setupJs = rewire("../modules/setup");
 
   /* getBrowserData */
   describe("getBrowserData", () => {
@@ -75,6 +77,7 @@
   /* handleSetupCallback */
   describe("handle setup callback", () => {
     it("should call callback", () => {
+      const setupVars = setupJs.__get__("vars");
       setupVars.configPath = "config";
       setupVars.manifestPath = "manifest";
       setupVars.shellPath = "shell";

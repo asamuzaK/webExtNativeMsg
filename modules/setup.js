@@ -537,6 +537,5 @@
     handleOldConfig,
     handleSetupCallback,
     setupReadline: rl,
-    setupVars: vars,
   };
 }
