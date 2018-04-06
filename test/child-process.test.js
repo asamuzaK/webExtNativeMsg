@@ -208,7 +208,7 @@
     });
 
     it("should get array in expected length", () => {
-      const EXPECTED_LENGTH = 2
+      const EXPECTED_LENGTH = 2;
       const res = extractArg("foo bar\\baz");
       assert.isTrue(Array.isArray(res));
       assert.strictEqual(res.length, EXPECTED_LENGTH);
