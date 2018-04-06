@@ -5,10 +5,13 @@
   const {ChildProcess, CmdArgs} = require("../modules/child-process");
   const {assert} = require("chai");
   const {describe, it} = require("mocha");
-  const sinon = require("sinon");
   const childProcess = require("child_process");
   const fs = require("fs");
   const path = require("path");
+  const rewire = require("rewire");
+  const sinon = require("sinon");
+
+  const childProc = rewire("../modules/child-process");
 
   /* constants */
   const {IS_WIN} = require("../modules/constant");
@@ -166,6 +169,70 @@
       it("should get arguments in string", () => {
         assert.strictEqual(cmdArr.toString(), "-a -b \"c d\"");
       });
+    });
+  });
+
+  describe("correctArg", () => {
+    const correctArg = childProc.__get__("correctArg");
+
+    it("should get empty string", () => {
+      assert.strictEqual(correctArg(), "");
+    });
+
+    it("should trim and/or strip quotes", () => {
+      assert.strictEqual(correctArg(" \"test\" "), "test");
+    });
+
+    it("should strip back slash", () => {
+      assert.strictEqual(correctArg("te\\st"), "test");
+    });
+
+    it("should strip quotes", () => {
+      assert.strictEqual(correctArg("test \"foo bar\""), "test foo bar");
+    });
+  });
+
+  describe("extractArg", () => {
+    const extractArg = childProc.__get__("extractArg");
+
+    it("should get empty array if argument not given", () => {
+      const res = extractArg();
+      assert.isTrue(Array.isArray(res));
+      assert.strictEqual(res.length, 0);
+    });
+
+    it("should get empty array if argument is not string", () => {
+      const res = extractArg(1);
+      assert.isTrue(Array.isArray(res));
+      assert.strictEqual(res.length, 0);
+    });
+
+    it("should get array in expected length", () => {
+      const EXPECTED_LENGTH = 2
+      const res = extractArg("foo bar\\baz");
+      assert.isTrue(Array.isArray(res));
+      assert.strictEqual(res.length, EXPECTED_LENGTH);
+      assert.deepEqual(res, [
+        "foo",
+        "bar\\baz",
+      ]);
+    });
+  });
+
+  describe("stringifyArg", () => {
+    const stringifyArg = childProc.__get__("stringifyArg");
+
+    it("should get empty string if no argument given", () => {
+      assert.strictEqual(stringifyArg(), "");
+    });
+
+    it("should get empty string if argument is not string", () => {
+      assert.strictEqual(stringifyArg(1), "");
+    });
+
+    it("should get string", () => {
+      assert.strictEqual(stringifyArg("foo \"bar baz\" qux\\quux"),
+                         "\"foo \\\"bar baz\\\" qux\\\\quux\"");
     });
   });
 }
