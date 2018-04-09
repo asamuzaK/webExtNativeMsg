@@ -69,37 +69,49 @@
 
   describe("logErr", () => {
     it("should get false", () => {
-      sinon.stub(console, "error");
-      const e = new Error("Log Error test");
-      const log = logErr(e);
-      const {calledOnce} = console.error;
-      console.error.restore();
-      assert.strictEqual(calledOnce, true);
-      assert.strictEqual(log, false);
+      const msg = "Log Error test";
+      let errMsg;
+      const consoleError = sinon.stub(console, "error").callsFake(e => {
+        errMsg = e.message;
+      });
+      const res = logErr(new Error(msg));
+      const {calledOnce} = consoleError;
+      consoleError.restore();
+      assert.isTrue(calledOnce);
+      assert.strictEqual(errMsg, msg);
+      assert.isFalse(res);
     });
   });
 
   describe("logMsg", () => {
     it("should get string", () => {
-      sinon.stub(console, "log");
       const msg = "Log message test";
-      const log = logMsg(msg);
-      const {called} = console.log;
-      console.log.restore();
-      assert.strictEqual(called, true);
-      assert.strictEqual(log, msg);
+      let logMessage;
+      const consoleLog = sinon.stub(console, "log").callsFake(m => {
+        logMessage = m;
+      });
+      const res = logMsg(msg);
+      const {calledOnce} = consoleLog;
+      consoleLog.restore();
+      assert.isTrue(calledOnce);
+      assert.strictEqual(logMessage, msg);
+      assert.strictEqual(res, msg);
     });
   });
 
   describe("logWarn", () => {
     it("should get false", () => {
-      sinon.stub(console, "warn");
-      const e = "Log warn test";
-      const log = logWarn(e);
-      const {calledOnce} = console.warn;
-      console.warn.restore();
-      assert.strictEqual(calledOnce, true);
-      assert.strictEqual(log, false);
+      const msg = "Log warn test";
+      let warnMsg;
+      const consoleWarn = sinon.stub(console, "warn").callsFake(m => {
+        warnMsg = m;
+      });
+      const res = logWarn(msg);
+      const {calledOnce} = consoleWarn;
+      consoleWarn.restore();
+      assert.isTrue(calledOnce);
+      assert.strictEqual(warnMsg, msg);
+      assert.isFalse(res);
     });
   });
 
