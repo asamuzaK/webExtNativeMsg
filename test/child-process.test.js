@@ -176,19 +176,28 @@
     const correctArg = childProc.__get__("correctArg");
 
     it("should get empty string", () => {
-      assert.strictEqual(correctArg(), "");
+      const res = correctArg();
+      assert.strictEqual(res, "");
+    });
+
+    it("should get string", () => {
+      const res = correctArg("-a -b");
+      assert.strictEqual(res, "-a -b");
     });
 
     it("should trim and/or strip quotes", () => {
-      assert.strictEqual(correctArg(" \"test\" "), "test");
+      const res = correctArg(" \"test\" ");
+      assert.strictEqual(res, "test");
     });
 
     it("should strip back slash", () => {
-      assert.strictEqual(correctArg("te\\st"), "test");
+      const res = correctArg("te\\st");
+      assert.strictEqual(res, "test");
     });
 
     it("should strip quotes", () => {
-      assert.strictEqual(correctArg("test \"foo bar\""), "test foo bar");
+      const res = correctArg("test \"foo bar\"");
+      assert.strictEqual(res, "test foo bar");
     });
   });
 
