@@ -230,7 +230,7 @@ describe("checkOldConfig", () => {
     const {calledOnce: rlCloseCalled} = stubRlClose;
     const {calledOnce: rlQuesCalled} = stubRlQues;
     const {calledOnce: setupCbCalled} = stubSetupCb;
-    //assert.isFalse(rlCloseCalled);
+    assert.isFalse(rlCloseCalled);
     assert.isTrue(rlQuesCalled);
     assert.isFalse(setupCbCalled);
     assert.strictEqual(
