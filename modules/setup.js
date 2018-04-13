@@ -34,15 +34,10 @@ const vars = {
   hostName: null,
   mainFile: null,
   manifestPath: null,
+  rl: null,
   shellPath: null,
   webExtIds: null,
 };
-
-/* readline */
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
 
 /**
  * abort setup
@@ -50,6 +45,7 @@ const rl = readline.createInterface({
  * @returns {void}
  */
 const abortSetup = msg => {
+  const {rl} = vars;
   console.info(`Setup aborted: ${msg}`);
   rl && rl.close();
   process.exit(1);
@@ -100,22 +96,27 @@ const getBrowserConfigDir = () => {
 
 /**
  * handle setup callback
- * @returns {void}
+ * @returns {?Function} - callback
  */
 const handleSetupCallback = () => {
   const {
     callback, configPath: configDirPath, shellPath: shellScriptPath,
     manifestPath,
   } = vars;
-  callback && callback({configDirPath, shellScriptPath, manifestPath});
+  let func;
+  if (typeof callback === "function") {
+    func = callback({configDirPath, shellScriptPath, manifestPath});
+  }
+  return func || null;
 };
 
 /**
  * handle old config
  * @param {string} ans - user input
- * @returns {void}
+ * @returns {Function} - handleSetupCallback()
  */
 const handleOldConfig = ans => {
+  const {rl} = vars;
   if (isString(ans)) {
     ans = ans.trim();
     if (/^y(?:es)?$/i.test(ans)) {
@@ -126,8 +127,8 @@ const handleOldConfig = ans => {
       }
     }
   }
-  rl.close();
-  handleSetupCallback();
+  rl && rl.close();
+  return handleSetupCallback();
 };
 
 /**
@@ -135,13 +136,13 @@ const handleOldConfig = ans => {
  * @returns {void}
  */
 const checkOldConfig = () => {
-  const {configDir} = vars;
+  const {configDir, rl} = vars;
   if (Array.isArray(configDir) && path.join(...configDir) !== OLD_CONFIG &&
-      isDir(OLD_CONFIG)) {
+      isDir(OLD_CONFIG) && rl) {
     rl.question(`Found old config directory ${OLD_CONFIG}. Remove? [y/n]\n`,
                 handleOldConfig);
   } else {
-    rl.close();
+    rl && rl.close();
     handleSetupCallback();
   }
 };
@@ -300,17 +301,17 @@ const handleBrowserConfigDir = ans => {
   if (!Array.isArray(dir)) {
     throw new TypeError(`Expected Array but got ${getType(dir)}.`);
   }
+  const {rl} = vars;
   const msg = `${path.join(...dir)} already exists.`;
+  rl && rl.close();
   if (isString(ans)) {
     ans = ans.trim();
     if (/^y(?:es)?$/i.test(ans)) {
       createFiles().catch(logErr);
     } else {
-      rl.close();
       abortSetup(msg);
     }
   } else {
-    rl.close();
     abortSetup(msg);
   }
 };
@@ -318,10 +319,12 @@ const handleBrowserConfigDir = ans => {
 /**
  * handle browser input
  * @param {string} ans - user input
- * @returns {void}
+ * @returns {?AsyncFunction} - createFiles();
  */
 const handleBrowserInput = ans => {
+  const {rl} = vars;
   const msg = "Browser not specified.";
+  let func;
   if (isString(ans)) {
     ans = ans.trim();
     if (ans.length) {
@@ -333,25 +336,26 @@ const handleBrowserInput = ans => {
           throw new TypeError(`Expected Array but got ${getType(dir)}.`);
         }
         const dirPath = path.join(...dir);
-        if (isDir(dirPath)) {
+        if (isDir(dirPath) && rl) {
           rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                       handleBrowserConfigDir);
         } else {
-          createFiles().catch(logErr);
+          func = createFiles().catch(logErr);
         }
       } else {
         // TODO: Add custom setup
-        rl.close();
+        rl && rl.close();
         abortSetup(`${ans} not supported.`);
       }
     } else {
-      rl.close();
+      rl && rl.close();
       abortSetup(msg);
     }
   } else {
-    rl.close();
+    rl && rl.close();
     abortSetup(msg);
   }
+  return func || null;
 };
 
 /**
@@ -490,6 +494,13 @@ class Setup {
     vars.mainFile = this._mainFile;
     vars.chromeExtIds = this._chromeExtIds;
     vars.webExtIds = this._webExtIds;
+    vars.rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    if (!vars.rl) {
+      throw new Error("Failed to run setup.");
+    }
     if (this._browser) {
       const dir = getBrowserConfigDir();
       if (!Array.isArray(dir)) {
@@ -497,8 +508,8 @@ class Setup {
       }
       const dirPath = path.join(...dir);
       if (isDir(dirPath)) {
-        rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
-                    handleBrowserConfigDir);
+        vars.rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
+                         handleBrowserConfigDir);
       } else {
         createFiles().catch(logErr);
       }
@@ -516,7 +527,7 @@ class Setup {
           arr.push(item);
         }
       }
-      rl.question(`${msg}[${arr.join(" ")}]\n`, handleBrowserInput);
+      vars.rl.question(`${msg}[${arr.join(" ")}]\n`, handleBrowserInput);
     }
   }
 }
@@ -535,5 +546,4 @@ module.exports = {
   handleBrowserInput,
   handleOldConfig,
   handleSetupCallback,
-  setupReadline: rl,
 };

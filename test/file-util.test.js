@@ -267,7 +267,7 @@ describe("isSubDir", () => {
 
 describe("readFile", () => {
   it("should throw", async () => {
-    const res = await readFile("foo/bar").catch(e => {
+    await readFile("foo/bar").catch(e => {
       assert.strictEqual(e.message, "foo/bar is not a file.");
     });
   });
