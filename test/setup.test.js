@@ -13,16 +13,7 @@ const rewire = require("rewire");
 const sinon = require("sinon");
 
 /* constant */
-const {
-  CHAR, DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
-} = require("../modules/constant");
-const DIR_CWD = process.cwd();
-const HKCU_SOFTWARE = ["HKEY_CURRENT_USER", "SOFTWARE"];
-const HOST_DIR_LABEL = "NativeMessagingHosts";
-const OLD_CONFIG = path.join(DIR_CWD, "config");
-const PERM_DIR = 0o700;
-const PERM_EXEC = 0o700;
-const PERM_FILE = 0o600;
+const {DIR_HOME, IS_WIN} = require("../modules/constant");
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();
 
