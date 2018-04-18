@@ -452,6 +452,18 @@ describe("extractArg", () => {
   });
 });
 
+describe("getProcessArgv", () => {
+  it("should get array", async () => {
+    const func = setupJs.__get__("getProcessArgv");
+    const res = await func();
+    assert.isTrue(Array.isArray(res));
+    assert.deepEqual(res, [
+      "test",
+      "--exit",
+    ]);
+  });
+});
+
 /* Setup */
 describe("Setup", () => {
   const setup = new Setup({

@@ -373,6 +373,15 @@ const extractArg = (arg, re) => {
   return value || null;
 };
 
+/**
+ * get process argv
+ * @returns {?Array} - argv
+ */
+const getProcessArgv = () => {
+  const [, , ...args] = process.argv;
+  return args || null;
+};
+
 /* Setup */
 class Setup {
   /**
@@ -473,7 +482,7 @@ class Setup {
    * @returns {void}
    */
   run() {
-    const [, , ...args] = process.argv;
+    const args = getProcessArgv();
     if (Array.isArray(args) && args.length) {
       for (const arg of args) {
         let value;
