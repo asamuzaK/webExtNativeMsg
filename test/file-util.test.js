@@ -153,9 +153,20 @@ describe("removeDir", () => {
     assert.deepEqual(res, [false, false]);
   });
 
-  it("should throw if dir is not subdirectory of base dir", () => {
+  it("should ignore if dir is not a directory", () => {
     const foo = path.resolve("foo");
-    assert.throws(() => removeDir(foo, TMPDIR));
+    assert.isFalse(isDir(foo));
+    assert.doesNotThrow(() => removeDir(foo, TMPDIR));
+  });
+
+  it("should throw if dir is not subdirectory of base dir", async () => {
+    const dirPath = path.join(TMPDIR, "webextnativemsg");
+    const foo = path.join(TMPDIR, "foo");
+    await fs.mkdirSync(dirPath);
+    await fs.mkdirSync(foo);
+    assert.throws(() => removeDir(foo, dirPath));
+    await fs.rmdirSync(dirPath);
+    await fs.rmdirSync(foo);
   });
 });
 
