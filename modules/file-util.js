@@ -136,19 +136,21 @@ const getFileNameFromFilePath = (file, subst = SUBST) => {
  * @returns {void}
  */
 const removeDir = (dir, baseDir) => {
-  if (!isSubDir(dir, baseDir)) {
-    throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
-  }
-  const files = fs.readdirSync(dir);
-  files.length && files.forEach(file => {
-    const cur = path.join(dir, file);
-    if (fs.lstatSync(cur).isDirectory()) {
-      removeDir(cur, baseDir);
-    } else {
-      fs.unlinkSync(cur);
+  if (isDir(dir)) {
+    if (!isSubDir(dir, baseDir)) {
+      throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-  });
-  fs.rmdirSync(dir);
+    const files = fs.readdirSync(dir);
+    files.length && files.forEach(file => {
+      const cur = path.join(dir, file);
+      if (fs.lstatSync(cur).isDirectory()) {
+        removeDir(cur, baseDir);
+      } else {
+        fs.unlinkSync(cur);
+      }
+    });
+    fs.rmdirSync(dir);
+  }
 };
 
 /**
