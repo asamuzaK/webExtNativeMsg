@@ -368,7 +368,10 @@ const extractArg = (arg, re) => {
   let value;
   if (isString(arg) && re && re.ignoreCase) {
     arg = re.exec(arg.trim());
-    arg && ([, value] = arg);
+    if (arg) {
+      const [, v] = arg;
+      value = v;
+    }
   }
   return value || null;
 };
