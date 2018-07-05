@@ -11,6 +11,7 @@ const {
 } = require("./file-util");
 const path = require("path");
 const process = require("process");
+const program = require("commander");
 const readline = require("readline");
 
 /* constants */
@@ -34,10 +35,18 @@ const vars = {
   hostName: null,
   mainFile: null,
   manifestPath: null,
+  overwrite: false,
   rl: null,
   shellPath: null,
   webExtIds: null,
 };
+
+/* command args */
+program
+  .option("-b, --browser <s>", "specify the browser")
+  .option("-p, --config-path <s>", "path to save config files")
+  .option("-o, --overwrite", "overwrite config if exists")
+  .parse(process.argv);
 
 /**
  * abort setup
@@ -322,7 +331,7 @@ const handleBrowserConfigDir = ans => {
  * @returns {?AsyncFunction} - createFiles();
  */
 const handleBrowserInput = ans => {
-  const {rl} = vars;
+  const {overwrite, rl} = vars;
   const msg = "Browser not specified.";
   let func;
   if (isString(ans)) {
@@ -336,7 +345,7 @@ const handleBrowserInput = ans => {
           throw new TypeError(`Expected Array but got ${getType(dir)}.`);
         }
         const dirPath = path.join(...dir);
-        if (isDir(dirPath) && rl) {
+        if (isDir(dirPath) && rl && !overwrite) {
           rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                       handleBrowserConfigDir);
         } else {
@@ -356,33 +365,6 @@ const handleBrowserInput = ans => {
     abortSetup(msg);
   }
   return func || null;
-};
-
-/**
- * extract argument
- * @param {string} arg - argument in key=value format
- * @param {RegExp} re - RegExp
- * @returns {string} - argument value
- */
-const extractArg = (arg, re) => {
-  let value;
-  if (isString(arg) && re && re.ignoreCase) {
-    arg = re.exec(arg.trim());
-    if (arg) {
-      const [, v] = arg;
-      value = v;
-    }
-  }
-  return value || null;
-};
-
-/**
- * get process argv
- * @returns {?Array} - argv
- */
-const getProcessArgv = () => {
-  const [, , ...args] = process.argv;
-  return args || null;
 };
 
 /* Setup */
@@ -485,18 +467,15 @@ class Setup {
    * @returns {void}
    */
   run() {
-    const args = getProcessArgv();
-    if (Array.isArray(args) && args.length) {
-      for (const arg of args) {
-        let value;
-        if (/^--browser=/i.test(arg)) {
-          value = extractArg(arg, /^--browser=(.+)$/i);
-          value && (this._browser = getBrowserData(value));
-        } else if (/^--config-path=/i.test(arg)) {
-          value = extractArg(arg, /^--config-path=(.+)$/i);
-          value && this.setConfigDir(value);
-        }
-      }
+    const {browser, configPath, overwrite} = program;
+    if (browser) {
+      this._browser = getBrowserData(browser);
+    }
+    if (configPath) {
+      this.setConfigDir(configPath);
+    }
+    if (overwrite) {
+      vars.overwrite = !!overwrite;
     }
     vars.browser = this._browser;
     vars.callback = this._callback;
@@ -519,7 +498,7 @@ class Setup {
         throw new TypeError(`Expected Array but got ${getType(dir)}.`);
       }
       const dirPath = path.join(...dir);
-      if (isDir(dirPath)) {
+      if (isDir(dirPath) && !vars.overwrite) {
         vars.rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                          handleBrowserConfigDir);
       } else {
@@ -551,7 +530,6 @@ module.exports = {
   createConfig,
   createFiles,
   createShellScript,
-  extractArg,
   getBrowserConfigDir,
   getBrowserData,
   handleBrowserConfigDir,
