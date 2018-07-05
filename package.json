@@ -17,6 +17,9 @@
     "lint": "eslint .",
     "test": "nyc --reporter=text mocha test --exit"
   },
+  "dependencies": {
+    "commander": "^2.16.0"
+  },
   "devDependencies": {
     "chai": "^4.1.2",
     "eslint": "^5.0.1",
@@ -25,8 +28,5 @@
     "rewire": "^4.0.1",
     "sinon": "^6.1.0"
   },
-  "version": "2.4.2",
-  "dependencies": {
-    "commander": "^2.16.0"
-  }
+  "version": "2.5.0"
 }
