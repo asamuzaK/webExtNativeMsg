@@ -39,13 +39,12 @@ const vars = {
   rl: null,
   shellPath: null,
   webExtIds: null,
-  commander: (new commander.Command()
-               .option("-b, --browser <name>", "specify the browser")
-               .option("-c, --config-path <path>", "path to save config files")
-               .option("-o, --overwrite", "overwrite config if exists")
-               .allowUnknownOption()
-               .parse(process.argv)
-             ),
+  commander: new commander.Command()
+    .option("-b, --browser <name>", "specify the browser")
+    .option("-c, --config-path <path>", "path to save config files")
+    .option("-o, --overwrite", "overwrite config if exists")
+    .allowUnknownOption()
+    .parse(process.argv),
 };
 
 /**
