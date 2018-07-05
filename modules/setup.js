@@ -35,7 +35,7 @@ const vars = {
   hostName: null,
   mainFile: null,
   manifestPath: null,
-  overwrite: false,
+  overwriteConfig: false,
   rl: null,
   shellPath: null,
   webExtIds: null,
@@ -103,9 +103,10 @@ const getBrowserConfigDir = () => {
 const handleSetupCallback = () => {
   const {
     callback, configPath: configDirPath, shellPath: shellScriptPath,
-    manifestPath,
+    manifestPath, rl,
   } = vars;
   let func;
+  rl && rl.close();
   if (typeof callback === "function") {
     func = callback({configDirPath, shellScriptPath, manifestPath});
   }
@@ -321,12 +322,11 @@ const handleBrowserConfigDir = ans => {
 /**
  * handle browser input
  * @param {string} ans - user input
- * @returns {?AsyncFunction} - createFiles();
+ * @returns {void}
  */
 const handleBrowserInput = ans => {
-  const {overwrite, rl} = vars;
+  const {overwriteConfig, rl} = vars;
   const msg = "Browser not specified.";
-  let func;
   if (isString(ans)) {
     ans = ans.trim();
     if (ans.length) {
@@ -338,11 +338,12 @@ const handleBrowserInput = ans => {
           throw new TypeError(`Expected Array but got ${getType(dir)}.`);
         }
         const dirPath = path.join(...dir);
-        if (isDir(dirPath) && rl && !overwrite) {
+        if (isDir(dirPath) && rl && !overwriteConfig) {
           rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                       handleBrowserConfigDir);
         } else {
-          func = createFiles().catch(logErr);
+          rl && rl.close();
+          createFiles().catch(logErr);
         }
       } else {
         // TODO: Add custom setup
@@ -357,7 +358,6 @@ const handleBrowserInput = ans => {
     rl && rl.close();
     abortSetup(msg);
   }
-  return func || null;
 };
 
 /* Setup */
@@ -460,21 +460,20 @@ class Setup {
    * @returns {void}
    */
   run() {
-    const {browser, configPath, overwrite} = (new Command())
-      .option("-b, --browser <name>", "specify the browser")
+    const {
+      browser, configPath, overwriteConfig,
+    } = (new Command()).option("-b, --browser <name>", "specify the browser")
       .option("-c, --config-path <path>", "path to save config files")
-      .option("-o, --overwrite", "overwrite config if exists")
-      .allowUnknownOption()
-      .parse(process.argv)
-      .opts();
+      .option("-o, --overwrite-config", "overwrite config if exists")
+      .allowUnknownOption().parse(process.argv).opts();
     if (browser) {
       this._browser = getBrowserData(browser);
     }
     if (configPath) {
       this.setConfigDir(configPath);
     }
-    if (overwrite) {
-      vars.overwrite = !!overwrite;
+    if (overwriteConfig) {
+      vars.overwriteConfig = !!overwriteConfig;
     }
     vars.browser = this._browser;
     vars.callback = this._callback;
@@ -497,10 +496,11 @@ class Setup {
         throw new TypeError(`Expected Array but got ${getType(dir)}.`);
       }
       const dirPath = path.join(...dir);
-      if (isDir(dirPath) && !vars.overwrite) {
+      if (isDir(dirPath) && !vars.overwriteConfig) {
         vars.rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                          handleBrowserConfigDir);
       } else {
+        vars.rl.close();
         createFiles().catch(logErr);
       }
     } else {

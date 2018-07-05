@@ -418,10 +418,11 @@ describe("handleBrowserInput", () => {
       },
       configDir: [TMPDIR],
     });
-    const res = await func("firefox");
-    const {called} = stubAbort;
-    assert.isTrue(res);
-    assert.isFalse(called);
+    await func("firefox");
+    const {called: calledCreateFiles} = stubCreateFiles;
+    const {called: calledAbort} = stubAbort;
+    assert.isTrue(calledCreateFiles);
+    assert.isFalse(calledAbort);
     abortSetup();
     createFiles();
     vars();
