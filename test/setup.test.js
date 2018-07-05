@@ -1,8 +1,8 @@
 "use strict";
 /* api */
 const {
-  Setup, extractArg, getBrowserData, getBrowserConfigDir,
-  handleBrowserInput, handleSetupCallback,
+  Setup, getBrowserData, getBrowserConfigDir, handleBrowserInput,
+  handleSetupCallback,
 } = require("../modules/setup");
 const {assert} = require("chai");
 const {describe, it} = require("mocha");
@@ -426,41 +426,28 @@ describe("handleBrowserInput", () => {
     createFiles();
     vars();
   });
-});
 
-describe("extractArg", () => {
-  it("should get value", () => {
-    assert.strictEqual(
-      extractArg("--app-file=index.exe", /^--app-file=(.+)$/i),
-      "index.exe"
-    );
-  });
-
-  it("should get value", () => {
-    assert.strictEqual(
-      extractArg("--browser=firefox", /^--browser=(.+)$/i),
-      "firefox"
-    );
-  });
-
-  it("should get value", () => {
-    assert.strictEqual(
-      extractArg("--config-path=\"C:\\Program Files\"",
-                 /^--config-path=(.+)$/i),
-      "\"C:\\Program Files\""
-    );
-  });
-});
-
-describe("getProcessArgv", () => {
-  it("should get array", async () => {
-    const func = setupJs.__get__("getProcessArgv");
-    const res = await func();
-    assert.isTrue(Array.isArray(res));
-    assert.deepEqual(res, [
-      "test",
-      "--exit",
-    ]);
+  it("should get function", async () => {
+    const func = setupJs.__get__("handleBrowserInput");
+    const stubCreateFiles = sinon.stub().callsFake(async () => true);
+    const createFiles = setupJs.__set__("createFiles", stubCreateFiles);
+    const stubAbort = sinon.stub().callsFake(msg => msg);
+    const abortSetup = setupJs.__set__("abortSetup", stubAbort);
+    const configDir = path.resolve(path.join("test", "file"));
+    const vars = setupJs.__set__("vars", {
+      browser: {
+        alias: "firefox",
+      },
+      configDir: [configDir],
+      overWrite: false,
+    });
+    const res = await func("firefox");
+    const {called} = stubAbort;
+    assert.isTrue(res);
+    assert.isFalse(called);
+    abortSetup();
+    createFiles();
+    vars();
   });
 });
 
