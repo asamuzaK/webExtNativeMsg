@@ -9,9 +9,9 @@ const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
 const {
   createDir, createFile, getAbsPath, isDir, isFile, removeDir,
 } = require("./file-util");
+const commander = require("commander");
 const path = require("path");
 const process = require("process");
-const program = require("commander");
 const readline = require("readline");
 
 /* constants */
@@ -39,14 +39,14 @@ const vars = {
   rl: null,
   shellPath: null,
   webExtIds: null,
+  commander: (new commander.Command()
+               .option("-b, --browser <name>", "specify the browser")
+               .option("-c, --config-path <path>", "path to save config files")
+               .option("-o, --overwrite", "overwrite config if exists")
+               .allowUnknownOption()
+               .parse(process.argv)
+             ),
 };
-
-/* command args */
-program
-  .option("-b, --browser <s>", "specify the browser")
-  .option("-p, --config-path <s>", "path to save config files")
-  .option("-o, --overwrite", "overwrite config if exists")
-  .parse(process.argv);
 
 /**
  * abort setup
@@ -467,7 +467,7 @@ class Setup {
    * @returns {void}
    */
   run() {
-    const {browser, configPath, overwrite} = program;
+    const {browser, configPath, overwrite} = vars.commander;
     if (browser) {
       this._browser = getBrowserData(browser);
     }
