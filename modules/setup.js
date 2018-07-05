@@ -212,7 +212,7 @@ const createShellScript = async configPath => {
  * @returns {void}
  */
 const createFiles = async () => {
-  const {browser, hostDesc, hostName, chromeExtIds, webExtIds} = vars;
+  const {browser, hostDesc, hostName, chromeExtIds, rl, webExtIds} = vars;
   if (!browser) {
     throw new Error(`Expected Object but got ${getType(browser)}.`);
   }
@@ -252,6 +252,7 @@ const createFiles = async () => {
     IS_MAC && path.join(...hostMac, fileName) ||
     path.join(...hostLinux, fileName)
   );
+  rl && rl.close();
   if (IS_WIN) {
     const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
     const regKey = path.join(...regWin, hostName);
