@@ -426,29 +426,6 @@ describe("handleBrowserInput", () => {
     createFiles();
     vars();
   });
-
-  it("should get function", async () => {
-    const func = setupJs.__get__("handleBrowserInput");
-    const stubCreateFiles = sinon.stub().callsFake(async () => true);
-    const createFiles = setupJs.__set__("createFiles", stubCreateFiles);
-    const stubAbort = sinon.stub().callsFake(msg => msg);
-    const abortSetup = setupJs.__set__("abortSetup", stubAbort);
-    const configDir = path.resolve(path.join("test", "file"));
-    const vars = setupJs.__set__("vars", {
-      browser: {
-        alias: "firefox",
-      },
-      configDir: [configDir],
-      overWrite: false,
-    });
-    const res = await func("firefox");
-    const {called} = stubAbort;
-    assert.isTrue(res);
-    assert.isFalse(called);
-    abortSetup();
-    createFiles();
-    vars();
-  });
 });
 
 /* Setup */
