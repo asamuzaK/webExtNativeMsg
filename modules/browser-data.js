@@ -3,7 +3,12 @@
  */
 "use strict";
 /* constants */
-const {DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB} = require("./constant");
+const {
+  DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
+  EXT_CHROME, EXT_WEB, IS_MAC, IS_WIN,
+} = require("./constant");
+const DIR_CONFIG = IS_WIN && DIR_CONFIG_WIN || IS_MAC && DIR_CONFIG_MAC ||
+                   DIR_CONFIG_LINUX;
 const HKCU_SOFTWARE = ["HKEY_CURRENT_USER", "SOFTWARE"];
 const HOST_DIR_LABEL = "NativeMessagingHosts";
 

@@ -13,7 +13,11 @@ const rewire = require("rewire");
 const sinon = require("sinon");
 
 /* constant */
-const {DIR_CONFIG, DIR_HOME, IS_WIN} = require("../modules/constant");
+const {
+  DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME, IS_MAC, IS_WIN,
+} = require("../modules/constant");
+const DIR_CONFIG = IS_WIN && DIR_CONFIG_WIN || IS_MAC && DIR_CONFIG_MAC ||
+                   DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();

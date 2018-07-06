@@ -6,8 +6,8 @@ const {isString} = require("../modules/common");
 
 /* constant */
 const {
-  CHAR, DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE,
-  IS_MAC, IS_WIN,
+  CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
+  EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE, IS_MAC, IS_WIN,
 } = require("../modules/constant");
 
 describe("string constants", () => {
@@ -47,11 +47,15 @@ describe("boolean constants", () => {
   });
 });
 
-describe("DIR_CONFIG", () => {
-  it("should get value", () => {
-    const dir = IS_WIN && [DIR_HOME, "AppData", "Roaming"] ||
-                IS_MAC && [DIR_HOME, "Library", "Application Support"] ||
-                [DIR_HOME, ".config"];
-    assert.deepEqual(dir, DIR_CONFIG);
+describe("array conatants", () => {
+  it("should get array", () => {
+    const arr = [
+      DIR_CONFIG_LINUX,
+      DIR_CONFIG_MAC,
+      DIR_CONFIG_WIN,
+    ];
+    arr.forEach(i => {
+      assert.isArray(i);
+    });
   });
 });

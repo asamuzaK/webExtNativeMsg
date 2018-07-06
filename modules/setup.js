@@ -15,8 +15,11 @@ const readline = require("readline");
 
 /* constants */
 const {
-  CHAR, DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
+  CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
+  EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
 } = require("./constant");
+const DIR_CONFIG = IS_WIN && DIR_CONFIG_WIN || IS_MAC && DIR_CONFIG_MAC ||
+                   DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
 const OLD_CONFIG = path.join(DIR_CWD, "config");
 const PERM_DIR = 0o700;
