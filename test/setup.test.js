@@ -624,8 +624,7 @@ describe("Setup", () => {
           return rl;
         }
       );
-      const configPath = path.join(TMPDIR, "myapp", "config");
-      await createDir([TMPDIR, "myapp", "config", "firefox"]);
+      const configPath = path.join(DIR_CWD, "files", "config");
       setup.configPath = configPath;
       setup.browser = "firefox";
       setup.overwriteConfig = false;
