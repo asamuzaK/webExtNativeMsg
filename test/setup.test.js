@@ -607,5 +607,38 @@ describe("Setup", () => {
         "Enter which browser you would like to set up the host for:\n"
       );
     });
+
+    it("should ask a question", async () => {
+      let rlQues;
+      const readline = setupJs.__get__("readline");
+      const createDir = setupJs.__get__("createDir");
+      const stubRlQues = sinon.stub().callsFake(msg => {
+        rlQues = msg;
+      });
+      const stubCreate = sinon.stub(readline, "createInterface").callsFake(
+        () => {
+          const rl = {
+            close: () => undefined,
+            question: stubRlQues,
+          };
+          return rl;
+        }
+      );
+      const configPath = path.join(TMPDIR, "myapp", "config");
+      await createDir([TMPDIR, "myapp", "config", "firefox"]);
+      setup.configPath = configPath;
+      setup.browser = "firefox";
+      setup.overwriteConfig = false;
+      await setup.run();
+      const {calledOnce: createCalled} = stubCreate;
+      const {calledOnce: quesCalled} = stubRlQues;
+      stubCreate.restore();
+      assert.isTrue(createCalled);
+      assert.isTrue(quesCalled);
+      assert.include(
+        rlQues,
+        `${path.join(configPath, "firefox")} already exists. Overwrite? [y/n]\n`
+      );
+    });
   });
 });
