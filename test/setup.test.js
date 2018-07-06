@@ -611,7 +611,6 @@ describe("Setup", () => {
     it("should ask a question", async () => {
       let rlQues;
       const readline = setupJs.__get__("readline");
-      const createDir = setupJs.__get__("createDir");
       const stubRlQues = sinon.stub().callsFake(msg => {
         rlQues = msg;
       });
