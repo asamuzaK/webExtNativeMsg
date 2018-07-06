@@ -9,15 +9,17 @@ const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
 const {
   createDir, createFile, getAbsPath, isDir, isFile, removeDir,
 } = require("./file-util");
-const {Command} = require("commander");
 const path = require("path");
 const process = require("process");
 const readline = require("readline");
 
 /* constants */
 const {
-  CHAR, DIR_CONFIG, DIR_HOME, EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
+  CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
+  EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN,
 } = require("./constant");
+const DIR_CONFIG = IS_WIN && DIR_CONFIG_WIN || IS_MAC && DIR_CONFIG_MAC ||
+                   DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
 const OLD_CONFIG = path.join(DIR_CWD, "config");
 const PERM_DIR = 0o700;
@@ -368,18 +370,23 @@ class Setup {
    * @param {string} [opt.hostDescription] - host description
    * @param {string} [opt.hostName] - host name
    * @param {string} [opt.mainScriptFile] - file name of the main script
-   * @param {Array} [opt.chromeExtensionIds] - Array of chrome extension IDs
-   * @param {Array} [opt.webExtensionIds] - Array of web extension IDs
+   * @param {Array} [opt.chromeExtensionIds] - array of chrome extension IDs
+   * @param {Array} [opt.webExtensionIds] - array of web extension IDs
+   * @param {callback} [opt.callback] - callback after setup
+   * @param {string} [opt.browser] - specify the browser
+   * @param {string} [opt.configPath] - config path
+   * @param {boolean} [opt.overwriteConfig] - overwrite config if exists
    */
   constructor(opt = {}) {
     const {
-      callback, hostDescription, hostName, mainScriptFile,
-      chromeExtensionIds, webExtensionIds,
+      browser, callback, chromeExtensionIds, configPath, hostDescription,
+      hostName, mainScriptFile, overwriteConfig, webExtensionIds,
     } = opt;
-    this._browser = null;
+    this._browser = isString(browser) && getBrowserData(browser) || null;
     this._configDir = isString(hostName) &&
                       [...DIR_CONFIG, hostName, "config"] ||
                       [DIR_CWD, "config"];
+    this._overwriteConfig = !!overwriteConfig;
     this._hostDesc = isString(hostDescription) && hostDescription || null;
     this._hostName = isString(hostName) && hostName || null;
     this._mainFile = isString(mainScriptFile) && mainScriptFile || "index.js";
@@ -389,6 +396,9 @@ class Setup {
     this._webExtIds = Array.isArray(webExtensionIds) &&
                       webExtensionIds.length && webExtensionIds || null;
     this._callback = typeof callback === "function" && callback || null;
+    if (isString(configPath) && configPath.length) {
+      this.setConfigDir(configPath);
+    }
   }
 
   /* getter / setter */
@@ -434,6 +444,33 @@ class Setup {
     this._callback = typeof func === "function" && func || null;
     vars.callback = this._callback;
   }
+  get overwriteConfig() {
+    return this._overwriteConfig;
+  }
+  set overwriteConfig(overwrite) {
+    this._overwriteConfig = !!overwrite;
+    vars.overwriteConfig = this._overwriteConfig;
+  }
+  get browser() {
+    let browser;
+    if (this._browser) {
+      const {alias} = this._browser;
+      browser = alias;
+    } else {
+      browser = this._browser;
+    }
+    return browser;
+  }
+  set browser(browser) {
+    this._browser = isString(browser) && getBrowserData(browser) || null;
+    vars.browser = this._browser;
+  }
+  get configPath() {
+    return path.join(...this._configDir);
+  }
+  set configPath(dir) {
+    this.setConfigDir(dir);
+  }
 
   /**
    * set config directory
@@ -460,28 +497,14 @@ class Setup {
    * @returns {void}
    */
   run() {
-    const {
-      browser, configPath, overwriteConfig,
-    } = (new Command()).option("-b, --browser <name>", "specify the browser")
-      .option("-c, --config-path <path>", "path to save config files")
-      .option("-o, --overwrite-config", "overwrite config if exists")
-      .allowUnknownOption().parse(process.argv).opts();
-    if (browser) {
-      this._browser = getBrowserData(browser);
-    }
-    if (configPath) {
-      this.setConfigDir(configPath);
-    }
-    if (overwriteConfig) {
-      vars.overwriteConfig = !!overwriteConfig;
-    }
     vars.browser = this._browser;
     vars.callback = this._callback;
+    vars.chromeExtIds = this._chromeExtIds;
     vars.configDir = this._configDir;
     vars.hostDesc = this._hostDesc;
     vars.hostName = this._hostName;
     vars.mainFile = this._mainFile;
-    vars.chromeExtIds = this._chromeExtIds;
+    vars.overwriteConfig = this._overwriteConfig;
     vars.webExtIds = this._webExtIds;
     vars.rl = readline.createInterface({
       input: process.stdin,
@@ -496,7 +519,7 @@ class Setup {
         throw new TypeError(`Expected Array but got ${getType(dir)}.`);
       }
       const dirPath = path.join(...dir);
-      if (isDir(dirPath) && !vars.overwriteConfig) {
+      if (isDir(dirPath) && !this._overwriteConfig) {
         vars.rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
                          handleBrowserConfigDir);
       } else {

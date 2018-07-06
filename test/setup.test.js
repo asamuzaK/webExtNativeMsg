@@ -13,7 +13,12 @@ const rewire = require("rewire");
 const sinon = require("sinon");
 
 /* constant */
-const {DIR_HOME, IS_WIN} = require("../modules/constant");
+const {
+  DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME, IS_MAC, IS_WIN,
+} = require("../modules/constant");
+const DIR_CONFIG = IS_WIN && DIR_CONFIG_WIN || IS_MAC && DIR_CONFIG_MAC ||
+                   DIR_CONFIG_LINUX;
+const DIR_CWD = process.cwd();
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();
 
@@ -465,6 +470,19 @@ describe("Setup", () => {
     it("should get null if callback arg is not given", () => {
       assert.isNull(setup.callback);
     });
+
+    it("should get false", () => {
+      assert.isFalse(setup.overwriteConfig);
+    });
+
+    it("should get null", () => {
+      assert.isNull(setup.browser);
+    });
+
+    it("should get string", () => {
+      assert.strictEqual(setup.configPath,
+                         path.join(...DIR_CONFIG, "myhost", "config"));
+    });
   });
 
   /* setters */
@@ -498,6 +516,43 @@ describe("Setup", () => {
       const myCallback = a => a;
       setup.callback = myCallback;
       assert.strictEqual(setup.callback.name, "myCallback");
+    });
+
+    it("should get true", () => {
+      setup.overwriteConfig = true;
+      assert.isTrue(setup.overwriteConfig);
+    });
+
+    it("should get false", () => {
+      setup.overwriteConfig = false;
+      assert.isFalse(setup.overwriteConfig);
+    });
+
+    it("should get null", () => {
+      setup.browser = "";
+      assert.isNull(setup.browser);
+    });
+
+    it("should get browser name", () => {
+      setup.browser = "firefox";
+      assert.strictEqual(setup.browser, "firefox");
+    });
+
+    it("should get null", () => {
+      setup.browser = "foo";
+      assert.isNull(setup.browser);
+    });
+
+    it("should get string", () => {
+      const myPath = path.join(DIR_CWD, "foo");
+      setup.configPath = myPath;
+      assert.strictEqual(setup.configPath, myPath);
+    });
+
+    it("should get string", () => {
+      const myPath = path.join(...DIR_CONFIG, "myhost", "config");
+      setup.configPath = myPath;
+      assert.strictEqual(setup.configPath, myPath);
     });
   });
 
@@ -550,6 +605,37 @@ describe("Setup", () => {
       assert.include(
         rlQues,
         "Enter which browser you would like to set up the host for:\n"
+      );
+    });
+
+    it("should ask a question", async () => {
+      let rlQues;
+      const readline = setupJs.__get__("readline");
+      const stubRlQues = sinon.stub().callsFake(msg => {
+        rlQues = msg;
+      });
+      const stubCreate = sinon.stub(readline, "createInterface").callsFake(
+        () => {
+          const rl = {
+            close: () => undefined,
+            question: stubRlQues,
+          };
+          return rl;
+        }
+      );
+      const configPath = path.resolve(path.join("test", "file", "config"));
+      setup.configPath = configPath;
+      setup.browser = "firefox";
+      setup.overwriteConfig = false;
+      await setup.run();
+      const {calledOnce: createCalled} = stubCreate;
+      const {calledOnce: quesCalled} = stubRlQues;
+      stubCreate.restore();
+      assert.isTrue(createCalled);
+      assert.isTrue(quesCalled);
+      assert.include(
+        rlQues,
+        `${path.join(configPath, "firefox")} already exists. Overwrite? [y/n]\n`
       );
     });
   });
