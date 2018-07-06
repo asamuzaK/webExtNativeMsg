@@ -623,7 +623,7 @@ describe("Setup", () => {
           return rl;
         }
       );
-      const configPath = path.join(DIR_CWD, "files", "config");
+      const configPath = path.resolve(path.join("test", "file", "config"));
       setup.configPath = configPath;
       setup.browser = "firefox";
       setup.overwriteConfig = false;
