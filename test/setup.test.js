@@ -13,7 +13,8 @@ const rewire = require("rewire");
 const sinon = require("sinon");
 
 /* constant */
-const {DIR_HOME, IS_WIN} = require("../modules/constant");
+const {DIR_CONFIG, DIR_HOME, IS_WIN} = require("../modules/constant");
+const DIR_CWD = process.cwd();
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();
 
@@ -465,6 +466,19 @@ describe("Setup", () => {
     it("should get null if callback arg is not given", () => {
       assert.isNull(setup.callback);
     });
+
+    it("should get false", () => {
+      assert.isFalse(setup.overwriteConfig);
+    });
+
+    it("should get null", () => {
+      assert.isNull(setup.browser);
+    });
+
+    it("should get string", () => {
+      assert.strictEqual(setup.configPath,
+                         path.join(...DIR_CONFIG, "myhost", "config"));
+    });
   });
 
   /* setters */
@@ -498,6 +512,43 @@ describe("Setup", () => {
       const myCallback = a => a;
       setup.callback = myCallback;
       assert.strictEqual(setup.callback.name, "myCallback");
+    });
+
+    it("should get true", () => {
+      setup.overwriteConfig = true;
+      assert.isTrue(setup.overwriteConfig);
+    });
+
+    it("should get false", () => {
+      setup.overwriteConfig = false;
+      assert.isFalse(setup.overwriteConfig);
+    });
+
+    it("should get null", () => {
+      setup.browser = "";
+      assert.isNull(setup.browser);
+    });
+
+    it("should get browser name", () => {
+      setup.browser = "firefox";
+      assert.strictEqual(setup.browser, "firefox");
+    });
+
+    it("should get null", () => {
+      setup.browser = "foo";
+      assert.isNull(setup.browser);
+    });
+
+    it("should get string", () => {
+      const myPath = path.join(DIR_CWD, "foo");
+      setup.configPath = myPath;
+      assert.strictEqual(setup.configPath, myPath);
+    });
+
+    it("should get string", () => {
+      const myPath = path.join(...DIR_CONFIG, "myhost", "config");
+      setup.configPath = myPath;
+      assert.strictEqual(setup.configPath, myPath);
     });
   });
 

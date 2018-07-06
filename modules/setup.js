@@ -448,15 +448,25 @@ class Setup {
     this._overwriteConfig = !!overwrite;
     vars.overwriteConfig = this._overwriteConfig;
   }
-
-  /**
-   * set browser data
-   * @param {string} browser - browser name
-   * @returns {void}
-   */
-  setBrowser(browser) {
+  get browser() {
+    let browser;
+    if (this._browser) {
+      const {alias} = this._browser;
+      browser = alias;
+    } else {
+      browser = this._browser;
+    }
+    return browser;
+  }
+  set browser(browser) {
     this._browser = isString(browser) && getBrowserData(browser) || null;
     vars.browser = this._browser;
+  }
+  get configPath() {
+    return path.join(...this._configDir);
+  }
+  set configPath(dir) {
+    this.setConfigDir(dir);
   }
 
   /**
