@@ -7,6 +7,7 @@ const {describe, it} = require("mocha");
 const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const process = require("process");
 const rewire = require("rewire");
 const sinon = require("sinon");
 
@@ -22,6 +23,32 @@ describe("ChildProcess", () => {
   it("should create an instance", () => {
     const proc = new ChildProcess();
     assert.instanceOf(proc, ChildProcess);
+  });
+
+  /* constructor */
+  it("should set cmd", () => {
+    const app = IS_WIN && "test.cmd" || "test.sh";
+    const cmd = path.resolve(path.join("test", "file", app));
+    const proc = new ChildProcess(cmd);
+    assert.deepEqual(proc._cmd, cmd);
+  });
+
+  it("should set args", () => {
+    const args = ["foo", "bar"];
+    const proc = new ChildProcess(null, args);
+    assert.deepEqual(proc._args, args);
+  });
+
+  it("should set args", () => {
+    const args = "foo bar";
+    const proc = new ChildProcess(null, args);
+    assert.deepEqual(proc._args, args.split(" "));
+  });
+
+  it("should set option", () => {
+    const opt = {cwd: null, env: process.env, encoding: "utf8", };
+    const proc = new ChildProcess(null, null, opt);
+    assert.deepEqual(proc._opt, opt);
   });
 
   /* method */
