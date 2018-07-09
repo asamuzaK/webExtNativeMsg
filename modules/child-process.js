@@ -17,14 +17,17 @@ const correctArg = arg => {
   if (isString(arg)) {
     if (/^\s*(?:".*"|'.*')\s*$/.test(arg)) {
       arg = arg.trim();
-      /^".*\\["\\].*"$/.test(arg) &&
-        (arg = arg.replace(/\\"/g, "\"").replace(/\\\\/g, "\\"));
+      if (/^".*\\["\\].*"$/.test(arg)) {
+        arg = arg.replace(/\\"/g, "\"").replace(/\\\\/g, "\\");
+      }
       arg = arg.replace(/^['"]/, "").replace(/["']$/, "");
     } else {
-      /^.*\\.*$/.test(arg) && (arg = arg.replace(/\\(?!\\)/g, ""));
-      /".*"|'.*'/.test(arg) && (
-        arg = arg.replace(/"([^"]+)*"|'([^']+)*'/g, (m, c1, c2) => c1 || c2)
-      );
+      if (/^.*\\.*$/.test(arg)) {
+        arg = arg.replace(/\\(?!\\)/g, "");
+      }
+      if (/".*"|'.*'/.test(arg)) {
+        arg = arg.replace(/"([^"]+)*"|'([^']+)*'/g, (m, c1, c2) => c1 || c2);
+      }
     }
   } else {
     arg = "";

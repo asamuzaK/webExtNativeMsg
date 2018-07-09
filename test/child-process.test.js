@@ -46,7 +46,7 @@ describe("ChildProcess", () => {
   });
 
   it("should set option", () => {
-    const opt = {cwd: null, env: process.env, encoding: "utf8", };
+    const opt = {cwd: null, env: process.env, encoding: "utf8"};
     const proc = new ChildProcess(null, null, opt);
     assert.deepEqual(proc._opt, opt);
   });
