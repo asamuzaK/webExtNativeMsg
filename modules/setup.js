@@ -371,14 +371,14 @@ class Setup {
   /**
    * setup options
    * @param {Object} [opt] - options
+   * @param {string} [opt.browser] - specify the browser
+   * @param {string} [opt.configPath] - config path
    * @param {string} [opt.hostDescription] - host description
    * @param {string} [opt.hostName] - host name
    * @param {string} [opt.mainScriptFile] - file name of the main script
    * @param {Array} [opt.chromeExtensionIds] - array of chrome extension IDs
    * @param {Array} [opt.webExtensionIds] - array of web extension IDs
    * @param {callback} [opt.callback] - callback after setup
-   * @param {string} [opt.browser] - specify the browser
-   * @param {string} [opt.configPath] - config path
    * @param {boolean} [opt.overwriteConfig] - overwrite config if exists
    */
   constructor(opt = {}) {
@@ -406,6 +406,26 @@ class Setup {
   }
 
   /* getter / setter */
+  get browser() {
+    let browser;
+    if (this._browser) {
+      const {alias} = this._browser;
+      browser = alias;
+    } else {
+      browser = this._browser;
+    }
+    return browser;
+  }
+  set browser(browser) {
+    this._browser = isString(browser) && getBrowserData(browser) || null;
+    vars.browser = this._browser;
+  }
+  get configPath() {
+    return path.join(...this._configDir);
+  }
+  set configPath(dir) {
+    this._setConfigDir(dir);
+  }
   get hostDescription() {
     return this._hostDesc;
   }
@@ -454,26 +474,6 @@ class Setup {
   set overwriteConfig(overwrite) {
     this._overwriteConfig = !!overwrite;
     vars.overwriteConfig = this._overwriteConfig;
-  }
-  get browser() {
-    let browser;
-    if (this._browser) {
-      const {alias} = this._browser;
-      browser = alias;
-    } else {
-      browser = this._browser;
-    }
-    return browser;
-  }
-  set browser(browser) {
-    this._browser = isString(browser) && getBrowserData(browser) || null;
-    vars.browser = this._browser;
-  }
-  get configPath() {
-    return path.join(...this._configDir);
-  }
-  set configPath(dir) {
-    this._setConfigDir(dir);
   }
 
   /**

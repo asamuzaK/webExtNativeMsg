@@ -3,7 +3,7 @@
 const {Setup} = require("../modules/setup");
 const {removeDir} = require("../modules/file-util");
 const {assert} = require("chai");
-const {describe, it} = require("mocha");
+const {beforeEach, describe, it} = require("mocha");
 const os = require("os");
 const path = require("path");
 const process = require("process");
@@ -403,19 +403,132 @@ describe("handleBrowserInput", () => {
 
 /* Setup */
 describe("Setup", () => {
-  const setup = new Setup({
-    hostDescription: "My host description",
-    hostName: "myhost",
+  let setup, setup2;
+
+  beforeEach(() => {
+    setup = new Setup({
+      hostDescription: "My host description",
+      hostName: "myhost",
+    });
+    setup2 = null;
   });
 
   it("should create an instance", () => {
     assert.instanceOf(setup, Setup);
   });
 
+  /* constructor */
+  describe("constructor", () => {
+    it("should set browser", () => {
+      const browser = "firefox";
+      setup2 = new Setup({
+        browser,
+      });
+      assert.strictEqual(setup2.browser, browser);
+    });
+
+    it("should set configPath", () => {
+      const configPath = path.join("test", "file", "config");
+      setup2 = new Setup({
+        configPath,
+      });
+      assert.strictEqual(setup2.configPath, path.resolve(configPath));
+    });
+
+    it("should set hostDescription", () => {
+      const hostDescription = "foo bar";
+      setup2 = new Setup({
+        hostDescription,
+      });
+      assert.strictEqual(setup2.hostDescription, hostDescription);
+    });
+
+    it("should set hostName", () => {
+      const hostName = "foo";
+      setup2 = new Setup({
+        hostName,
+      });
+      assert.strictEqual(setup2.hostName, hostName);
+    });
+
+    it("should set mainScriptFile", () => {
+      const mainScriptFile = "foo.js";
+      setup2 = new Setup({
+        mainScriptFile,
+      });
+      assert.strictEqual(setup2.mainScriptFile, mainScriptFile);
+    });
+
+    it("should set chromeExtensionIds", () => {
+      const chromeExtensionIds = ["chrome-extension://foo"];
+      setup2 = new Setup({
+        chromeExtensionIds,
+      });
+      assert.deepEqual(setup2.chromeExtensionIds, chromeExtensionIds);
+    });
+
+    it("should set webExtensionIds", () => {
+      const webExtensionIds = ["foo@bar"];
+      setup2 = new Setup({
+        webExtensionIds,
+      });
+      assert.deepEqual(setup2.webExtensionIds, webExtensionIds);
+    });
+
+    it("should set callback", () => {
+      const myCallback = a => a;
+      setup2 = new Setup({
+        callback: myCallback,
+      });
+      assert.isFunction(setup2.callback);
+      assert.strictEqual(setup2.callback.name, "myCallback");
+    });
+
+    it("should set overwriteConfig", () => {
+      const overwriteConfig = true;
+      setup2 = new Setup({
+        overwriteConfig,
+      });
+      assert.strictEqual(setup2.overwriteConfig, !!overwriteConfig);
+    });
+
+    it("should set overwriteConfig", () => {
+      const overwriteConfig = false;
+      setup2 = new Setup({
+        overwriteConfig,
+      });
+      assert.strictEqual(setup2.overwriteConfig, !!overwriteConfig);
+    });
+  });
+
   /* getters */
   describe("getters", () => {
+    it("should get null", () => {
+      assert.isNull(setup.browser);
+    });
+
+    it("should get string", () => {
+      assert.strictEqual(setup.configPath,
+                         path.join(...DIR_CONFIG, "myhost", "config"));
+    });
+
+    it("should get string", () => {
+      setup2 = new Setup();
+      assert.strictEqual(setup2.configPath,
+                         path.join(DIR_CWD, "config"));
+    });
+    it("should get null", () => {
+      setup2 = new Setup();
+      assert.isNull(setup2.hostDescription);
+    });
+
     it("should get hostDescription value in string", () => {
       assert.strictEqual(setup.hostDescription, "My host description");
+    });
+
+    it("should get null", () => {
+      setup2 = new Setup();
+      assert.isNull(setup2.hostName);
     });
 
     it("should get hostName value in string", () => {
@@ -441,19 +554,37 @@ describe("Setup", () => {
     it("should get false", () => {
       assert.isFalse(setup.overwriteConfig);
     });
-
-    it("should get null", () => {
-      assert.isNull(setup.browser);
-    });
-
-    it("should get string", () => {
-      assert.strictEqual(setup.configPath,
-                         path.join(...DIR_CONFIG, "myhost", "config"));
-    });
   });
 
   /* setters */
   describe("setters", () => {
+    it("should get null", () => {
+      setup.browser = "";
+      assert.isNull(setup.browser);
+    });
+
+    it("should get browser name", () => {
+      setup.browser = "firefox";
+      assert.strictEqual(setup.browser, "firefox");
+    });
+
+    it("should get null", () => {
+      setup.browser = "foo";
+      assert.isNull(setup.browser);
+    });
+
+    it("should get string", () => {
+      const myPath = path.join(DIR_CWD, "foo");
+      setup.configPath = myPath;
+      assert.strictEqual(setup.configPath, myPath);
+    });
+
+    it("should get string", () => {
+      const myPath = path.join(...DIR_CONFIG, "myhost", "config");
+      setup.configPath = myPath;
+      assert.strictEqual(setup.configPath, myPath);
+    });
+
     it("should set hostDescription in given string", () => {
       setup.hostDescription = "My new host description";
       assert.strictEqual(setup.hostDescription, "My new host description");
@@ -494,33 +625,6 @@ describe("Setup", () => {
       setup.overwriteConfig = false;
       assert.isFalse(setup.overwriteConfig);
     });
-
-    it("should get null", () => {
-      setup.browser = "";
-      assert.isNull(setup.browser);
-    });
-
-    it("should get browser name", () => {
-      setup.browser = "firefox";
-      assert.strictEqual(setup.browser, "firefox");
-    });
-
-    it("should get null", () => {
-      setup.browser = "foo";
-      assert.isNull(setup.browser);
-    });
-
-    it("should get string", () => {
-      const myPath = path.join(DIR_CWD, "foo");
-      setup.configPath = myPath;
-      assert.strictEqual(setup.configPath, myPath);
-    });
-
-    it("should get string", () => {
-      const myPath = path.join(...DIR_CONFIG, "myhost", "config");
-      setup.configPath = myPath;
-      assert.strictEqual(setup.configPath, myPath);
-    });
   });
 
   /* methods */
@@ -537,7 +641,7 @@ describe("Setup", () => {
 
     it("should set array containing given path", () => {
       const configPath = path.join("foo", "bar");
-      const setup2 = new Setup();
+      setup2 = new Setup();
       setup2._setConfigDir(configPath);
       assert.strictEqual(setup2.configPath, path.resolve(configPath));
     });
