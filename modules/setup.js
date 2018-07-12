@@ -188,7 +188,6 @@ const handleRegStderr = data => {
  * @returns {void}
  */
 const handleRegClose = code => {
-  let func;
   if (code === 0 && IS_WIN) {
     const {browser, hostName} = vars;
     const {regWin} = browser;

@@ -236,7 +236,7 @@ describe("handleRegStdErr", () => {
       const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
       handleRegStderr(data);
       stubErr.restore();
-      assert.strictEqual(err, `stderr: ${reg}: ${data}`)
+      assert.strictEqual(err, `stderr: ${reg}: ${data}`);
     });
   }
 });
