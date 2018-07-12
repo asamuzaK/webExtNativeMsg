@@ -7,7 +7,7 @@ const {ChildProcess} = require("./child-process");
 const {browserData} = require("./browser-data");
 const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
 const {
-  createDir, createFile, getAbsPath, isDir, isFile, removeDir,
+  createDir, createFile, getAbsPath, isDir, isFile,
 } = require("./file-util");
 const path = require("path");
 const process = require("process");
@@ -21,7 +21,6 @@ const {
 const DIR_CONFIG = IS_WIN && DIR_CONFIG_WIN || IS_MAC && DIR_CONFIG_MAC ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
-const OLD_CONFIG = path.join(DIR_CWD, "config");
 const PERM_DIR = 0o700;
 const PERM_EXEC = 0o700;
 const PERM_FILE = 0o600;
@@ -49,9 +48,7 @@ const vars = {
  * @returns {void}
  */
 const abortSetup = msg => {
-  const {rl} = vars;
   console.info(`Setup aborted: ${msg}`);
-  rl && rl.close();
   process.exit(1);
 };
 
@@ -116,43 +113,6 @@ const handleSetupCallback = () => {
 };
 
 /**
- * handle old config
- * @param {string} ans - user input
- * @returns {Function} - handleSetupCallback()
- */
-const handleOldConfig = ans => {
-  const {rl} = vars;
-  if (isString(ans)) {
-    ans = ans.trim();
-    if (/^y(?:es)?$/i.test(ans)) {
-      try {
-        removeDir(OLD_CONFIG, DIR_CWD);
-      } catch (e) {
-        logErr(`Failed to remove directory: ${e.message}`);
-      }
-    }
-  }
-  rl && rl.close();
-  return handleSetupCallback();
-};
-
-/**
- * check old config
- * @returns {void}
- */
-const checkOldConfig = () => {
-  const {configDir, rl} = vars;
-  if (Array.isArray(configDir) && path.join(...configDir) !== OLD_CONFIG &&
-      isDir(OLD_CONFIG) && rl) {
-    rl.question(`Found old config directory ${OLD_CONFIG}. Remove? [y/n]\n`,
-                handleOldConfig);
-  } else {
-    rl && rl.close();
-    handleSetupCallback();
-  }
-};
-
-/**
  * create config directory
  * @returns {string} - config directory path
  */
@@ -210,6 +170,52 @@ const createShellScript = async configPath => {
 };
 
 /**
+ * create registry
+ * @param {string} hostName - host name
+ * @param {string} manifestPath - manifest file path
+ * @param {Array} regWin - reg dir array
+ * @returns {Object} - child process
+ */
+const createReg = async (hostName, manifestPath, regWin) => {
+  if (!isString(hostName)) {
+    throw new TypeError(`Expected String but got ${getType(hostName)}.`);
+  }
+  if (!isString(manifestPath)) {
+    throw new TypeError(`Expected String but got ${getType(manifestPath)}.`);
+  }
+  if (!Array.isArray(regWin)) {
+    throw new TypeError(`Expected Array but got ${getType(regWin)}.`);
+  }
+  let proc;
+  if (IS_WIN) {
+    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+    const regKey = path.join(...regWin, hostName);
+    const args = ["add", regKey, "/ve", "/d", manifestPath, "/f"];
+    const opt = {
+      cwd: null,
+      encoding: CHAR,
+      env: process.env,
+    };
+    proc = await (new ChildProcess(reg, args, opt)).spawn();
+    proc.on("error", e => {
+      throw e;
+    });
+    proc.stderr.on("data", data => {
+      data && console.error(`stderr: ${reg}: ${data}`);
+    });
+    proc.on("close", code => {
+      if (code === 0) {
+        console.info(`Created: ${regKey}`);
+        handleSetupCallback().catch(logErr);
+      } else {
+        console.warn(`${reg} exited with ${code}.`);
+      }
+    });
+  }
+  return proc || null;
+};
+
+/**
  * create files
  * @returns {void}
  */
@@ -249,35 +255,13 @@ const createFiles = async () => {
     type: "stdio",
   }, null, INDENT);
   const fileName = `${hostName}.json`;
-  const filePath = path.resolve(
+  const manifestPath = path.resolve(
     IS_WIN && path.join(configPath, fileName) ||
     IS_MAC && path.join(...hostMac, fileName) ||
     path.join(...hostLinux, fileName)
   );
   if (IS_WIN) {
-    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-    const regKey = path.join(...regWin, hostName);
-    const args = ["add", regKey, "/ve", "/d", filePath, "/f"];
-    const opt = {
-      cwd: null,
-      encoding: CHAR,
-      env: process.env,
-    };
-    const proc = await (new ChildProcess(reg, args, opt)).spawn();
-    proc.on("error", e => {
-      throw e;
-    });
-    proc.stderr.on("data", data => {
-      data && console.error(`stderr: ${reg}: ${data}`);
-    });
-    proc.on("close", code => {
-      if (code === 0) {
-        console.info(`Created: ${regKey}`);
-        checkOldConfig();
-      } else {
-        console.warn(`${reg} exited with ${code}.`);
-      }
-    });
+    await createReg(hostName, manifestPath, regWin);
   } else {
     const hostDir = IS_MAC && hostMac || hostLinux;
     const hostDirPath = await createDir(hostDir, PERM_DIR);
@@ -286,14 +270,14 @@ const createFiles = async () => {
     }
   }
   const file = await createFile(
-    filePath, manifest, {encoding: CHAR, flag: "w", mode: PERM_FILE}
+    manifestPath, manifest, {encoding: CHAR, flag: "w", mode: PERM_FILE}
   );
   if (!file) {
-    throw new Error(`Failed to create ${filePath}.`);
+    throw new Error(`Failed to create ${manifestPath}.`);
   }
-  console.info(`Created: ${filePath}`);
-  vars.manifestPath = filePath;
-  !IS_WIN && checkOldConfig();
+  console.info(`Created: ${manifestPath}`);
+  vars.manifestPath = manifestPath;
+  !IS_WIN && handleSetupCallback();
 };
 
 /**
@@ -397,7 +381,7 @@ class Setup {
                       webExtensionIds.length && webExtensionIds || null;
     this._callback = typeof callback === "function" && callback || null;
     if (isString(configPath) && configPath.length) {
-      this.setConfigDir(configPath);
+      this._setConfigDir(configPath);
     }
   }
 
@@ -469,7 +453,7 @@ class Setup {
     return path.join(...this._configDir);
   }
   set configPath(dir) {
-    this.setConfigDir(dir);
+    this._setConfigDir(dir);
   }
 
   /**
@@ -477,7 +461,7 @@ class Setup {
    * @param {string} dir - directory path
    * @returns {void}
    */
-  setConfigDir(dir) {
+  _setConfigDir(dir) {
     const dirPath = getAbsPath(dir);
     if (!dirPath) {
       throw new Error(`Failed to normalize ${dir}`);
@@ -547,15 +531,4 @@ class Setup {
 
 module.exports = {
   Setup,
-  abortSetup,
-  checkOldConfig,
-  createConfig,
-  createFiles,
-  createShellScript,
-  getBrowserConfigDir,
-  getBrowserData,
-  handleBrowserConfigDir,
-  handleBrowserInput,
-  handleOldConfig,
-  handleSetupCallback,
 };

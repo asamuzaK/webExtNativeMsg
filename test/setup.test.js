@@ -1,9 +1,7 @@
 "use strict";
 /* api */
-const {
-  Setup, getBrowserData, getBrowserConfigDir, handleBrowserInput,
-  handleSetupCallback,
-} = require("../modules/setup");
+const {Setup} = require("../modules/setup");
+const {removeDir} = require("../modules/file-util");
 const {assert} = require("chai");
 const {describe, it} = require("mocha");
 const os = require("os");
@@ -27,63 +25,59 @@ const setupJs = rewire("../modules/setup");
 describe("abortSetup", () => {
   it("should exit with message", () => {
     let info;
-    const func = setupJs.__get__("abortSetup");
+    const abortSetup = setupJs.__get__("abortSetup");
     const stubExit = sinon.stub(process, "exit");
     const stubInfo = sinon.stub(console, "info").callsFake(msg => {
       info = msg;
     });
-    const stubRlClose = sinon.stub().callsFake(() => undefined);
-    const vars = setupJs.__set__("vars", {
-      rl: {
-        close: stubRlClose,
-      },
-    });
-    func("test");
+    abortSetup("foo");
     const {calledOnce: infoCalled} = stubInfo;
     const {calledOnce: exitCalled} = stubExit;
-    const {calledOnce: closeCalled} = stubRlClose;
     stubInfo.restore();
     stubExit.restore();
     assert.isTrue(infoCalled);
     assert.isTrue(exitCalled);
-    assert.isTrue(closeCalled);
-    assert.strictEqual(info, "Setup aborted: test");
-    vars();
+    assert.strictEqual(info, "Setup aborted: foo");
   });
 });
 
 describe("getBrowserData", () => {
   it("should get object if key matches", () => {
+    const getBrowserData = setupJs.__get__("getBrowserData");
     assert.isObject(getBrowserData("firefox"));
   });
 
   it("should get object if key matches", () => {
+    const getBrowserData = setupJs.__get__("getBrowserData");
     assert.isObject(getBrowserData("chrome"));
   });
 
   it("should get null if no argument given", () => {
+    const getBrowserData = setupJs.__get__("getBrowserData");
     assert.isNull(getBrowserData());
   });
 
   it("should get null if key does not match", () => {
+    const getBrowserData = setupJs.__get__("getBrowserData");
     assert.isNull(getBrowserData("foo"));
   });
 });
 
 describe("getBrowserConfigDir", () => {
   it("should get null", () => {
+    const getBrowserConfigDir = setupJs.__get__("getBrowserConfigDir");
     assert.isNull(getBrowserConfigDir());
   });
 
   it("should get dir", () => {
-    const func = setupJs.__get__("getBrowserConfigDir");
+    const getBrowserConfigDir = setupJs.__get__("getBrowserConfigDir");
     const vars = setupJs.__set__("vars", {
       browser: {
         alias: "firefox",
       },
       configDir: [TMPDIR],
     });
-    const res = func();
+    const res = getBrowserConfigDir();
     assert.isTrue(Array.isArray(res));
     assert.deepEqual(res, [TMPDIR, "firefox"]);
     vars();
@@ -92,18 +86,19 @@ describe("getBrowserConfigDir", () => {
 
 describe("handleSetupCallback", () => {
   it("should get null", () => {
+    const handleSetupCallback = setupJs.__get__("handleSetupCallback");
     assert.isNull(handleSetupCallback());
   });
 
   it("should call callback", () => {
-    const func = setupJs.__get__("handleSetupCallback");
+    const handleSetupCallback = setupJs.__get__("handleSetupCallback");
     const vars = setupJs.__set__("vars", {
       configPath: "config",
       manifestPath: "manifest",
       shellPath: "shell",
       callback: obj => obj,
     });
-    const res = func();
+    const res = handleSetupCallback();
     assert.deepEqual(res, {
       configDirPath: "config",
       manifestPath: "manifest",
@@ -113,145 +108,18 @@ describe("handleSetupCallback", () => {
   });
 });
 
-describe("handleOldConfig", () => {
-  it("should get function", () => {
-    const func = setupJs.__get__("handleOldConfig");
-    const stubRlClose = sinon.stub().callsFake(() => undefined);
-    const vars = setupJs.__set__("vars", {
-      rl: {
-        close: stubRlClose,
-      },
-    });
-    const handleSetupCb = setupJs.__set__("handleSetupCallback", () => true);
-    const res = func();
-    const {calledOnce: closeCalled} = stubRlClose;
-    assert.isTrue(closeCalled);
-    assert.isTrue(res);
-    vars();
-    handleSetupCb();
-  });
-
-  it("should get function", () => {
-    const func = setupJs.__get__("handleOldConfig");
-    const stubRlClose = sinon.stub().callsFake(() => undefined);
-    const vars = setupJs.__set__("vars", {
-      rl: {
-        close: stubRlClose,
-      },
-    });
-    const stubRemDir = sinon.stub().callsFake(() => undefined);
-    const removeDir = setupJs.__set__("removeDir", stubRemDir);
-    const handleSetupCb = setupJs.__set__("handleSetupCallback", () => true);
-    const res = func("yes");
-    const {calledOnce: remDirCalled} = stubRemDir;
-    const {calledOnce: closeCalled} = stubRlClose;
-    assert.isTrue(remDirCalled);
-    assert.isTrue(closeCalled);
-    assert.isTrue(res);
-    vars();
-    removeDir();
-    handleSetupCb();
-  });
-
-  it("should get function", () => {
-    const func = setupJs.__get__("handleOldConfig");
-    const stubRlClose = sinon.stub().callsFake(() => undefined);
-    const stubRemDir = sinon.stub().callsFake(() => {
-      throw new Error("error test");
-    });
-    const stubLogErr = sinon.stub().callsFake(() => undefined);
-    const vars = setupJs.__set__("vars", {
-      rl: {
-        close: stubRlClose,
-      },
-    });
-    const removeDir = setupJs.__set__("removeDir", stubRemDir);
-    const logErr = setupJs.__set__("logErr", stubLogErr);
-    const handleSetupCb = setupJs.__set__("handleSetupCallback", () => true);
-    const res = func("yes");
-    const {calledOnce: remDirCalled} = stubRemDir;
-    const {calledOnce: logErrCalled} = stubLogErr;
-    const {calledOnce: closeCalled} = stubRlClose;
-    assert.isTrue(remDirCalled);
-    assert.isTrue(logErrCalled);
-    assert.isTrue(closeCalled);
-    assert.isTrue(res);
-    removeDir();
-    logErr();
-    handleSetupCb();
-    vars();
-  });
-});
-
-describe("checkOldConfig", () => {
-  it("should not ask question", () => {
-    const func = setupJs.__get__("checkOldConfig");
-    const stubRlClose = sinon.stub().callsFake(() => undefined);
-    const stubSetupCb = sinon.stub().callsFake(() => undefined);
-    const vars = setupJs.__set__("vars", {
-      rl: {
-        close: stubRlClose,
-      },
-    });
-    const handleSetupCb = setupJs.__set__("handleSetupCallback", stubSetupCb);
-    func();
-    const {calledOnce: closeCalled} = stubRlClose;
-    const {calledOnce: setupCbCalled} = stubSetupCb;
-    assert.isTrue(closeCalled);
-    assert.isTrue(setupCbCalled);
-    handleSetupCb();
-    vars();
-  });
-
-  it("should ask question", () => {
-    const func = setupJs.__get__("checkOldConfig");
-    const configDir = path.resolve(path.join("test", "file"));
-    const oldConfigDir = path.join(configDir, "config");
-    let quesMsg;
-    const stubRlClose = sinon.stub().callsFake(() => undefined);
-    const stubRlQues = sinon.stub().callsFake(msg => {
-      quesMsg = msg;
-    });
-    const stubSetupCb = sinon.stub().callsFake(() => undefined);
-    const oldConfig = setupJs.__set__("OLD_CONFIG", oldConfigDir);
-    const vars = setupJs.__set__("vars", {
-      configDir: [configDir],
-      rl: {
-        close: stubRlClose,
-        question: stubRlQues,
-      },
-    });
-    const handleSetupCb = setupJs.__set__("handleSetupCallback", stubSetupCb);
-    func();
-    const {calledOnce: rlCloseCalled} = stubRlClose;
-    const {calledOnce: rlQuesCalled} = stubRlQues;
-    const {calledOnce: setupCbCalled} = stubSetupCb;
-    assert.isFalse(rlCloseCalled);
-    assert.isTrue(rlQuesCalled);
-    assert.isFalse(setupCbCalled);
-    assert.strictEqual(
-      quesMsg,
-      `Found old config directory ${oldConfigDir}. Remove? [y/n]\n`
-    );
-    handleSetupCb();
-    oldConfig();
-    vars();
-  });
-});
-
 describe("createConfig", () => {
   it("should throw", async () => {
-    const func = setupJs.__get__("createConfig");
-    await func().catch(e => {
+    const createConfig = setupJs.__get__("createConfig");
+    await createConfig().catch(e => {
       assert.strictEqual(e.message, "Expected Array but got Null.");
     });
   });
 
   it("should get path", async () => {
-    const func = setupJs.__get__("createConfig");
+    const createConfig = setupJs.__get__("createConfig");
     let infoMsg;
     const dirPath = path.join(TMPDIR, "firefox");
-    const removeDir = setupJs.__get__("removeDir");
     const stubInfo = sinon.stub(console, "info").callsFake(msg => {
       infoMsg = msg;
     });
@@ -261,7 +129,7 @@ describe("createConfig", () => {
       },
       configDir: [TMPDIR],
     });
-    const res = await func();
+    const res = await createConfig();
     const {calledOnce} = stubInfo;
     stubInfo.restore();
     assert.isTrue(calledOnce);
@@ -274,48 +142,47 @@ describe("createConfig", () => {
 
 describe("createShellScript", () => {
   it("should throw", async () => {
-    const func = setupJs.__get__("createShellScript");
-    await func().catch(e => {
+    const createShellScript = setupJs.__get__("createShellScript");
+    await createShellScript().catch(e => {
       assert.strictEqual(e.message, "No such directory: undefined.");
     });
   });
 
   it("should throw", async () => {
-    const func = setupJs.__get__("createShellScript");
-    await func("foo/bar").catch(e => {
+    const createShellScript = setupJs.__get__("createShellScript");
+    await createShellScript("foo/bar").catch(e => {
       assert.strictEqual(e.message, "No such directory: foo/bar.");
     });
   });
 
   it("should throw", async () => {
-    const func = setupJs.__get__("createShellScript");
+    const createShellScript = setupJs.__get__("createShellScript");
     const vars = setupJs.__set__("vars", {
       hostName: null,
       mainFile: "foo",
     });
-    await func(TMPDIR).catch(e => {
+    await createShellScript(TMPDIR).catch(e => {
       assert.strictEqual(e.message, "Expected String but got Null.");
     });
     vars();
   });
 
   it("should throw", async () => {
-    const func = setupJs.__get__("createShellScript");
+    const createShellScript = setupJs.__get__("createShellScript");
     const vars = setupJs.__set__("vars", {
       hostName: "foo",
       mainFile: null,
     });
-    await func(TMPDIR).catch(e => {
+    await createShellScript(TMPDIR).catch(e => {
       assert.strictEqual(e.message, "Expected String but got Null.");
     });
     vars();
   });
 
   it("should get path", async () => {
-    const func = setupJs.__get__("createShellScript");
+    const createShellScript = setupJs.__get__("createShellScript");
     const configDir = [TMPDIR, "firefox", "config"];
     const createDir = setupJs.__get__("createDir");
-    const removeDir = setupJs.__get__("removeDir");
     const shellPath = path.join(...configDir, IS_WIN && "foo.cmd" || "foo.sh");
     let infoMsg;
     const stubInfo = sinon.stub(console, "info").callsFake(msg => {
@@ -326,7 +193,7 @@ describe("createShellScript", () => {
       mainFile: "bar",
     });
     const configPath = await createDir(configDir);
-    const res = await func(configPath);
+    const res = await createShellScript(configPath);
     stubInfo.restore();
     assert.strictEqual(res, shellPath);
     assert.strictEqual(infoMsg, `Created: ${shellPath}`);
@@ -335,84 +202,123 @@ describe("createShellScript", () => {
   });
 });
 
+describe("createReg", () => {
+  it("should throw if no argument given", async () => {
+    const createReg = setupJs.__get__("createReg");
+    await createReg().catch(e => {
+      assert.strictEqual(e.message, "Expected String but got Undefined.");
+    });
+  });
+
+  it("should throw if manifestPath not given", async () => {
+    const createReg = setupJs.__get__("createReg");
+    await createReg("foo").catch(e => {
+      assert.strictEqual(e.message, "Expected String but got Undefined.");
+    });
+  });
+
+  it("should throw if regWin not given", async () => {
+    const createReg = setupJs.__get__("createReg");
+    await createReg("foo", "bar").catch(e => {
+      assert.strictEqual(e.message, "Expected Array but got Undefined.");
+    });
+  });
+
+  /*
+  it("should create reg", async () => {
+    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+    const regKey = path.join(...regWin, hostName);
+    const args = ["delete", regKey, "/va", "/f"];
+    const opt = {
+      cwd: null,
+      encoding: CHAR,
+      env: process.env,
+    };
+    await (new ChildProcess(reg, args, opt)).spawn();
+  });
+  */
+});
+
 describe("createFiles", () => {
   it("should throw", async () => {
-    const func = setupJs.__get__("createFiles");
+    const createFiles = setupJs.__get__("createFiles");
     const vars = setupJs.__set__("vars", {
       browser: null,
     });
-    await func().catch(e => {
+    await createFiles().catch(e => {
       assert.strictEqual(e.message, "Expected Object but got Null.");
     });
     vars();
   });
 
   it("should throw", async () => {
-    const func = setupJs.__get__("createFiles");
+    const createFiles = setupJs.__get__("createFiles");
     const vars = setupJs.__set__("vars", {
       browser: {},
       hostDesc: null,
     });
-    await func().catch(e => {
+    await createFiles().catch(e => {
       assert.strictEqual(e.message, "Expected String but got Null.");
     });
     vars();
   });
 
   it("should throw", async () => {
-    const func = setupJs.__get__("createFiles");
+    const createFiles = setupJs.__get__("createFiles");
     const vars = setupJs.__set__("vars", {
       browser: {},
       hostDesc: "foo",
       hostName: null,
     });
-    await func().catch(e => {
+    await createFiles().catch(e => {
       assert.strictEqual(e.message, "Expected String but got Null.");
     });
     vars();
   });
 });
 
-// TODO:
 describe("handleBrowserInput", () => {
   it("should abort", () => {
-    sinon.stub(process, "exit");
-    sinon.stub(console, "info");
+    const handleBrowserInput = setupJs.__get__("handleBrowserInput");
+    const stubExit = sinon.stub(process, "exit");
+    const stubInfo = sinon.stub(console, "info");
     handleBrowserInput();
-    const {calledOnce: consoleCalledOnce} = console.info;
-    const {calledOnce: exitCalledOnce} = process.exit;
-    console.info.restore();
-    process.exit.restore();
-    assert.strictEqual(consoleCalledOnce, true);
-    assert.strictEqual(exitCalledOnce, true);
+    const {calledOnce: infoCalled} = stubInfo;
+    const {calledOnce: exitCalled} = stubExit;
+    stubInfo.restore();
+    stubExit.restore();
+    assert.isTrue(infoCalled);
+    assert.isTrue(exitCalled);
   });
 
   it("should abort", () => {
-    sinon.stub(process, "exit");
-    sinon.stub(console, "info");
+    const handleBrowserInput = setupJs.__get__("handleBrowserInput");
+    const stubExit = sinon.stub(process, "exit");
+    const stubInfo = sinon.stub(console, "info");
     handleBrowserInput("foo");
-    const {calledOnce: consoleCalledOnce} = console.info;
-    const {calledOnce: exitCalledOnce} = process.exit;
-    console.info.restore();
-    process.exit.restore();
-    assert.strictEqual(consoleCalledOnce, true);
-    assert.strictEqual(exitCalledOnce, true);
+    const {calledOnce: infoCalled} = stubInfo;
+    const {calledOnce: exitCalled} = stubExit;
+    stubInfo.restore();
+    stubExit.restore();
+    assert.isTrue(infoCalled);
+    assert.isTrue(exitCalled);
   });
 
   it("should abort", () => {
-    sinon.stub(process, "exit");
-    sinon.stub(console, "info");
+    const handleBrowserInput = setupJs.__get__("handleBrowserInput");
+    const stubExit = sinon.stub(process, "exit");
+    const stubInfo = sinon.stub(console, "info");
     handleBrowserInput("");
-    const {calledOnce: consoleCalledOnce} = console.info;
-    const {calledOnce: exitCalledOnce} = process.exit;
-    console.info.restore();
-    process.exit.restore();
-    assert.strictEqual(consoleCalledOnce, true);
-    assert.strictEqual(exitCalledOnce, true);
+    const {calledOnce: infoCalled} = stubInfo;
+    const {calledOnce: exitCalled} = stubExit;
+    stubInfo.restore();
+    stubExit.restore();
+    assert.isTrue(infoCalled);
+    assert.isTrue(exitCalled);
   });
 
   it("should get function", async () => {
-    const func = setupJs.__get__("handleBrowserInput");
+    const handleBrowserInput = setupJs.__get__("handleBrowserInput");
     const stubCreateFiles = sinon.stub().callsFake(async () => true);
     const createFiles = setupJs.__set__("createFiles", stubCreateFiles);
     const stubAbort = sinon.stub().callsFake(msg => msg);
@@ -423,7 +329,7 @@ describe("handleBrowserInput", () => {
       },
       configDir: [TMPDIR],
     });
-    await func("firefox");
+    await handleBrowserInput("firefox");
     const {called: calledCreateFiles} = stubCreateFiles;
     const {called: calledAbort} = stubAbort;
     assert.isTrue(calledCreateFiles);
@@ -557,15 +463,22 @@ describe("Setup", () => {
   });
 
   /* methods */
-  describe("setConfigDir", () => {
+  describe("_setConfigDir", () => {
     it("should throw if dir is not given", () => {
-      assert.throws(() => setup.setConfigDir(),
+      assert.throws(() => setup._setConfigDir(),
                     "Failed to normalize undefined");
     });
 
     it("should throw if dir is not subdirectory of user's home dir", () => {
-      assert.throws(() => setup.setConfigDir("/foo/bar/"),
+      assert.throws(() => setup._setConfigDir("/foo/bar/"),
                     `Config path is not sub directory of ${DIR_HOME}.`);
+    });
+
+    it("should set array containing given path", () => {
+      const configPath = path.join("foo", "bar");
+      const setup2 = new Setup();
+      setup2._setConfigDir(configPath);
+      assert.strictEqual(setup2.configPath, path.resolve(configPath));
     });
   });
 
