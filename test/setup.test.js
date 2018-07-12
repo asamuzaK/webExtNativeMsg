@@ -200,43 +200,104 @@ describe("createShellScript", () => {
     vars();
     removeDir(path.join(TMPDIR, "firefox"), TMPDIR);
   });
+
+  it("should get path", async () => {
+    const createShellScript = setupJs.__get__("createShellScript");
+    const configDir = [TMPDIR, "firefox", "config"];
+    const createDir = setupJs.__get__("createDir");
+    const shellPath = path.join(...configDir, IS_WIN && "foo.cmd" || "foo.sh");
+    let infoMsg;
+    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+      infoMsg = msg;
+    });
+    const vars = setupJs.__set__("vars", {
+      hostName: "foo",
+      mainFile: path.resolve(path.join("test", "file", "test.js")),
+    });
+    const configPath = await createDir(configDir);
+    const res = await createShellScript(configPath);
+    stubInfo.restore();
+    assert.strictEqual(res, shellPath);
+    assert.strictEqual(infoMsg, `Created: ${shellPath}`);
+    vars();
+    removeDir(path.join(TMPDIR, "firefox"), TMPDIR);
+  });
+});
+
+describe("handleRegStdErr", () => {
+  if (IS_WIN) {
+    it("should console error", () => {
+      let err;
+      const handleRegStderr = setupJs.__get__("handleRegStderr");
+      const data = "foo";
+      const stubErr = sinon.stub(console, "error").callsFake(msg => {
+        err = msg;
+      });
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+      handleRegStderr(data);
+      stubErr.restore();
+      assert.strictEqual(err, `stderr: ${reg}: ${data}`)
+    });
+  }
+});
+
+describe("handleRegClose", () => {
+  if (IS_WIN) {
+    it("should warn", () => {
+      let wrn;
+      const handleRegClose = setupJs.__get__("handleRegClose");
+      const stubWarn = sinon.stub(console, "warn").callsFake(msg => {
+        wrn = msg;
+      });
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+      handleRegClose(1);
+      stubWarn.restore();
+      assert.strictEqual(wrn, `${reg} exited with 1.`);
+    });
+
+    it("should call function", async () => {
+      let infoMsg;
+      const handleRegClose = setupJs.__get__("handleRegClose");
+      const vars = setupJs.__set__("vars", {
+        browser: {
+          regWin: ["foo"],
+        },
+        hostName: "bar",
+      });
+      const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+        infoMsg = msg;
+      });
+      await handleRegClose(0);
+      stubInfo.restore();
+      assert.strictEqual(infoMsg, `Created: ${path.join("foo", "bar")}`);
+      vars();
+    });
+  }
 });
 
 describe("createReg", () => {
-  it("should throw if no argument given", async () => {
-    const createReg = setupJs.__get__("createReg");
-    await createReg().catch(e => {
-      assert.strictEqual(e.message, "Expected String but got Undefined.");
+  if (IS_WIN) {
+    it("should throw if no argument given", async () => {
+      const createReg = setupJs.__get__("createReg");
+      await createReg().catch(e => {
+        assert.strictEqual(e.message, "Expected String but got Undefined.");
+      });
     });
-  });
 
-  it("should throw if manifestPath not given", async () => {
-    const createReg = setupJs.__get__("createReg");
-    await createReg("foo").catch(e => {
-      assert.strictEqual(e.message, "Expected String but got Undefined.");
+    it("should throw if manifestPath not given", async () => {
+      const createReg = setupJs.__get__("createReg");
+      await createReg("foo").catch(e => {
+        assert.strictEqual(e.message, "Expected String but got Undefined.");
+      });
     });
-  });
 
-  it("should throw if regWin not given", async () => {
-    const createReg = setupJs.__get__("createReg");
-    await createReg("foo", "bar").catch(e => {
-      assert.strictEqual(e.message, "Expected Array but got Undefined.");
+    it("should throw if regWin not given", async () => {
+      const createReg = setupJs.__get__("createReg");
+      await createReg("foo", "bar").catch(e => {
+        assert.strictEqual(e.message, "Expected Array but got Undefined.");
+      });
     });
-  });
-
-  /*
-  it("should create reg", async () => {
-    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-    const regKey = path.join(...regWin, hostName);
-    const args = ["delete", regKey, "/va", "/f"];
-    const opt = {
-      cwd: null,
-      encoding: CHAR,
-      env: process.env,
-    };
-    await (new ChildProcess(reg, args, opt)).spawn();
-  });
-  */
+  }
 });
 
 describe("createFiles", () => {

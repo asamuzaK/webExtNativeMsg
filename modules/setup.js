@@ -5,7 +5,9 @@
 /* api */
 const {ChildProcess} = require("./child-process");
 const {browserData} = require("./browser-data");
-const {escapeChar, getType, isString, logErr, quoteArg} = require("./common");
+const {
+  escapeChar, getType, isString, logErr, quoteArg, throwErr,
+} = require("./common");
 const {
   createDir, createFile, getAbsPath, isDir, isFile,
 } = require("./file-util");
@@ -102,10 +104,9 @@ const getBrowserConfigDir = () => {
 const handleSetupCallback = () => {
   const {
     callback, configPath: configDirPath, shellPath: shellScriptPath,
-    manifestPath, rl,
+    manifestPath,
   } = vars;
   let func;
-  rl && rl.close();
   if (typeof callback === "function") {
     func = callback({configDirPath, shellScriptPath, manifestPath});
   }
@@ -170,6 +171,37 @@ const createShellScript = async configPath => {
 };
 
 /**
+ * handle create registry stderr
+ * @param {*} data - data
+ * @returns {void}
+ */
+const handleRegStderr = data => {
+  if (IS_WIN) {
+    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+    data && console.error(`stderr: ${reg}: ${data}`);
+  }
+};
+
+/**
+ * handle create registry close
+ * @param {number} code - exit code
+ * @returns {void}
+ */
+const handleRegClose = code => {
+  let func;
+  if (code === 0 && IS_WIN) {
+    const {browser, hostName} = vars;
+    const {regWin} = browser;
+    const regKey = path.join(...regWin, hostName);
+    console.info(`Created: ${regKey}`);
+    handleSetupCallback();
+  } else if (IS_WIN) {
+    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+    console.warn(`${reg} exited with ${code}.`);
+  }
+};
+
+/**
  * create registry
  * @param {string} hostName - host name
  * @param {string} manifestPath - manifest file path
@@ -197,20 +229,9 @@ const createReg = async (hostName, manifestPath, regWin) => {
       env: process.env,
     };
     proc = await (new ChildProcess(reg, args, opt)).spawn();
-    proc.on("error", e => {
-      throw e;
-    });
-    proc.stderr.on("data", data => {
-      data && console.error(`stderr: ${reg}: ${data}`);
-    });
-    proc.on("close", code => {
-      if (code === 0) {
-        console.info(`Created: ${regKey}`);
-        handleSetupCallback().catch(logErr);
-      } else {
-        console.warn(`${reg} exited with ${code}.`);
-      }
-    });
+    proc.on("error", throwErr);
+    proc.stderr.on("data", handleRegStderr);
+    proc.on("close", handleRegClose);
   }
   return proc || null;
 };
