@@ -1,9 +1,10 @@
 "use strict";
 /* api */
 const {Setup} = require("../modules/setup");
-const {removeDir} = require("../modules/file-util");
+const {createDir, removeDir} = require("../modules/file-util");
 const {assert} = require("chai");
 const {beforeEach, describe, it} = require("mocha");
+const childProcess = require("child_process");
 const os = require("os");
 const path = require("path");
 const process = require("process");
@@ -181,8 +182,7 @@ describe("createShellScript", () => {
 
   it("should get path", async () => {
     const createShellScript = setupJs.__get__("createShellScript");
-    const configDir = [TMPDIR, "firefox", "config"];
-    const createDir = setupJs.__get__("createDir");
+    const configDir = [TMPDIR, "webextnativemsg", "config"];
     const shellPath = path.join(...configDir, IS_WIN && "foo.cmd" || "foo.sh");
     let infoMsg;
     const stubInfo = sinon.stub(console, "info").callsFake(msg => {
@@ -198,13 +198,12 @@ describe("createShellScript", () => {
     assert.strictEqual(res, shellPath);
     assert.strictEqual(infoMsg, `Created: ${shellPath}`);
     vars();
-    removeDir(path.join(TMPDIR, "firefox"), TMPDIR);
+    await removeDir(path.join(TMPDIR, "webextnativemsg"), TMPDIR);
   });
 
   it("should get path", async () => {
     const createShellScript = setupJs.__get__("createShellScript");
-    const configDir = [TMPDIR, "firefox", "config"];
-    const createDir = setupJs.__get__("createDir");
+    const configDir = [TMPDIR, "webextnativemsg", "config"];
     const shellPath = path.join(...configDir, IS_WIN && "foo.cmd" || "foo.sh");
     let infoMsg;
     const stubInfo = sinon.stub(console, "info").callsFake(msg => {
@@ -220,7 +219,7 @@ describe("createShellScript", () => {
     assert.strictEqual(res, shellPath);
     assert.strictEqual(infoMsg, `Created: ${shellPath}`);
     vars();
-    removeDir(path.join(TMPDIR, "firefox"), TMPDIR);
+    await removeDir(path.join(TMPDIR, "webextnativemsg"), TMPDIR);
   });
 });
 
@@ -296,6 +295,20 @@ describe("createReg", () => {
       await createReg("foo", "bar").catch(e => {
         assert.strictEqual(e.message, "Expected Array but got Undefined.");
       });
+    });
+
+    it("should spawn child process", async () => {
+      const createReg = setupJs.__get__("createReg");
+      const stubSpawn = sinon.stub(childProcess, "spawn").returns({
+        on: a => a,
+        stderr: {
+          on: a => a,
+        },
+      });
+      await createReg("foo", "bar", ["baz"]);
+      const {calledOnce} = stubSpawn;
+      stubSpawn.restore();
+      assert.isTrue(calledOnce);
     });
   }
 });
