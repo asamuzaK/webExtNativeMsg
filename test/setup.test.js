@@ -731,6 +731,7 @@ describe("Setup", () => {
         close: stubRlClose,
         question: stubRlQues,
       });
+      const stubInfo = sinon.stub(console, "info");
       const stubSpawn = sinon.stub(childProcess, "spawn").returns({
         on: a => a,
         stderr: {
@@ -744,17 +745,29 @@ describe("Setup", () => {
       assert.isTrue(isDir(browserConfigPath));
       setup.configPath = configPath;
       setup.browser = "chrome";
+      setup.chromeExtensionIds = ["chrome-extension://foo"];
       setup.overwriteConfig = true;
       await setup.run();
       const {calledOnce: createCalled} = stubRlCreate;
       const {calledOnce: closeCalled} = stubRlClose;
       const {calledOnce: quesCalled} = stubRlQues;
+      const {calledOnce: spawnCalled} = stubSpawn;
+      const {called: infoCalled} = stubInfo;
       stubRlCreate.restore();
       stubSpawn.restore();
+      stubInfo.restore();
       assert.isTrue(createCalled);
       assert.isTrue(closeCalled);
       assert.isFalse(quesCalled);
+      assert.isTrue(infoCalled);
       assert.isUndefined(rlQues);
+      if (IS_WIN) {
+        assert.isTrue(spawnCalled);
+      } else {
+        assert.isFalse(spawnCalled);
+      }
+      await removeDir(path.join(configPath, "chrome"), configPath);
+      assert.isFalse(isDir(browserConfigPath));
     });
   });
 });

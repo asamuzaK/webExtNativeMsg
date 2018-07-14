@@ -498,9 +498,10 @@ class Setup {
 
   /**
    * run setup
-   * @returns {void}
+   * @returns {?AsyncFunction} - createFiles()
    */
   run() {
+    let func;
     vars.browser = this._browser;
     vars.callback = this._callback;
     vars.chromeExtIds = this._chromeExtIds;
@@ -528,7 +529,7 @@ class Setup {
                          handleBrowserConfigDir);
       } else {
         vars.rl.close();
-        createFiles().catch(logErr);
+        func = createFiles().catch(logErr);
       }
     } else {
       const arr = [];
@@ -546,6 +547,7 @@ class Setup {
       }
       vars.rl.question(`${msg}[${arr.join(" ")}]\n`, handleBrowserInput);
     }
+    return func || null;
   }
 }
 
