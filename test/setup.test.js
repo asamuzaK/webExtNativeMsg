@@ -743,6 +743,7 @@ describe("Setup", () => {
       setup.configPath = configPath;
       setup.browser = "firefox";
       setup.overwriteConfig = true;
+      assert.isTrue(isDir(browserConfigPath));
       await setup.run();
       const {calledOnce: createCalled} = stubRlCreate;
       const {calledOnce: closeCalled} = stubRlClose;
