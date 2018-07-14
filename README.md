@@ -85,7 +85,7 @@ Properties:
 
 Methods:
 * run(): Runs setup script.
-  * @returns {void}
+  * @returns {?Promise.<void>}
 
 ### Class Input / Output
 
