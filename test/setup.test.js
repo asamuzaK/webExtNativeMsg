@@ -351,6 +351,100 @@ describe("createFiles", () => {
   });
 });
 
+describe("handleBrowserConfigDir", () => {
+  it("should throw", () => {
+    const handleBrowserConfigDir = setupJs.__get__("handleBrowserConfigDir");
+    const stubFunc = sinon.stub().returns(null);
+    const getBrowserConfigDir =
+      setupJs.__set__("getBrowserConfigDir", stubFunc);
+    assert.throws(() => handleBrowserConfigDir());
+    getBrowserConfigDir();
+  });
+
+  it("should abort if no arguments given", async () => {
+    let infoMsg;
+    const handleBrowserConfigDir = setupJs.__get__("handleBrowserConfigDir");
+    const getBrowserData = setupJs.__get__("getBrowserData");
+    const browser = getBrowserData("firefox");
+    const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
+    const stubAbort = sinon.stub().callsFake(msg => {
+      infoMsg = msg;
+    });
+    const stubRlClose = sinon.stub().callsFake(() => undefined);
+    const abortSetup = setupJs.__set__("abortSetup", stubAbort);
+    const vars = setupJs.__set__("vars", {
+      browser,
+      configDir: [DIR_CWD, "test", "file", "config"],
+      hostName: "foo",
+      rl: {
+        close: stubRlClose,
+      },
+    });
+    await handleBrowserConfigDir();
+    const {calledOnce: closeCalled} = stubRlClose;
+    const {calledOnce: abortCalled} = stubAbort;
+    assert.isTrue(closeCalled);
+    assert.isTrue(abortCalled);
+    assert.strictEqual(infoMsg, `${dirPath} already exists.`);
+    abortSetup();
+    vars();
+  });
+
+  it("should abort if anser is not yes", async () => {
+    let infoMsg;
+    const handleBrowserConfigDir = setupJs.__get__("handleBrowserConfigDir");
+    const getBrowserData = setupJs.__get__("getBrowserData");
+    const stubAbort = sinon.stub().callsFake(msg => {
+      infoMsg = msg;
+    });
+    const abortSetup = setupJs.__set__("abortSetup", stubAbort);
+    const stubRlClose = sinon.stub().callsFake(() => undefined);
+    const browser = getBrowserData("firefox");
+    const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
+    const vars = setupJs.__set__("vars", {
+      browser,
+      configDir: [DIR_CWD, "test", "file", "config"],
+      hostName: "foo",
+      rl: {
+        close: stubRlClose,
+      },
+    });
+    await handleBrowserConfigDir("");
+    const {calledOnce: closeCalled} = stubRlClose;
+    const {calledOnce: abortCalled} = stubAbort;
+    assert.isTrue(closeCalled);
+    assert.isTrue(abortCalled);
+    assert.strictEqual(infoMsg, `${dirPath} already exists.`);
+    abortSetup();
+    vars();
+  });
+
+  it("should call function", async () => {
+    const handleBrowserConfigDir = setupJs.__get__("handleBrowserConfigDir");
+    const getBrowserData = setupJs.__get__("getBrowserData");
+    const stubCreateFiles = sinon.stub().callsFake(async () => true);
+    const createFiles = setupJs.__set__("createFiles", stubCreateFiles);
+    const stubRlClose = sinon.stub().callsFake(() => undefined);
+    const browser = getBrowserData("firefox");
+    const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
+    const vars = setupJs.__set__("vars", {
+      browser,
+      configDir: [DIR_CWD, "test", "file", "config"],
+      hostName: "foo",
+      rl: {
+        close: stubRlClose,
+      },
+    });
+    await handleBrowserConfigDir("yes");
+    const {calledOnce: closeCalled} = stubRlClose;
+    const {calledOnce: createFilesCalled} = stubCreateFiles;
+    assert.isTrue(closeCalled);
+    assert.isTrue(createFilesCalled);
+    createFiles();
+    vars();
+  });
+});
+
 describe("handleBrowserInput", () => {
   it("should abort", () => {
     const handleBrowserInput = setupJs.__get__("handleBrowserInput");
@@ -391,7 +485,37 @@ describe("handleBrowserInput", () => {
     assert.isTrue(exitCalled);
   });
 
-  it("should get function", async () => {
+  it("should ask question", async () => {
+    let rlQues;
+    const handleBrowserInput = setupJs.__get__("handleBrowserInput");
+    const getBrowserData = setupJs.__get__("getBrowserData");
+    const stubCreateFiles = sinon.stub().callsFake(async () => true);
+    const createFiles = setupJs.__set__("createFiles", stubCreateFiles);
+    const stubRlQues = sinon.stub().callsFake(msg => {
+      rlQues = msg;
+    });
+    const browser = getBrowserData("firefox");
+    const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
+    const vars = setupJs.__set__("vars", {
+      browser,
+      configDir: [DIR_CWD, "test", "file", "config"],
+      hostName: "foo",
+      overwriteConfig: false,
+      rl: {
+        question: stubRlQues,
+      },
+    });
+    await handleBrowserInput("firefox");
+    const {calledOnce: createFilesCalled} = stubCreateFiles;
+    const {calledOnce: quesCalled} = stubRlQues;
+    assert.isFalse(createFilesCalled);
+    assert.isTrue(quesCalled);
+    assert.strictEqual(rlQues, `${dirPath} already exists. Overwrite? [y/n]\n`);
+    createFiles();
+    vars();
+  });
+
+  it("should call function", async () => {
     const handleBrowserInput = setupJs.__get__("handleBrowserInput");
     const stubCreateFiles = sinon.stub().callsFake(async () => true);
     const createFiles = setupJs.__set__("createFiles", stubCreateFiles);
