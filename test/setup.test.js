@@ -738,7 +738,7 @@ describe("Setup", () => {
           on: a => a,
         },
       });
-      const configDir = [DIR_CWD, "test", "file", "config"];
+      const configDir = [DIR_CWD, "test", "tmp", "config"];
       const configPath = await createDir(configDir);
       await removeDir(path.join(configPath, "chrome"), configPath);
       const browserConfigPath = await createDir([...configDir, "chrome"]);
