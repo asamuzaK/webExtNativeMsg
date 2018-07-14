@@ -743,8 +743,7 @@ describe("Setup", () => {
       setup.configPath = configPath;
       setup.browser = "firefox";
       setup.overwriteConfig = true;
-      await Promise.all([setup.run()]).catch(e => {
-      });
+      await setup.run();
       const {calledOnce: createCalled} = stubRlCreate;
       const {calledOnce: closeCalled} = stubRlClose;
       const {calledOnce: quesCalled} = stubRlQues;
