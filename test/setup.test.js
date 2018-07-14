@@ -1,7 +1,7 @@
 "use strict";
 /* api */
 const {Setup} = require("../modules/setup");
-const {createDir, removeDir} = require("../modules/file-util");
+const {createDir, isDir, removeDir} = require("../modules/file-util");
 const {assert} = require("chai");
 const {beforeEach, describe, it} = require("mocha");
 const childProcess = require("child_process");
@@ -678,15 +678,10 @@ describe("Setup", () => {
       const stubRlQues = sinon.stub().callsFake(msg => {
         rlQues = msg;
       });
-      const stubCreate = sinon.stub(readline, "createInterface").callsFake(
-        () => {
-          const rl = {
-            close: () => undefined,
-            question: stubRlQues,
-          };
-          return rl;
-        }
-      );
+      const stubCreate = sinon.stub(readline, "createInterface").returns({
+        close: () => undefined,
+        question: stubRlQues,
+      });
       await setup.run();
       const {calledOnce: createCalled} = stubCreate;
       const {calledOnce: quesCalled} = stubRlQues;
@@ -705,15 +700,10 @@ describe("Setup", () => {
       const stubRlQues = sinon.stub().callsFake(msg => {
         rlQues = msg;
       });
-      const stubCreate = sinon.stub(readline, "createInterface").callsFake(
-        () => {
-          const rl = {
-            close: () => undefined,
-            question: stubRlQues,
-          };
-          return rl;
-        }
-      );
+      const stubCreate = sinon.stub(readline, "createInterface").returns({
+        close: () => undefined,
+        question: stubRlQues,
+      });
       const configPath = path.resolve(path.join("test", "file", "config"));
       setup.configPath = configPath;
       setup.browser = "firefox";
@@ -728,6 +718,42 @@ describe("Setup", () => {
         rlQues,
         `${path.join(configPath, "firefox")} already exists. Overwrite? [y/n]\n`
       );
+    });
+
+    it("should call function", async () => {
+      let rlQues;
+      const readline = setupJs.__get__("readline");
+      const stubRlClose = sinon.stub().callsFake(() => undefined);
+      const stubRlQues = sinon.stub().callsFake(msg => {
+        rlQues = msg;
+      });
+      const stubRlCreate = sinon.stub(readline, "createInterface").returns({
+        close: stubRlClose,
+        question: stubRlQues,
+      });
+      const stubSpawn = sinon.stub(childProcess, "spawn").returns({
+        on: a => a,
+        stderr: {
+          on: a => a,
+        },
+      });
+      const configDir = [TMPDIR, "webextmsg", "config"];
+      const configPath = await createDir(configDir);
+      const browserConfigPath = await createDir([...configDir, "firefox"]);
+      setup.configPath = configPath;
+      setup.browser = "firefox";
+      setup.overwriteConfig = true;
+      await Promise.all([setup.run()]).catch(e => {
+      });
+      const {calledOnce: createCalled} = stubRlCreate;
+      const {calledOnce: closeCalled} = stubRlClose;
+      const {calledOnce: quesCalled} = stubRlQues;
+      stubRlCreate.restore();
+      stubSpawn.restore();
+      assert.isTrue(createCalled);
+      assert.isTrue(closeCalled);
+      assert.isFalse(quesCalled);
+      assert.isUndefined(rlQues);
     });
   });
 });

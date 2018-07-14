@@ -145,12 +145,17 @@ describe("removeDir", () => {
     await createFile(filePath, value, {
       encoding: "utf8", flag: "w", mode: PERM_FILE,
     });
-    removeDir(dirPath, TMPDIR);
-    const res = await Promise.all([
+    const res1 = await Promise.all([
       fs.existsSync(filePath),
       fs.existsSync(dirPath),
     ]);
-    assert.deepEqual(res, [false, false]);
+    removeDir(dirPath, TMPDIR);
+    const res2 = await Promise.all([
+      fs.existsSync(filePath),
+      fs.existsSync(dirPath),
+    ]);
+    assert.deepEqual(res1, [true, true]);
+    assert.deepEqual(res2, [false, false]);
   });
 
   it("should ignore if dir is not a directory", () => {
