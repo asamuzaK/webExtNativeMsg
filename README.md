@@ -62,17 +62,17 @@ Construct:
   * @param {Object} [opt] - options which contains optional properties below.
 
 Properties:
-* hostName: {string} - Host name.
-* hostDescription: {string} - Host description.
-* mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
-* chromeExtensionIds: {Array} - Array of chrome extension IDs.
-* webExtensionIds: {Array} - Array of web extension IDs.
 * browser {string} - Specify the browser.
 * configPath {string} - Path to save config files.
   * On Windows, config path defaults to `C:\Users\[UserName]\AppData\Roaming\[hostName]\config\`.
   * On Mac, `~/Library/Application Support/[hostName]/config/`.
   * On Linux, `~/.config/[hostName]/config/`.
 * overwriteConfig {boolean} - Overwrite config if exists. Defaults to `false`.
+* hostName: {string} - Host name.
+* hostDescription: {string} - Host description.
+* mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
+* chromeExtensionIds: {Array} - Array of chrome extension IDs.
+* webExtensionIds: {Array} - Array of web extension IDs.
 * callback: {Function} - A function that will be called when setup is done.
   * The function will be passed an argument containing information about the paths of the created files.
     ```
