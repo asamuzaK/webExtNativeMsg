@@ -341,13 +341,58 @@ describe("createFiles", () => {
     const createFiles = setupJs.__get__("createFiles");
     const vars = setupJs.__set__("vars", {
       browser: {},
-      hostDesc: "foo",
+      hostDesc: "foo bar",
       hostName: null,
     });
     await createFiles().catch(e => {
       assert.strictEqual(e.message, "Expected String but got Null.");
     });
     vars();
+  });
+
+  it("should call function", async () => {
+    const createFiles = setupJs.__get__("createFiles");
+    const getBrowserData = setupJs.__get__("getBrowserData");
+    const stubInfo = sinon.stub(console, "info");
+    const stubSpawn = sinon.stub(childProcess, "spawn").returns({
+      on: a => a,
+      stderr: {
+        on: a => a,
+      },
+    });
+    const stubReg = sinon.stub().callsFake(async () => undefined);
+    const createReg = setupJs.__set__("createReg", stubReg);
+    const stubHandleCallback = sinon.stub().callsFake(() => undefined);
+    const handleSetupCallback =
+      setupJs.__set__("handleSetupCallback", stubHandleCallback);
+    const browser = getBrowserData("chrome");
+    const configDir = [DIR_CWD, "test", "file", "tmp"];
+    const vars = setupJs.__set__("vars", {
+      browser, configDir,
+      chromeExtIds: ["chrome-extension://foo"],
+      webExtIds: ["foo@bar"],
+      hostDesc: "foo bar",
+      hostName: "foo",
+      mainFile: path.join("test", "file", "test.js"),
+    });
+    await createFiles();
+    const {calledOnce: regCalled} = stubReg;
+    const {calledOnce: cbCalled} = stubHandleCallback;
+    const {called: infoCalled} = stubInfo;
+    stubSpawn.restore();
+    stubInfo.restore();
+    if (IS_WIN) {
+      assert.isTrue(regCalled);
+      assert.isFalse(cbCalled);
+    } else {
+      assert.isFalse(regCalled);
+      assert.isTrue(cbCalled);
+    }
+    assert.isTrue(infoCalled);
+    createReg();
+    handleSetupCallback();
+    vars();
+    await removeDir(path.resolve(path.join(...configDir)), DIR_CWD);
   });
 });
 
@@ -426,7 +471,6 @@ describe("handleBrowserConfigDir", () => {
     const createFiles = setupJs.__set__("createFiles", stubCreateFiles);
     const stubRlClose = sinon.stub().callsFake(() => undefined);
     const browser = getBrowserData("firefox");
-    const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
     const vars = setupJs.__set__("vars", {
       browser,
       configDir: [DIR_CWD, "test", "file", "config"],
