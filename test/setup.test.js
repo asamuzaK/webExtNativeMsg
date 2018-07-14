@@ -737,13 +737,14 @@ describe("Setup", () => {
           on: a => a,
         },
       });
-      const configDir = [TMPDIR, "webextmsg", "config"];
+      const configDir = [DIR_CWD, "test", "file", "config"];
       const configPath = await createDir(configDir);
-      const browserConfigPath = await createDir([...configDir, "firefox"]);
-      setup.configPath = configPath;
-      setup.browser = "firefox";
-      setup.overwriteConfig = true;
+      await removeDir(path.join(configPath, "chrome"), configPath);
+      const browserConfigPath = await createDir([...configDir, "chrome"]);
       assert.isTrue(isDir(browserConfigPath));
+      setup.configPath = configPath;
+      setup.browser = "chrome";
+      setup.overwriteConfig = true;
       await setup.run();
       const {calledOnce: createCalled} = stubRlCreate;
       const {calledOnce: closeCalled} = stubRlClose;
