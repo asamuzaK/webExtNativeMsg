@@ -8,17 +8,18 @@ Helper modules for WebExtensions native messaging host.
 
 ## Supported browsers
 
-|Browser    |Windows|Linux  |Mac    |
-|:----------|:-----:|:-----:|:-----:|
-|Firefox    |   ✓   |   ✓   |   ✓   |
-|Cyberfox   |   ✓ *1|       |       |
-|Waterfox   |   ✓ *1|       |       |
-|Chrome     |   ✓   |   ✓   |   ✓   |
-|Chromium   |       |   ✓   |   ✓   |
-|CentBrowser|   ✓ *2|       |       |
-|Kinza      |   ✓ *2|       |       |
-|Opera      |   ✓ *2|       |   ✓ *2|
-|Vivaldi    |   ✓ *2|   ✓   |   ✓   |
+|Browser      |Windows|Linux  |Mac    |
+|:------------|:-----:|:-----:|:-----:|
+|Firefox      |   ✓   |   ✓   |   ✓   |
+|Cyberfox     |   ✓ *1|       |       |
+|Waterfox     |   ✓ *1|       |       |
+|Chrome       |   ✓   |   ✓   |   ✓   |
+|Chrome Canary|   ✓ *2|       |   ✓   |
+|Chromium     |       |   ✓   |   ✓   |
+|CentBrowser  |   ✓ *2|       |       |
+|Kinza        |   ✓ *2|       |       |
+|Opera        |   ✓ *2|       |   ✓ *2|
+|Vivaldi      |   ✓ *2|   ✓   |   ✓   |
 
 *1: Shares host with Firefox.
 *2: Shares host with Chrome.
