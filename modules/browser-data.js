@@ -50,7 +50,7 @@ const browserData = {
     alias: "chromecanary",
     aliasWin: "chrome",
     hostLinux: null,
-    hostMac: [...DIR_CONFIG, "Google", "Chrome", "Canary", HOST_DIR_LABEL],
+    hostMac: [...DIR_CONFIG, "Google", "Chrome Canary", HOST_DIR_LABEL],
     regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
     type: EXT_CHROME,
   },
