@@ -18,12 +18,13 @@
     "test": "nyc --reporter=text mocha test --exit"
   },
   "devDependencies": {
+    "acorn": "^6.0.2",
     "chai": "^4.2.0",
     "eslint": "^5.8.0",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
     "rewire": "^4.0.1",
-    "sinon": "^7.1.0"
+    "sinon": "^7.1.1"
   },
   "version": "3.2.2"
 }
