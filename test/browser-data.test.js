@@ -19,28 +19,6 @@ describe("Firefox", () => {
   });
 });
 
-describe("Cyberfox", () => {
-  it("should contain cyberfox property", () => {
-    assert.property(browserData, "cyberfox");
-  });
-
-  it("should contain alias and type keys", () => {
-    assert.containsAllKeys(browserData.cyberfox, ["alias", "type"]);
-  });
-
-  it("should contain alter alias key", () => {
-    assert.containsAllKeys(browserData.cyberfox, ["aliasWin"]);
-  });
-
-  it("should contain host keys", () => {
-    assert.containsAllKeys(browserData.cyberfox,
-                           ["hostLinux", "hostMac", "regWin"]);
-    assert.isNull(browserData.cyberfox.hostLinux);
-    assert.isNull(browserData.cyberfox.hostMac);
-    assert.isArray(browserData.cyberfox.regWin);
-  });
-});
-
 describe("Waterfox", () => {
   it("should contain waterfox property", () => {
     assert.property(browserData, "waterfox");
