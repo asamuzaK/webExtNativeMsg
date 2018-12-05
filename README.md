@@ -11,7 +11,6 @@ Helper modules for WebExtensions native messaging host.
 |Browser      |Windows|Linux  |Mac    |
 |:------------|:-----:|:-----:|:-----:|
 |Firefox      |   ✓   |   ✓   |   ✓   |
-|Cyberfox     |   ✓ *1|       |       |
 |Waterfox     |   ✓ *1|       |       |
 |Chrome       |   ✓   |   ✓   |   ✓   |
 |Chrome Canary|   ✓ *2|       |   ✓   |

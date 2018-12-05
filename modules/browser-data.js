@@ -22,14 +22,6 @@ const browserData = {
     regWin: [...HKCU_SOFTWARE, "Mozilla", HOST_DIR_LABEL],
     type: EXT_WEB,
   },
-  cyberfox: {
-    alias: "cyberfox",
-    aliasWin: "firefox",
-    hostLinux: null,
-    hostMac: null,
-    regWin: [...HKCU_SOFTWARE, "Mozilla", HOST_DIR_LABEL],
-    type: EXT_WEB,
-  },
   waterfox: {
     alias: "waterfox",
     aliasWin: "firefox",
