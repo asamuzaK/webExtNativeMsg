@@ -271,13 +271,14 @@ const createFiles = async () => {
   if (!Array.isArray(value)) {
     throw new TypeError(`Expected Array but got ${getType(value)}.`);
   }
-  const manifest = JSON.stringify({
+  const manifest = {
     [key]: [...value],
     description: hostDesc,
     name: hostName,
     path: shellPath,
     type: "stdio",
-  }, null, INDENT);
+  };
+  const content = `JSON.stringify(manifest, null, INDENT)\n`;
   const fileName = `${hostName}.json`;
   const manifestPath = path.resolve(
     IS_WIN && path.join(configPath, fileName) ||
@@ -294,7 +295,7 @@ const createFiles = async () => {
     }
   }
   const file = await createFile(
-    manifestPath, manifest, {encoding: CHAR, flag: "w", mode: PERM_FILE}
+    manifestPath, content, {encoding: CHAR, flag: "w", mode: PERM_FILE}
   );
   if (!file) {
     throw new Error(`Failed to create ${manifestPath}.`);
