@@ -426,6 +426,57 @@ describe("createFiles", () => {
     vars();
     await removeDir(path.resolve(path.join(...configDir)), DIR_CWD);
   });
+
+  it("should get new line at EOF", async () => {
+    const createFiles = setupJs.__get__("createFiles");
+    const getBrowserData = setupJs.__get__("getBrowserData");
+    const stubInfo = sinon.stub(console, "info");
+    const stubSpawn = sinon.stub(childProcess, "spawn").returns({
+      on: a => a,
+      stderr: {
+        on: a => a,
+      },
+    });
+    const stubReg = sinon.stub().callsFake(async () => undefined);
+    const createReg = setupJs.__set__("createReg", stubReg);
+    const stubHandleCallback = sinon.stub().callsFake(() => undefined);
+    const handleSetupCallback =
+      setupJs.__set__("handleSetupCallback", stubHandleCallback);
+    const browser = getBrowserData("chrome");
+    const configDir = [DIR_CWD, "test", "file", "tmp"];
+    const vars = setupJs.__set__("vars", {
+      browser, configDir,
+      chromeExtIds: ["chrome-extension://foo"],
+      webExtIds: ["foo@bar"],
+      hostDesc: "foo bar",
+      hostName: "foo",
+      mainFile: path.join("test", "file", "test.js"),
+    });
+    await createFiles();
+    const {manifestPath} = setupJs.__get__("vars");
+    const file = fs.readFileSync(manifestPath, {
+      encoding: "utf8",
+      flag: "r",
+    });
+    const {calledOnce: regCalled} = stubReg;
+    const {calledOnce: cbCalled} = stubHandleCallback;
+    const {called: infoCalled} = stubInfo;
+    stubSpawn.restore();
+    stubInfo.restore();
+    if (IS_WIN) {
+      assert.isTrue(regCalled);
+      assert.isFalse(cbCalled);
+    } else {
+      assert.isFalse(regCalled);
+      assert.isTrue(cbCalled);
+    }
+    assert.isTrue(infoCalled);
+    assert.isTrue(file.endsWith("\n"));
+    createReg();
+    handleSetupCallback();
+    vars();
+    await removeDir(path.resolve(path.join(...configDir)), DIR_CWD);
+  });
 });
 
 describe("handleBrowserConfigDir", () => {
