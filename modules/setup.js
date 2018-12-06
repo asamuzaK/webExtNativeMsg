@@ -151,14 +151,18 @@ const createShellScript = async configPath => {
   const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
   const appPath = process.execPath;
   const filePath = path.resolve(path.join(DIR_CWD, mainFile));
-  let cmd;
+  let cmd, content;
   if (await isFile(filePath)) {
     cmd = `${quoteArg(appPath)} ${quoteArg(filePath)}`;
   } else {
     cmd = quoteArg(appPath);
   }
-  const content = IS_WIN && `@echo off\n${cmd}\n` ||
-                  `#!/usr/bin/env bash\n${cmd}\n`;
+  if (IS_WIN) {
+    content = `@echo off\n${cmd}\n`;
+  } else {
+    const envShell = process.env.SHELL;
+    content = `#!${envShell}\n${cmd}\n`;
+  }
   const file = await createFile(
     shellPath, content, {encoding: CHAR, flag: "w", mode: PERM_EXEC}
   );
