@@ -278,7 +278,7 @@ const createFiles = async () => {
     path: shellPath,
     type: "stdio",
   };
-  const content = `JSON.stringify(manifest, null, INDENT)\n`;
+  const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
   const fileName = `${hostName}.json`;
   const manifestPath = path.resolve(
     IS_WIN && path.join(configPath, fileName) ||
