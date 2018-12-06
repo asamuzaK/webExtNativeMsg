@@ -2,9 +2,11 @@
 /* api */
 const {Setup} = require("../modules/setup");
 const {createDir, isDir, removeDir} = require("../modules/file-util");
+const {quoteArg} = require("../modules/common");
 const {assert} = require("chai");
 const {beforeEach, describe, it} = require("mocha");
 const childProcess = require("child_process");
+const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const process = require("process");
@@ -218,6 +220,36 @@ describe("createShellScript", () => {
     stubInfo.restore();
     assert.strictEqual(res, shellPath);
     assert.strictEqual(infoMsg, `Created: ${shellPath}`);
+    vars();
+    await removeDir(path.join(TMPDIR, "webextnativemsg"), TMPDIR);
+  });
+
+  it("should get content", async () => {
+    const createShellScript = setupJs.__get__("createShellScript");
+    const configDir = [TMPDIR, "webextnativemsg", "config"];
+    const shellPath = path.join(...configDir, IS_WIN && "foo.cmd" || "foo.sh");
+    let infoMsg;
+    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+      infoMsg = msg;
+    });
+    const vars = setupJs.__set__("vars", {
+      hostName: "foo",
+      mainFile: path.resolve(path.join("test", "file", "test.js")),
+    });
+    const configPath = await createDir(configDir);
+    const res = await createShellScript(configPath);
+    stubInfo.restore();
+    const file = fs.readFileSync(shellPath, {
+      encoding: "utf8",
+      flag: "r",
+    });
+    assert.strictEqual(res, shellPath);
+    assert.strictEqual(infoMsg, `Created: ${shellPath}`);
+    if (IS_WIN) {
+      assert.strictEqual(file, `@echo off\n${quoteArg(process.execPath)}\n`);
+    } else {
+      assert.strictEqual(file, `#!${process.env.SHELL}\n${process.execPath}\n`);
+    }
     vars();
     await removeDir(path.join(TMPDIR, "webextnativemsg"), TMPDIR);
   });
