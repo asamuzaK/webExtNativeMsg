@@ -248,6 +248,7 @@ describe("createShellScript", () => {
     if (IS_WIN) {
       assert.strictEqual(file, `@echo off\n${quoteArg(process.execPath)}\n`);
     } else {
+      assert.isDefined(process.env.SHELL);
       assert.strictEqual(file, `#!${process.env.SHELL}\n${process.execPath}\n`);
     }
     vars();
