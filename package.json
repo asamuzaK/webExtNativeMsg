@@ -18,7 +18,7 @@
     "test": "nyc --reporter=text mocha test --exit"
   },
   "devDependencies": {
-    "acorn": "^6.0.4",
+    "acorn": "^6.0.5",
     "chai": "^4.2.0",
     "eslint": "^5.11.1",
     "mocha": "^5.2.0",
