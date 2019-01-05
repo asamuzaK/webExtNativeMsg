@@ -1,7 +1,7 @@
 "use strict";
 /* api */
 const {Setup} = require("../modules/setup");
-const {createDir, isDir, removeDir} = require("../modules/file-util");
+const {createDirectory, isDir, removeDir} = require("../modules/file-util");
 const {quoteArg} = require("../modules/common");
 const {assert} = require("chai");
 const {beforeEach, describe, it} = require("mocha");
@@ -194,7 +194,7 @@ describe("createShellScript", () => {
       hostName: "foo",
       mainFile: "bar",
     });
-    const configPath = await createDir(configDir);
+    const configPath = await createDirectory(path.join(...configDir));
     const res = await createShellScript(configPath);
     stubInfo.restore();
     assert.strictEqual(res, shellPath);
@@ -215,7 +215,7 @@ describe("createShellScript", () => {
       hostName: "foo",
       mainFile: path.resolve(path.join("test", "file", "test.js")),
     });
-    const configPath = await createDir(configDir);
+    const configPath = await createDirectory(path.join(...configDir));
     const res = await createShellScript(configPath);
     stubInfo.restore();
     assert.strictEqual(res, shellPath);
@@ -236,7 +236,7 @@ describe("createShellScript", () => {
       hostName: "foo",
       mainFile: path.resolve(path.join("test", "file", "test.js")),
     });
-    const configPath = await createDir(configDir);
+    const configPath = await createDirectory(path.join(...configDir));
     const res = await createShellScript(configPath);
     stubInfo.restore();
     const file = fs.readFileSync(shellPath, {
@@ -991,9 +991,10 @@ describe("Setup", () => {
         },
       });
       const configDir = [DIR_CWD, "test", "tmp", "config"];
-      const configPath = await createDir(configDir);
+      const configPath = await createDirectory(path.join(...configDir));
       await removeDir(path.join(configPath, "chrome"), configPath);
-      const browserConfigPath = await createDir([...configDir, "chrome"]);
+      const browserConfigPath =
+        await createDirectory(path.join(configPath, "chrome"));
       assert.isTrue(isDir(browserConfigPath));
       setup.configPath = configPath;
       setup.browser = "chrome";

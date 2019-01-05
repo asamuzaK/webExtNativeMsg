@@ -9,7 +9,7 @@ const {
   escapeChar, getType, isString, logErr, quoteArg, throwErr,
 } = require("./common");
 const {
-  createDir, createFile, getAbsPath, isDir, isFile,
+  createDirectory, createFile, getAbsPath, isDir, isFile,
 } = require("./file-util");
 const path = require("path");
 const process = require("process");
@@ -122,7 +122,7 @@ const createConfig = async () => {
   if (!Array.isArray(dir)) {
     throw new TypeError(`Expected Array but got ${getType(dir)}.`);
   }
-  const configPath = await createDir(dir, PERM_DIR);
+  const configPath = await createDirectory(path.join(...dir), PERM_DIR);
   if (await !isDir(configPath)) {
     throw new Error(`Failed to create ${path.join(dir)}.`);
   }
@@ -289,7 +289,7 @@ const createFiles = async () => {
     await createReg(hostName, manifestPath, regWin);
   } else {
     const hostDir = IS_MAC && hostMac || hostLinux;
-    const hostDirPath = await createDir(hostDir, PERM_DIR);
+    const hostDirPath = await createDirectory(path.join(...hostDir), PERM_DIR);
     if (await !isDir(hostDirPath)) {
       throw new Error(`Failed to create ${path.join(...hostDir)}.`);
     }

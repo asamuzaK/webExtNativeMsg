@@ -2,7 +2,7 @@
 /* api */
 const {
   ChildProcess, CmdArgs, Input, Output, Setup,
-  convertUriToFilePath, createDir, createFile, getAbsPath,
+  convertUriToFilePath, createDir, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
   isFile, isSubDir, readFile, removeDir,
 } = require("../index");
@@ -45,6 +45,10 @@ describe("Functions", () => {
 
   it("should be type of function", () => {
     assert.typeOf(createDir, "function");
+  });
+
+  it("should be type of function", () => {
+    assert.typeOf(createDirectory, "function");
   });
 
   it("should be type of function", () => {
