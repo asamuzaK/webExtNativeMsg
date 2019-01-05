@@ -177,6 +177,27 @@ const createDir = (arr, mode = PERM_DIR) => {
 };
 
 /**
+ * create a directory
+ * @param {string} dir - directory path to create
+ * @param {number} [mode] - permission
+ * @returns {string} - directory path
+ */
+const createDirectory = (dir, mode = PERM_DIR) => {
+  if (!isString(dir)) {
+    throw new TypeError(`Expected String but got ${getType(dir)}.`);
+  }
+  const dirPath = path.resolve(path.normalize(dir));
+  if (!fs.existsSync(dirPath)) {
+    const opt = {
+      mode,
+      recursive: true,
+    };
+    fs.mkdirSync(dirPath, opt);
+  }
+  return dirPath;
+};
+
+/**
  * create a file
  * @param {string} file - file path
  * @param {string|Buffer|Uint8Array} value - value to write
@@ -221,7 +242,7 @@ const readFile = async (file, opt = {encoding: null, flag: "r"}) => {
 };
 
 module.exports = {
-  convertUriToFilePath, createDir, createFile, getAbsPath,
+  convertUriToFilePath, createDir, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
   isExecutable, isFile, isSubDir, removeDir, readFile,
 };

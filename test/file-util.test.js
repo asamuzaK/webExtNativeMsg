@@ -2,7 +2,7 @@
 /* api */
 const {URL} = require("url");
 const {
-  convertUriToFilePath, createDir, createFile, getAbsPath,
+  convertUriToFilePath, createDir, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
   isExecutable, isFile, isSubDir, removeDir, readFile,
 } = require("../modules/file-util");
@@ -96,6 +96,21 @@ describe("createDir", () => {
 
   it("should throw if given argument is not an array", () => {
     assert.throws(() => createDir(), "Expected Array but got Undefined.");
+  });
+});
+
+describe("createDirectory", () => {
+  it("should get string", async () => {
+    const dirString = path.join(TMPDIR, "webextnativemsg", "1");
+    const dir = createDirectory(dirString);
+    assert.strictEqual(dir, dirString);
+    fs.rmdirSync(dirString);
+    fs.rmdirSync(path.join(TMPDIR, "webextnativemsg"));
+  });
+
+  it("should throw if given argument is not a string", () => {
+    assert.throws(() => createDirectory(),
+                  "Expected String but got Undefined.");
   });
 });
 
