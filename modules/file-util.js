@@ -186,6 +186,9 @@ const createDirectory = (dir, mode = PERM_DIR) => {
   if (!isString(dir)) {
     throw new TypeError(`Expected String but got ${getType(dir)}.`);
   }
+  if (!Number.isInteger(mode)) {
+    throw new TypeError(`Expected Number but got ${getType(mode)}.`);
+  }
   const dirPath = path.resolve(path.normalize(dir));
   if (!fs.existsSync(dirPath)) {
     const opt = {

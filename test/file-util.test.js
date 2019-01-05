@@ -112,6 +112,11 @@ describe("createDirectory", () => {
     assert.throws(() => createDirectory(),
                   "Expected String but got Undefined.");
   });
+
+  it("should throw if given second argument is not a number", () => {
+    assert.throws(() => createDirectory("/foo/bar", "baz"),
+                  "Expected Number but got String.");
+  });
 });
 
 describe("createFile", () => {
