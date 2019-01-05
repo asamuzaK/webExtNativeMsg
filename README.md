@@ -226,12 +226,14 @@ Note: `dir` should be subdirectory of `baseDir`.
 ### Function createDir(arr, mode)
 
 Note: Deprecated. Will be removed in the future release.
+<!--
 Create a directory.
 Note: first argument should be array of directory label, like `["path", "to", "dir"]`.
 
 * @param {Array} arr - directory array
 * @param {string|number} [mode] - permission. Defaults to `0o777`
 * @returns {?string} - directory path
+-->
 
 ### Function createDirectory(dir, mode)
 
