@@ -102,20 +102,26 @@ describe("createDir", () => {
 describe("createDirectory", () => {
   it("should get string", async () => {
     const dirString = path.join(TMPDIR, "webextnativemsg", "1");
-    const dir = createDirectory(dirString);
+    const dir = await createDirectory(dirString);
     assert.strictEqual(dir, dirString);
     fs.rmdirSync(dirString);
     fs.rmdirSync(path.join(TMPDIR, "webextnativemsg"));
   });
 
-  it("should throw if given argument is not a string", () => {
-    assert.throws(() => createDirectory(),
-                  "Expected String but got Undefined.");
+  it("should throw if given argument is not a string", async () => {
+    await createDirectory().catch(e => {
+      assert.instanceOf(e, TypeError, "error");
+      assert.strictEqual(e.message, "Expected String but got Undefined.",
+                         "message");
+    });
   });
 
-  it("should throw if given second argument is not a number", () => {
-    assert.throws(() => createDirectory("/foo/bar", "baz"),
-                  "Expected Number but got String.");
+  it("should throw if given second argument is not a number", async () => {
+    await createDirectory("/foo/bar", "baz").catch(e => {
+      assert.instanceOf(e, TypeError, "error");
+      assert.strictEqual(e.message, "Expected Number but got String.",
+                         "message");
+    });
   });
 });
 

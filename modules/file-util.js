@@ -155,6 +155,7 @@ const removeDir = (dir, baseDir) => {
 
 /**
  * create a directory
+ * NOTE: Deprecated. Remove in the future.
  * @param {Array} arr - directory array
  * @param {string|number} [mode] - permission
  * @returns {?string} - directory path
@@ -182,7 +183,7 @@ const createDir = (arr, mode = PERM_DIR) => {
  * @param {number} [mode] - permission
  * @returns {string} - directory path
  */
-const createDirectory = (dir, mode = PERM_DIR) => {
+const createDirectory = async (dir, mode = PERM_DIR) => {
   if (!isString(dir)) {
     throw new TypeError(`Expected String but got ${getType(dir)}.`);
   }
@@ -195,7 +196,7 @@ const createDirectory = (dir, mode = PERM_DIR) => {
       mode,
       recursive: true,
     };
-    fs.mkdirSync(dirPath, opt);
+    await fs.promises.mkdir(dirPath, opt);
   }
   return dirPath;
 };
