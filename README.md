@@ -235,7 +235,7 @@ Note: first argument should be array of directory label, like `["path", "to", "d
 * @returns {?string} - directory path
 -->
 
-### Function createDirectory(dir, mode)
+### Async Function createDirectory(dir, mode)
 
 Create a directory.
 
@@ -253,7 +253,7 @@ Create a file.
 * @param {string} [opt.encoding] - encoding. Defaults to `null`
 * @param {string} [opt.flag] - flag. Defaults to `"w"`
 * @param {number|string} [opt.mode] - file permission. Defaults to `0o666`
-* @returns {?string} - file path, nullable
+* @returns {string} - file path
 
 ### Async Function readFile(file, opt)
 
