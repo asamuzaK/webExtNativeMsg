@@ -173,6 +173,7 @@ describe("ChildProcess", () => {
 
 /* CmdArgs */
 describe("CmdArgs", () => {
+  const cmd = new CmdArgs();
   const cmdStr = new CmdArgs("-a -b \"c d\"");
   const cmdArr = new CmdArgs(["-a", "-b", "c d"]);
 
@@ -193,6 +194,10 @@ describe("CmdArgs", () => {
     it("should get arguments in array", () => {
       assert.deepEqual(cmdArr.toArray(), ["-a", "-b", "c d"]);
     });
+
+    it("should get empty array", () => {
+      assert.deepEqual(cmd.toArray(), []);
+    });
   });
 
   describe("toString", () => {
@@ -202,6 +207,10 @@ describe("CmdArgs", () => {
 
     it("should get arguments in string", () => {
       assert.strictEqual(cmdArr.toString(), "-a -b \"c d\"");
+    });
+
+    it("should get empty string", () => {
+      assert.strictEqual(cmd.toString(), "");
     });
   });
 });
@@ -235,6 +244,12 @@ describe("correctArg", () => {
     const correctArg = childProc.__get__("correctArg");
     const res = correctArg("test \"foo bar\"");
     assert.strictEqual(res, "test foo bar");
+  });
+
+  it("should strip quotes", () => {
+    const correctArg = childProc.__get__("correctArg");
+    const res = correctArg("\"a\\\\b\"");
+    assert.strictEqual(res, "a\\b");
   });
 });
 

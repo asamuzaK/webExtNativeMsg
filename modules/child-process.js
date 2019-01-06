@@ -124,7 +124,7 @@ class ChildProcess {
    * @returns {Object} - child process
    */
   async spawn(file, pos = false) {
-    if (!isExecutable(this._cmd)) {
+    if (await !isExecutable(this._cmd)) {
       throw new Error(`${this._cmd} is not executable.`);
     }
     const cmd = this._cmd;
