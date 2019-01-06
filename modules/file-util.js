@@ -5,9 +5,9 @@
 /* api */
 const {URL} = require("url");
 const {getType, isString, stringifyPositiveInt} = require("./common");
-const {promisify} = require("util");
 const fs = require("fs");
 const path = require("path");
+const {promises: fsPromise} = fs;
 
 /* constants */
 const {DIR_HOME, IS_WIN} = require("./constant");
@@ -196,20 +196,20 @@ const createDirectory = async (dir, mode = PERM_DIR) => {
       mode,
       recursive: true,
     };
-    await fs.promises.mkdir(dirPath, opt);
+    await fsPromise.mkdir(dirPath, opt);
   }
   return dirPath;
 };
 
 /**
  * create a file
- * @param {string} file - file path
+ * @param {string} file - file path to create
  * @param {string|Buffer|Uint8Array} value - value to write
  * @param {Object} [opt] - options
  * @param {string} [opt.encoding] - encoding
  * @param {string} [opt.flag] - flag
  * @param {number|string} [opt.mode] - file permission
- * @returns {?string} - file path
+ * @returns {string} - file path
  */
 const createFile = async (file, value, opt = {
   encoding: null, flag: "w", mode: PERM_FILE,
@@ -223,9 +223,9 @@ const createFile = async (file, value, opt = {
       `Expected String, Buffer, Uint8Array but got ${getType(value)}.`
     );
   }
-  const write = promisify(fs.writeFile);
-  await write(file, value, opt);
-  return isFile(file) && file || null;
+  const filePath = path.resolve(path.normalize(file));
+  await fsPromise.writeFile(filePath, value, opt);
+  return filePath;
 };
 
 /**
@@ -240,8 +240,7 @@ const readFile = async (file, opt = {encoding: null, flag: "r"}) => {
   if (!isFile(file)) {
     throw new Error(`${file} is not a file.`);
   }
-  const read = promisify(fs.readFile);
-  const value = await read(file, opt);
+  const value = await fsPromise.readFile(file, opt);
   return value;
 };
 
