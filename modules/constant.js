@@ -4,6 +4,7 @@
 "use strict";
 /* api */
 const os = require("os");
+const path = require("path");
 
 /* constants */
 const CHAR = "utf8";
@@ -15,9 +16,10 @@ const IS_BE = os.endianness() === "BE";
 const IS_LE = os.endianness() === "LE";
 const IS_MAC = os.platform() === "darwin";
 const IS_WIN = os.platform() === "win32";
-const DIR_CONFIG_LINUX = [DIR_HOME, ".config"];
-const DIR_CONFIG_MAC = [DIR_HOME, "Library", "Application Support"];
-const DIR_CONFIG_WIN = [DIR_HOME, "AppData", "Roaming"];
+const DIR_CONFIG_LINUX = path.join(os.homedir(), ".config");
+const DIR_CONFIG_MAC =
+  path.join(os.homedir(), "Library", "Application Support");
+const DIR_CONFIG_WIN = path.join(os.homedir(), "AppData", "Roaming");
 
 module.exports = {
   CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,

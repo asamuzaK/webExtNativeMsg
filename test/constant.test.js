@@ -14,6 +14,9 @@ describe("string constants", () => {
   it("should get string", () => {
     const arr = [
       CHAR,
+      DIR_CONFIG_LINUX,
+      DIR_CONFIG_MAC,
+      DIR_CONFIG_WIN,
       DIR_HOME,
       EXT_CHROME,
       EXT_WEB,
@@ -43,19 +46,6 @@ describe("boolean constants", () => {
     ];
     arr.forEach(i => {
       assert.isTrue(typeof i === "boolean");
-    });
-  });
-});
-
-describe("array conatants", () => {
-  it("should get array", () => {
-    const arr = [
-      DIR_CONFIG_LINUX,
-      DIR_CONFIG_MAC,
-      DIR_CONFIG_WIN,
-    ];
-    arr.forEach(i => {
-      assert.isArray(i);
     });
   });
 });

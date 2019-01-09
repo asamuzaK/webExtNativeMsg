@@ -393,8 +393,7 @@ class Setup {
     } = opt;
     this._browser = isString(browser) && getBrowserData(browser) || null;
     this._configDir = isString(hostName) &&
-                      [...DIR_CONFIG, hostName, "config"] ||
-                      [DIR_CWD, "config"];
+                      [DIR_CONFIG, hostName, "config"] || [DIR_CWD, "config"];
     this._overwriteConfig = !!overwriteConfig;
     this._hostDesc = isString(hostDescription) && hostDescription || null;
     this._hostName = isString(hostName) && hostName || null;

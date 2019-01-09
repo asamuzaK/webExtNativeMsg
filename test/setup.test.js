@@ -774,7 +774,7 @@ describe("Setup", () => {
 
     it("should get string", () => {
       assert.strictEqual(setup.configPath,
-                         path.join(...DIR_CONFIG, "myhost", "config"));
+                         path.join(DIR_CONFIG, "myhost", "config"));
     });
 
     it("should get string", () => {
@@ -845,7 +845,7 @@ describe("Setup", () => {
     });
 
     it("should get string", () => {
-      const myPath = path.join(...DIR_CONFIG, "myhost", "config");
+      const myPath = path.join(DIR_CONFIG, "myhost", "config");
       setup.configPath = myPath;
       assert.strictEqual(setup.configPath, myPath);
     });
