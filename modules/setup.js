@@ -5,9 +5,7 @@
 /* api */
 const {ChildProcess} = require("./child-process");
 const {browserData} = require("./browser-data");
-const {
-  escapeChar, getType, isString, logErr, quoteArg, throwErr,
-} = require("./common");
+const {getType, isString, logErr, quoteArg, throwErr} = require("./common");
 const {
   createDirectory, createFile, getAbsPath, isDir, isFile,
 } = require("./file-util");
@@ -80,18 +78,21 @@ const getBrowserData = key => {
 
 /**
  * get browser specific config directory
- * @returns {?Array} - config directory array
+ * @returns {?string} - config directory
  */
 const getBrowserConfigDir = () => {
   const {browser, configDir} = vars;
   let dir;
-  if (browser && Array.isArray(configDir)) {
+  if (browser && isString(configDir)) {
     const {alias, aliasLinux, aliasMac, aliasWin} = browser;
     if (isString(alias)) {
-      dir =
-        IS_WIN && [...configDir, isString(aliasWin) && aliasWin || alias] ||
-        IS_MAC && [...configDir, isString(aliasMac) && aliasMac || alias] ||
-        [...configDir, isString(aliasLinux) && aliasLinux || alias];
+      if (IS_WIN) {
+        dir = path.join(configDir, isString(aliasWin) && aliasWin || alias);
+      } else if (IS_MAC) {
+        dir = path.join(configDir, isString(aliasMac) && aliasMac || alias);
+      } else {
+        dir = path.join(configDir, isString(aliasLinux) && aliasLinux || alias);
+      }
     }
   }
   return dir || null;
@@ -119,10 +120,10 @@ const handleSetupCallback = () => {
  */
 const createConfig = async () => {
   const dir = await getBrowserConfigDir();
-  if (!Array.isArray(dir)) {
-    throw new TypeError(`Expected Array but got ${getType(dir)}.`);
+  if (!isString(dir)) {
+    throw new TypeError(`Expected String but got ${getType(dir)}.`);
   }
-  const configPath = await createDirectory(path.join(...dir), PERM_DIR);
+  const configPath = await createDirectory(dir, PERM_DIR);
   if (await !isDir(configPath)) {
     throw new Error(`Failed to create ${path.join(dir)}.`);
   }
@@ -312,11 +313,11 @@ const createFiles = async () => {
  */
 const handleBrowserConfigDir = ans => {
   const dir = getBrowserConfigDir();
-  if (!Array.isArray(dir)) {
-    throw new TypeError(`Expected Array but got ${getType(dir)}.`);
+  if (!isString(dir)) {
+    throw new TypeError(`Expected String but got ${getType(dir)}.`);
   }
   const {rl} = vars;
-  const msg = `${path.join(...dir)} already exists.`;
+  const msg = `${dir} already exists.`;
   rl && rl.close();
   if (isString(ans)) {
     ans = ans.trim();
@@ -345,12 +346,11 @@ const handleBrowserInput = ans => {
       browser && (vars.browser = browser);
       if (browser) {
         const dir = getBrowserConfigDir();
-        if (!Array.isArray(dir)) {
-          throw new TypeError(`Expected Array but got ${getType(dir)}.`);
+        if (!isString(dir)) {
+          throw new TypeError(`Expected String but got ${getType(dir)}.`);
         }
-        const dirPath = path.join(...dir);
-        if (isDir(dirPath) && rl && !overwriteConfig) {
-          rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
+        if (isDir(dir) && rl && !overwriteConfig) {
+          rl.question(`${dir} already exists. Overwrite? [y/n]\n`,
                       handleBrowserConfigDir);
         } else {
           rl && rl.close();
@@ -393,7 +393,8 @@ class Setup {
     } = opt;
     this._browser = isString(browser) && getBrowserData(browser) || null;
     this._configDir = isString(hostName) &&
-                      [DIR_CONFIG, hostName, "config"] || [DIR_CWD, "config"];
+                      path.join(DIR_CONFIG, hostName, "config") ||
+                      path.join(DIR_CWD, "config");
     this._overwriteConfig = !!overwriteConfig;
     this._hostDesc = isString(hostDescription) && hostDescription || null;
     this._hostName = isString(hostName) && hostName || null;
@@ -425,7 +426,7 @@ class Setup {
     vars.browser = this._browser;
   }
   get configPath() {
-    return path.join(...this._configDir);
+    return this._configDir;
   }
   set configPath(dir) {
     this._setConfigDir(dir);
@@ -493,10 +494,7 @@ class Setup {
     if (!dirPath.startsWith(DIR_HOME)) {
       throw new Error(`Config path is not sub directory of ${DIR_HOME}.`);
     }
-    const homeDir = escapeChar(DIR_HOME, /(\\)/g);
-    const reg = new RegExp(`^(?:${homeDir}|~)`);
-    const subDir = dirPath.replace(reg, "").split(path.sep).filter(i => i);
-    this._configDir = subDir.length && [DIR_HOME, ...subDir] || [DIR_HOME];
+    this._configDir = dirPath;
     vars.configDir = this._configDir;
   }
 
@@ -524,12 +522,11 @@ class Setup {
     }
     if (this._browser) {
       const dir = getBrowserConfigDir();
-      if (!Array.isArray(dir)) {
-        throw new TypeError(`Expected Array but got ${getType(dir)}.`);
+      if (!isString(dir)) {
+        throw new TypeError(`Expected String but got ${getType(dir)}.`);
       }
-      const dirPath = path.join(...dir);
-      if (isDir(dirPath) && !this._overwriteConfig) {
-        vars.rl.question(`${dirPath} already exists. Overwrite? [y/n]\n`,
+      if (isDir(dir) && !this._overwriteConfig) {
+        vars.rl.question(`${dir} already exists. Overwrite? [y/n]\n`,
                          handleBrowserConfigDir);
       } else {
         vars.rl.close();

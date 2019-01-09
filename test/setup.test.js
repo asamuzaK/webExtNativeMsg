@@ -78,11 +78,10 @@ describe("getBrowserConfigDir", () => {
       browser: {
         alias: "firefox",
       },
-      configDir: [TMPDIR],
+      configDir: TMPDIR,
     });
     const res = getBrowserConfigDir();
-    assert.isTrue(Array.isArray(res));
-    assert.deepEqual(res, [TMPDIR, "firefox"]);
+    assert.strictEqual(res, path.join(TMPDIR, "firefox"));
     vars();
   });
 });
@@ -115,7 +114,7 @@ describe("createConfig", () => {
   it("should throw", async () => {
     const createConfig = setupJs.__get__("createConfig");
     await createConfig().catch(e => {
-      assert.strictEqual(e.message, "Expected Array but got Null.");
+      assert.strictEqual(e.message, "Expected String but got Null.");
     });
   });
 
@@ -130,7 +129,7 @@ describe("createConfig", () => {
       browser: {
         alias: "firefox",
       },
-      configDir: [TMPDIR],
+      configDir: TMPDIR,
     });
     const res = await createConfig();
     const {calledOnce} = stubInfo;
@@ -399,7 +398,7 @@ describe("createFiles", () => {
     const handleSetupCallback =
       setupJs.__set__("handleSetupCallback", stubHandleCallback);
     const browser = getBrowserData("chrome");
-    const configDir = [DIR_CWD, "test", "file", "tmp"];
+    const configDir = path.join(DIR_CWD, "test", "file", "tmp");
     const vars = setupJs.__set__("vars", {
       browser, configDir,
       chromeExtIds: ["chrome-extension://foo"],
@@ -425,7 +424,7 @@ describe("createFiles", () => {
     createReg();
     handleSetupCallback();
     vars();
-    await removeDir(path.resolve(path.join(...configDir)), DIR_CWD);
+    await removeDir(configDir, DIR_CWD);
   });
 
   it("should get new line at EOF", async () => {
@@ -444,7 +443,7 @@ describe("createFiles", () => {
     const handleSetupCallback =
       setupJs.__set__("handleSetupCallback", stubHandleCallback);
     const browser = getBrowserData("chrome");
-    const configDir = [DIR_CWD, "test", "file", "tmp"];
+    const configDir = path.join(DIR_CWD, "test", "file", "tmp");
     const vars = setupJs.__set__("vars", {
       browser, configDir,
       chromeExtIds: ["chrome-extension://foo"],
@@ -476,7 +475,7 @@ describe("createFiles", () => {
     createReg();
     handleSetupCallback();
     vars();
-    await removeDir(path.resolve(path.join(...configDir)), DIR_CWD);
+    await removeDir(configDir, DIR_CWD);
   });
 });
 
@@ -503,7 +502,7 @@ describe("handleBrowserConfigDir", () => {
     const abortSetup = setupJs.__set__("abortSetup", stubAbort);
     const vars = setupJs.__set__("vars", {
       browser,
-      configDir: [DIR_CWD, "test", "file", "config"],
+      configDir: path.join(DIR_CWD, "test", "file", "config"),
       hostName: "foo",
       rl: {
         close: stubRlClose,
@@ -532,7 +531,7 @@ describe("handleBrowserConfigDir", () => {
     const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
     const vars = setupJs.__set__("vars", {
       browser,
-      configDir: [DIR_CWD, "test", "file", "config"],
+      configDir: path.join(DIR_CWD, "test", "file", "config"),
       hostName: "foo",
       rl: {
         close: stubRlClose,
@@ -557,7 +556,7 @@ describe("handleBrowserConfigDir", () => {
     const browser = getBrowserData("firefox");
     const vars = setupJs.__set__("vars", {
       browser,
-      configDir: [DIR_CWD, "test", "file", "config"],
+      configDir: path.join(DIR_CWD, "test", "file", "config"),
       hostName: "foo",
       rl: {
         close: stubRlClose,
@@ -626,7 +625,7 @@ describe("handleBrowserInput", () => {
     const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
     const vars = setupJs.__set__("vars", {
       browser,
-      configDir: [DIR_CWD, "test", "file", "config"],
+      configDir: path.join(DIR_CWD, "test", "file", "config"),
       hostName: "foo",
       overwriteConfig: false,
       rl: {
@@ -653,7 +652,7 @@ describe("handleBrowserInput", () => {
       browser: {
         alias: "firefox",
       },
-      configDir: [TMPDIR],
+      configDir: TMPDIR,
     });
     await handleBrowserInput("firefox");
     const {called: calledCreateFiles} = stubCreateFiles;
@@ -904,10 +903,23 @@ describe("Setup", () => {
                     `Config path is not sub directory of ${DIR_HOME}.`);
     });
 
-    it("should set array containing given path", () => {
+    it("should throw if dir is not subdirectory of user's home dir", () => {
+      assert.throws(() => setup._setConfigDir(path.join(DIR_HOME, "../foo")),
+                    `Config path is not sub directory of ${DIR_HOME}.`);
+    });
+
+    it("should set dir", () => {
       const configPath = path.join("foo", "bar");
       setup2 = new Setup();
       setup2._setConfigDir(configPath);
+      assert.strictEqual(setup2.configPath, path.resolve(configPath));
+    });
+
+    it("should set dir", () => {
+      const configPath = path.join("foo", "../bar/baz");
+      setup2 = new Setup();
+      setup2._setConfigDir(configPath);
+      assert.strictEqual(configPath, path.join("bar", "baz"));
       assert.strictEqual(setup2.configPath, path.resolve(configPath));
     });
   });
