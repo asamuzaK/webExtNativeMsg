@@ -191,7 +191,7 @@ const createDirectory = async (dir, mode = PERM_DIR) => {
     throw new TypeError(`Expected Number but got ${getType(mode)}.`);
   }
   const dirPath = path.resolve(path.normalize(dir));
-  if (!fs.existsSync(dirPath)) {
+  if (!isDir(dirPath)) {
     const opt = {
       mode,
       recursive: true,
