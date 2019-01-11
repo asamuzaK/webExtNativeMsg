@@ -9,28 +9,43 @@ const childProcess = require("child_process");
 const process = require("process");
 
 /**
+ * concat array
+ * @param {Array} arrA - array
+ * @param {Array} arrB - array
+ * @returns {Array} - array
+ */
+const concatArray = (arrA, arrB) => {
+  if (!Array.isArray(arrA)) {
+    throw new TypeError(`Expected Array but got ${getType(arrA)}.`);
+  }
+  if (!Array.isArray(arrB)) {
+    throw new TypeError(`Expected Array but got ${getType(arrB)}.`);
+  }
+  return arrA.concat(arrB);
+};
+
+/**
  * correct argument string
  * @param {string} arg - argument
  * @returns {string} - argument
  */
 const correctArg = arg => {
-  if (isString(arg)) {
-    if (/^\s*(?:".*"|'.*')\s*$/.test(arg)) {
-      arg = arg.trim();
-      if (/^".*\\["\\].*"$/.test(arg)) {
-        arg = arg.replace(/\\"/g, "\"").replace(/\\\\/g, "\\");
-      }
-      arg = arg.replace(/^['"]/, "").replace(/["']$/, "");
-    } else {
-      if (/^.*\\.*$/.test(arg)) {
-        arg = arg.replace(/\\(?!\\)/g, "");
-      }
-      if (/".*"|'.*'/.test(arg)) {
-        arg = arg.replace(/"([^"]+)*"|'([^']+)*'/g, (m, c1, c2) => c1 || c2);
-      }
+  if (!isString(arg)) {
+    throw new TypeError(`Expected String but got ${getType(arg)}.`);
+  }
+  if (/^\s*(?:".*"|'.*')\s*$/.test(arg)) {
+    arg = arg.trim();
+    if (/^".*\\["\\].*"$/.test(arg)) {
+      arg = arg.replace(/\\"/g, "\"").replace(/\\\\/g, "\\");
     }
+    arg = arg.replace(/^['"]/, "").replace(/["']$/, "");
   } else {
-    arg = "";
+    if (/^.*\\.*$/.test(arg)) {
+      arg = arg.replace(/\\(?!\\)/g, "");
+    }
+    if (/".*"|'.*'/.test(arg)) {
+      arg = arg.replace(/"([^"]+)*"|'([^']+)*'/g, (m, c1, c2) => c1 || c2);
+    }
   }
   return arg;
 };
@@ -41,8 +56,12 @@ const correctArg = arg => {
  * @returns {Array} - arguments array
  */
 const extractArg = arg => {
+  if (!isString(arg)) {
+    throw new TypeError(`Expected String but got ${getType(arg)}.`);
+  }
   let arr;
-  if (isString(arg) && (arg = escapeChar(arg, /(\\)/g))) {
+  arg = escapeChar(arg, /(\\)/g);
+  if (arg) {
     const reCmd = /(?:^|\s)(?:"(?:[^"\\]|\\[^"]|\\")*"|'(?:[^'\\]|\\[^']|\\')*')(?=\s|$)|(?:\\ |[^\s])+(?:"(?:[^"\\]|\\[^"]|\\")*"|'(?:[^'\\]|\\[^']|\\')*')(?:(?:\\ |[^\s])+(?:"(?:[^"\\]|\\[^"]|\\")*"|'(?:[^'\\]|\\[^']|\\')*'))*(?:\\ |[^\s])*|(?:[^"'\s\\]|\\[^\s]|\\ )+/g;
     arr = arg.match(reCmd);
   }
@@ -55,15 +74,17 @@ const extractArg = arg => {
  * @returns {string} - argument
  */
 const stringifyArg = arg => {
+  let str;
   if (isString(arg)) {
     if (/["'\\\s]/.test(arg)) {
-      const str = escapeChar(arg, /(["\\])/g);
-      arg = str && `"${str}"` || "";
+      str = `"${escapeChar(arg, /(["\\])/g)}"`.trim();
+    } else {
+      str = arg.trim();
     }
   } else {
-    arg = "";
+    str = "";
   }
-  return isString(arg) && arg.trim() || "";
+  return str;
 };
 
 /* CmdArgs */
@@ -86,7 +107,7 @@ class CmdArgs {
       arr = this._input;
     } else if (isString(this._input)) {
       const args = [this._input].map(extractArg);
-      arr = args.length && args.reduce((a, b) => a.concat(b)) || [];
+      arr = args.reduce(concatArray);
     }
     return arr || [];
   }
@@ -143,4 +164,5 @@ class ChildProcess {
 
 module.exports = {
   ChildProcess, CmdArgs,
+  concatArray, correctArg, extractArg, stringifyArg,
 };

@@ -1,22 +1,163 @@
 /* eslint-disable max-nested-callbacks, no-magic-numbers */
 "use strict";
 /* api */
-const {ChildProcess, CmdArgs} = require("../modules/child-process");
+const {
+  ChildProcess, CmdArgs, concatArray, correctArg, extractArg, stringifyArg,
+} = require("../modules/child-process");
 const {assert} = require("chai");
 const {describe, it} = require("mocha");
 const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const process = require("process");
-const rewire = require("rewire");
 const sinon = require("sinon");
-
-const childProc = rewire("../modules/child-process");
 
 /* constants */
 const {IS_WIN} = require("../modules/constant");
 const PERM_EXEC = 0o700;
 const PERM_FILE = 0o600;
+
+describe("concatArray", () => {
+  it("should throw", () => {
+    assert.throws(() => concatArray(),
+                  TypeError, "Expected Array but got Undefined.");
+  });
+
+  it("should throw", () => {
+    assert.throws(() => concatArray([]),
+                  TypeError, "Expected Array but got Undefined.");
+  });
+
+  it("should get empty array", () => {
+    const res = concatArray([], []);
+    assert.deepEqual(res, []);
+  });
+
+  it("should get array", () => {
+    const res = concatArray(["foo"], []);
+    assert.deepEqual(res, ["foo"]);
+  });
+
+  it("should get array", () => {
+    const res = concatArray([], ["foo"]);
+    assert.deepEqual(res, ["foo"]);
+  });
+
+  it("should get array", () => {
+    const res = concatArray(["foo"], ["bar"]);
+    assert.deepEqual(res, ["foo", "bar"]);
+  });
+});
+
+describe("correctArg", () => {
+  it("should throw", () => {
+    assert.throws(() => correctArg(),
+                  TypeError, "Expected String but got Undefined.");
+  });
+
+  it("should get string", () => {
+    const res = correctArg("-a -b");
+    assert.strictEqual(res, "-a -b");
+  });
+
+  it("should trim and/or strip quotes", () => {
+    const res = correctArg(" \"test\" ");
+    assert.strictEqual(res, "test");
+  });
+
+  it("should strip back slash", () => {
+    const res = correctArg("te\\st");
+    assert.strictEqual(res, "test");
+  });
+
+  it("should strip quotes", () => {
+    const res = correctArg("test \"foo bar\"");
+    assert.strictEqual(res, "test foo bar");
+  });
+
+  it("should strip quotes", () => {
+    const res = correctArg("\"a\\\\b\"");
+    assert.strictEqual(res, "a\\b");
+  });
+
+  it("should strip quotes", () => {
+    const res = correctArg("'a b'");
+    assert.strictEqual(res, "a b");
+  });
+
+  it("should strip quotes", () => {
+    const res = correctArg("test 'a b'");
+    assert.strictEqual(res, "test a b");
+  });
+});
+
+describe("extractArg", () => {
+  it("should throw", () => {
+    assert.throws(() => extractArg(),
+                  TypeError, "Expected String but got Undefined.");
+  });
+
+  it("should get empty array", () => {
+    const res = extractArg("");
+    assert.deepEqual(res, []);
+  });
+
+  it("should get empty array", () => {
+    const res = extractArg(" ");
+    assert.deepEqual(res, []);
+  });
+
+  it("should get array", () => {
+    const res = extractArg("foo \"bar baz\"");
+    assert.deepEqual(res, [
+      "foo",
+      "bar baz",
+    ]);
+  });
+
+  it("should get array", () => {
+    const res = extractArg("foo 'bar baz'");
+    assert.deepEqual(res, [
+      "foo",
+      "bar baz",
+    ]);
+  });
+
+  it("should get array", () => {
+    const res = extractArg("foo bar\\baz");
+    assert.deepEqual(res, [
+      "foo",
+      "bar\\baz",
+    ]);
+  });
+});
+
+describe("stringifyArg", () => {
+  it("should get empty string if no argument given", () => {
+    assert.strictEqual(stringifyArg(), "");
+  });
+
+  it("should get empty string if argument is not string", () => {
+    assert.strictEqual(stringifyArg(1), "");
+  });
+
+  it("should get empty string", () => {
+    assert.strictEqual(stringifyArg(""), "");
+  });
+
+  it("should get quoted string", () => {
+    assert.strictEqual(stringifyArg("''"), "\"''\"");
+  });
+
+  it("should get quoted string", () => {
+    assert.strictEqual(stringifyArg("\"\""), "\"\\\"\\\"\"");
+  });
+
+  it("should get string", () => {
+    assert.strictEqual(stringifyArg("foo \"bar baz\" qux\\quux"),
+                       "\"foo \\\"bar baz\\\" qux\\\\quux\"");
+  });
+});
 
 /* ChildProcess */
 describe("ChildProcess", () => {
@@ -174,8 +315,27 @@ describe("ChildProcess", () => {
 /* CmdArgs */
 describe("CmdArgs", () => {
   const cmd = new CmdArgs();
+  const cmdEmptyStr = new CmdArgs("");
+  const cmdEmptyArr = new CmdArgs([]);
+  const cmdSpace = new CmdArgs(" ");
   const cmdStr = new CmdArgs("-a -b \"c d\"");
   const cmdArr = new CmdArgs(["-a", "-b", "c d"]);
+
+  it("should create an instance", () => {
+    assert.instanceOf(cmd, CmdArgs);
+  });
+
+  it("should create an instance", () => {
+    assert.instanceOf(cmdEmptyStr, CmdArgs);
+  });
+
+  it("should create an instance", () => {
+    assert.instanceOf(cmdEmptyArr, CmdArgs);
+  });
+
+  it("should create an instance", () => {
+    assert.instanceOf(cmdSpace, CmdArgs);
+  });
 
   it("should create an instance", () => {
     assert.instanceOf(cmdStr, CmdArgs);
@@ -187,6 +347,22 @@ describe("CmdArgs", () => {
 
   /* methods */
   describe("toArray", () => {
+    it("should get empty array", () => {
+      assert.deepEqual(cmd.toArray(), []);
+    });
+
+    it("should get empty array", () => {
+      assert.deepEqual(cmdEmptyStr.toArray(), []);
+    });
+
+    it("should get empty array", () => {
+      assert.deepEqual(cmdEmptyArr.toArray(), []);
+    });
+
+    it("should get empty array", () => {
+      assert.deepEqual(cmdSpace.toArray(), []);
+    });
+
     it("should get arguments in array", () => {
       assert.deepEqual(cmdStr.toArray(), ["-a", "-b", "c d"]);
     });
@@ -194,13 +370,25 @@ describe("CmdArgs", () => {
     it("should get arguments in array", () => {
       assert.deepEqual(cmdArr.toArray(), ["-a", "-b", "c d"]);
     });
-
-    it("should get empty array", () => {
-      assert.deepEqual(cmd.toArray(), []);
-    });
   });
 
   describe("toString", () => {
+    it("should get empty string", () => {
+      assert.strictEqual(cmd.toString(), "");
+    });
+
+    it("should get empty string", () => {
+      assert.strictEqual(cmdEmptyStr.toString(), "");
+    });
+
+    it("should get empty string", () => {
+      assert.strictEqual(cmdEmptyArr.toString(), "");
+    });
+
+    it("should get empty string", () => {
+      assert.strictEqual(cmdSpace.toString(), "");
+    });
+
     it("should get arguments in string", () => {
       assert.strictEqual(cmdStr.toString(), "-a -b \"c d\"");
     });
@@ -208,93 +396,5 @@ describe("CmdArgs", () => {
     it("should get arguments in string", () => {
       assert.strictEqual(cmdArr.toString(), "-a -b \"c d\"");
     });
-
-    it("should get empty string", () => {
-      assert.strictEqual(cmd.toString(), "");
-    });
-  });
-});
-
-describe("correctArg", () => {
-  it("should get empty string", () => {
-    const correctArg = childProc.__get__("correctArg");
-    const res = correctArg();
-    assert.strictEqual(res, "");
-  });
-
-  it("should get string", () => {
-    const correctArg = childProc.__get__("correctArg");
-    const res = correctArg("-a -b");
-    assert.strictEqual(res, "-a -b");
-  });
-
-  it("should trim and/or strip quotes", () => {
-    const correctArg = childProc.__get__("correctArg");
-    const res = correctArg(" \"test\" ");
-    assert.strictEqual(res, "test");
-  });
-
-  it("should strip back slash", () => {
-    const correctArg = childProc.__get__("correctArg");
-    const res = correctArg("te\\st");
-    assert.strictEqual(res, "test");
-  });
-
-  it("should strip quotes", () => {
-    const correctArg = childProc.__get__("correctArg");
-    const res = correctArg("test \"foo bar\"");
-    assert.strictEqual(res, "test foo bar");
-  });
-
-  it("should strip quotes", () => {
-    const correctArg = childProc.__get__("correctArg");
-    const res = correctArg("\"a\\\\b\"");
-    assert.strictEqual(res, "a\\b");
-  });
-});
-
-describe("extractArg", () => {
-  it("should get empty array if argument not given", () => {
-    const extractArg = childProc.__get__("extractArg");
-    const res = extractArg();
-    assert.isTrue(Array.isArray(res));
-    assert.strictEqual(res.length, 0);
-  });
-
-  it("should get empty array if argument is not string", () => {
-    const extractArg = childProc.__get__("extractArg");
-    const res = extractArg(1);
-    assert.isTrue(Array.isArray(res));
-    assert.strictEqual(res.length, 0);
-  });
-
-  it("should get array in expected length", () => {
-    const extractArg = childProc.__get__("extractArg");
-    const EXPECTED_LENGTH = 2;
-    const res = extractArg("foo bar\\baz");
-    assert.isTrue(Array.isArray(res));
-    assert.strictEqual(res.length, EXPECTED_LENGTH);
-    assert.deepEqual(res, [
-      "foo",
-      "bar\\baz",
-    ]);
-  });
-});
-
-describe("stringifyArg", () => {
-  it("should get empty string if no argument given", () => {
-    const stringifyArg = childProc.__get__("stringifyArg");
-    assert.strictEqual(stringifyArg(), "");
-  });
-
-  it("should get empty string if argument is not string", () => {
-    const stringifyArg = childProc.__get__("stringifyArg");
-    assert.strictEqual(stringifyArg(1), "");
-  });
-
-  it("should get string", () => {
-    const stringifyArg = childProc.__get__("stringifyArg");
-    assert.strictEqual(stringifyArg("foo \"bar baz\" qux\\quux"),
-                       "\"foo \\\"bar baz\\\" qux\\\\quux\"");
   });
 });
