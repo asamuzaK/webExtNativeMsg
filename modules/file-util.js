@@ -28,11 +28,8 @@ const convertUriToFilePath = uri => {
   const {protocol, pathname} = new URL(uri);
   let file;
   if (protocol === "file:" && pathname) {
-    if (IS_WIN) {
-      file = path.normalize(decodeURIComponent(pathname).slice(1));
-    } else {
-      file = decodeURIComponent(pathname);
-    }
+    file = IS_WIN && path.normalize(decodeURIComponent(pathname).slice(1)) ||
+           decodeURIComponent(pathname);
   }
   return file || null;
 };

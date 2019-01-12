@@ -24,22 +24,22 @@ class Input {
    * @returns {Array} - message array
    */
   _decoder() {
-    let arr = [];
+    const arr = [];
     if (Buffer.isBuffer(this._input)) {
-      !this._length && this._input.length >= BYTE_LEN && (
+      if (!this._length && this._input.length >= BYTE_LEN) {
         this._length = IS_BE && this._input.readUIntBE(0, BYTE_LEN) ||
-                       this._input.readUIntLE(0, BYTE_LEN),
-        this._input = this._input.slice(BYTE_LEN)
-      );
-      if (this._length && this._input.length >= this._length) {
-        const buf = this._input.slice(0, this._length);
-        arr.push(JSON.parse(buf.toString(CHAR)));
-        this._input = this._input.length > this._length &&
-                      this._input.slice(this._length) || null;
-        this._length = null;
-        if (this._input) {
-          const cur = this._decoder();
-          cur.length && (arr = arr.concat(cur));
+                       this._input.readUIntLE(0, BYTE_LEN);
+        this._input = this._input.slice(BYTE_LEN);
+      }
+      if (this._length) {
+        if (this._input.length > this._length) {
+          throw new Error("Failed to decode message.");
+        }
+        if (this._input.length === this._length) {
+          const buf = this._input.slice(0, this._length);
+          arr.push(JSON.parse(buf.toString(CHAR)));
+          this._input = null;
+          this._length = null;
         }
       }
     }
@@ -52,16 +52,23 @@ class Input {
    * @returns {?Array} - message array
    */
   decode(chunk) {
-    const buf = (isString(chunk) || Buffer.isBuffer(chunk)) &&
-                  Buffer.from(chunk);
     let msg;
-    buf && (
-      this._input = Buffer.isBuffer(this._input) &&
-                    Buffer.concat([this._input, buf]) || buf
-    );
-    Buffer.isBuffer(this._input) && this._input.length >= BYTE_LEN &&
-      (msg = this._decoder());
-    return Array.isArray(msg) && msg || null;
+    const buf =
+      (isString(chunk) || Buffer.isBuffer(chunk)) && Buffer.from(chunk);
+    if (buf) {
+      if (Buffer.isBuffer(this._input)) {
+        this._input = Buffer.concat([this._input, buf]);
+      } else {
+        this._input = buf;
+      }
+    }
+    if (Buffer.isBuffer(this._input) && this._input.length >= BYTE_LEN) {
+      const arr = this._decoder();
+      if (Array.isArray(arr) && arr.length) {
+        msg = arr;
+      }
+    }
+    return msg || null;
   }
 }
 
@@ -95,9 +102,12 @@ class Output {
    * @returns {?Buffer} - buffered message
    */
   encode(msg) {
-    this._output = msg;
-    msg = this._encoder();
-    return Buffer.isBuffer(msg) && msg || null;
+    let buf;
+    if (msg) {
+      this._output = msg;
+      buf = this._encoder();
+    }
+    return Buffer.isBuffer(buf) && buf || null;
   }
 }
 

@@ -86,13 +86,11 @@ const getBrowserConfigDir = () => {
   if (browser && isString(configDir)) {
     const {alias, aliasLinux, aliasMac, aliasWin} = browser;
     if (isString(alias)) {
-      if (IS_WIN) {
-        dir = path.join(configDir, isString(aliasWin) && aliasWin || alias);
-      } else if (IS_MAC) {
-        dir = path.join(configDir, isString(aliasMac) && aliasMac || alias);
-      } else {
-        dir = path.join(configDir, isString(aliasLinux) && aliasLinux || alias);
-      }
+      dir = IS_WIN &&
+            path.join(configDir, isString(aliasWin) && aliasWin || alias) ||
+            IS_MAC &&
+            path.join(configDir, isString(aliasMac) && aliasMac || alias) ||
+            path.join(configDir, isString(aliasLinux) && aliasLinux || alias);
     }
   }
   return dir || null;
@@ -119,14 +117,11 @@ const handleSetupCallback = () => {
  * @returns {string} - config directory path
  */
 const createConfig = async () => {
-  const dir = await getBrowserConfigDir();
+  const dir = getBrowserConfigDir();
   if (!isString(dir)) {
     throw new TypeError(`Expected String but got ${getType(dir)}.`);
   }
   const configPath = await createDirectory(dir, PERM_DIR);
-  if (await !isDir(configPath)) {
-    throw new Error(`Failed to create ${path.join(dir)}.`);
-  }
   console.info(`Created: ${configPath}`);
   vars.configPath = configPath;
   return configPath;
@@ -148,28 +143,17 @@ const createShellScript = async configPath => {
   if (!isString(mainFile)) {
     throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
   }
-  const shellExt = IS_WIN && "cmd" || "sh";
-  const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
   const appPath = process.execPath;
   const filePath = path.resolve(path.join(DIR_CWD, mainFile));
-  let cmd, content;
-  if (await isFile(filePath)) {
-    cmd = `${quoteArg(appPath)} ${quoteArg(filePath)}`;
-  } else {
-    cmd = quoteArg(appPath);
-  }
-  if (IS_WIN) {
-    content = `@echo off\n${cmd}\n`;
-  } else {
-    const envShell = process.env.SHELL;
-    content = `#!${envShell}\n${cmd}\n`;
-  }
-  const file = await createFile(
-    shellPath, content, {encoding: CHAR, flag: "w", mode: PERM_EXEC}
-  );
-  if (!file) {
-    throw new Error(`Failed to create ${shellPath}.`);
-  }
+  const cmd = isFile(filePath) &&
+              `${quoteArg(appPath)} ${quoteArg(filePath)}` || quoteArg(appPath);
+  const content = IS_WIN && `@echo off\n${cmd}\n` ||
+                  `#!${process.env.SHELL}\n${cmd}\n`;
+  const shellExt = IS_WIN && "cmd" || "sh";
+  const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
+  await createFile(shellPath, content, {
+    encoding: CHAR, flag: "w", mode: PERM_EXEC,
+  });
   console.info(`Created: ${shellPath}`);
   vars.shellPath = shellPath;
   return shellPath;
@@ -193,15 +177,17 @@ const handleRegStderr = data => {
  * @returns {void}
  */
 const handleRegClose = code => {
-  if (code === 0 && IS_WIN) {
-    const {browser, hostName} = vars;
-    const {regWin} = browser;
-    const regKey = path.join(...regWin, hostName);
-    console.info(`Created: ${regKey}`);
-    handleSetupCallback();
-  } else if (IS_WIN) {
-    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-    console.warn(`${reg} exited with ${code}.`);
+  if (IS_WIN) {
+    if (code === 0) {
+      const {browser, hostName} = vars;
+      const {regWin} = browser;
+      const regKey = path.join(...regWin, hostName);
+      console.info(`Created: ${regKey}`);
+      handleSetupCallback();
+    } else {
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+      console.warn(`${reg} exited with ${code}.`);
+    }
   }
 };
 
@@ -286,21 +272,12 @@ const createFiles = async () => {
     IS_MAC && path.join(...hostMac, fileName) ||
     path.join(...hostLinux, fileName)
   );
-  if (IS_WIN) {
-    await createReg(hostName, manifestPath, regWin);
-  } else {
-    const hostDir = IS_MAC && hostMac || hostLinux;
-    const hostDirPath = await createDirectory(path.join(...hostDir), PERM_DIR);
-    if (await !isDir(hostDirPath)) {
-      throw new Error(`Failed to create ${path.join(...hostDir)}.`);
-    }
-  }
-  const file = await createFile(
-    manifestPath, content, {encoding: CHAR, flag: "w", mode: PERM_FILE}
-  );
-  if (!file) {
-    throw new Error(`Failed to create ${manifestPath}.`);
-  }
+  const hostDir = IS_MAC && hostMac || !IS_WIN && hostLinux;
+  IS_WIN && await createReg(hostName, manifestPath, regWin) ||
+  hostDir && await createDirectory(path.join(...hostDir), PERM_DIR);
+  await createFile(manifestPath, content, {
+    encoding: CHAR, flag: "w", mode: PERM_FILE,
+  });
   console.info(`Created: ${manifestPath}`);
   vars.manifestPath = manifestPath;
   !IS_WIN && handleSetupCallback();
@@ -309,7 +286,7 @@ const createFiles = async () => {
 /**
  * handle browser config directory input
  * @param {string} ans - user input
- * @returns {void}
+ * @returns {AsyncFunction|Function} - createFiles() / abortSetup()
  */
 const handleBrowserConfigDir = ans => {
   const dir = getBrowserConfigDir();
@@ -318,57 +295,61 @@ const handleBrowserConfigDir = ans => {
   }
   const {rl} = vars;
   const msg = `${dir} already exists.`;
+  let func;
   rl && rl.close();
   if (isString(ans)) {
     ans = ans.trim();
     if (/^y(?:es)?$/i.test(ans)) {
-      createFiles().catch(logErr);
+      func = createFiles().catch(logErr);
     } else {
-      abortSetup(msg);
+      func = abortSetup(msg);
     }
   } else {
-    abortSetup(msg);
+    func = abortSetup(msg);
   }
+  return func;
 };
 
 /**
  * handle browser input
  * @param {string} ans - user input
- * @returns {void}
+ * @returns {AsyncFunction|Function} - createFiles() / rl.question() /
+ *                                     abortSetup()
  */
 const handleBrowserInput = ans => {
   const {overwriteConfig, rl} = vars;
   const msg = "Browser not specified.";
+  let func;
   if (isString(ans)) {
     ans = ans.trim();
     if (ans.length) {
       const browser = getBrowserData(ans);
-      browser && (vars.browser = browser);
+      vars.browser = browser;
       if (browser) {
         const dir = getBrowserConfigDir();
         if (!isString(dir)) {
           throw new TypeError(`Expected String but got ${getType(dir)}.`);
         }
         if (isDir(dir) && rl && !overwriteConfig) {
-          rl.question(`${dir} already exists. Overwrite? [y/n]\n`,
-                      handleBrowserConfigDir);
+          func = rl.question(`${dir} already exists. Overwrite? [y/n]\n`,
+                             handleBrowserConfigDir);
         } else {
           rl && rl.close();
-          createFiles().catch(logErr);
+          func = createFiles().catch(logErr);
         }
       } else {
-        // TODO: Add custom setup
         rl && rl.close();
-        abortSetup(`${ans} not supported.`);
+        func = abortSetup(`${ans} not supported.`);
       }
     } else {
       rl && rl.close();
-      abortSetup(msg);
+      func = abortSetup(msg);
     }
   } else {
     rl && rl.close();
-    abortSetup(msg);
+    func = abortSetup(msg);
   }
+  return func;
 };
 
 /* Setup */
@@ -449,7 +430,7 @@ class Setup {
     return this._mainFile;
   }
   set mainScriptFile(name) {
-    this._mainFile = isString(name) && name || null;
+    this._mainFile = isString(name) && name || "index.js";
     vars.mainFile = this._mainFile;
   }
   get chromeExtensionIds() {
@@ -522,9 +503,6 @@ class Setup {
     }
     if (this._browser) {
       const dir = getBrowserConfigDir();
-      if (!isString(dir)) {
-        throw new TypeError(`Expected String but got ${getType(dir)}.`);
-      }
       if (isDir(dir) && !this._overwriteConfig) {
         vars.rl.question(`${dir} already exists. Overwrite? [y/n]\n`,
                          handleBrowserConfigDir);
@@ -536,9 +514,8 @@ class Setup {
       const arr = [];
       const msg =
         "Enter which browser you would like to set up the host for:\n";
-      const items = Object.keys(browserData);
-      for (const item of items) {
-        const obj = browserData[item];
+      const items = Object.entries(browserData);
+      for (const [item, obj] of items) {
         if ((IS_WIN && obj.regWin || IS_MAC && obj.hostMac ||
              !IS_WIN && !IS_MAC && obj.hostLinux) &&
             (obj.type === EXT_CHROME && this._chromeExtIds ||
@@ -554,4 +531,8 @@ class Setup {
 
 module.exports = {
   Setup,
+  abortSetup, createConfig, createFiles, createReg, createShellScript,
+  getBrowserConfigDir, getBrowserData, handleBrowserConfigDir,
+  handleBrowserInput, handleRegClose, handleRegStderr, handleSetupCallback,
+  vars,
 };

@@ -163,22 +163,26 @@ describe("removeDir", () => {
   it("should remove dir and it's files", async () => {
     const dirPath = path.join(TMPDIR, "webextnativemsg");
     fs.mkdirSync(dirPath);
-    const filePath = path.join(dirPath, "test.txt");
+    const subDirPath = path.join(dirPath, "foo");
+    fs.mkdirSync(subDirPath);
+    const filePath = path.join(subDirPath, "test.txt");
     const value = "test file.\n";
     await createFile(filePath, value, {
       encoding: "utf8", flag: "w", mode: PERM_FILE,
     });
     const res1 = await Promise.all([
-      fs.existsSync(filePath),
       fs.existsSync(dirPath),
+      fs.existsSync(subDirPath),
+      fs.existsSync(filePath),
     ]);
     removeDir(dirPath, TMPDIR);
     const res2 = await Promise.all([
-      fs.existsSync(filePath),
       fs.existsSync(dirPath),
+      fs.existsSync(subDirPath),
+      fs.existsSync(filePath),
     ]);
-    assert.deepEqual(res1, [true, true]);
-    assert.deepEqual(res2, [false, false]);
+    assert.deepEqual(res1, [true, true, true]);
+    assert.deepEqual(res2, [false, false, false]);
   });
 
   it("should ignore if dir is not a directory", () => {
