@@ -1118,7 +1118,7 @@ describe("handleBrowserInput", () => {
       fs.unlinkSync(path.resolve(...browser.hostLinux, "foo.json"));
     }
     stubSpawn.restore();
-    await removeDir(path.join(DIR_CWD, "test", "tmp", "config", DIR_CWD))
+    await removeDir(path.join(DIR_CWD, "test", "tmp", "config", DIR_CWD));
   });
 });
 
