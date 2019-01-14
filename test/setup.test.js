@@ -737,7 +737,7 @@ describe("_createManifest", () => {
                                "Mozilla", "NativeMessagingHosts", "foo.json");
     } else {
       manifestPath = path.join(os.homedir(), ".config", ".mozilla",
-                               "NativeMessagingHosts", "foo.json");
+                               "native-messaging-hosts", "foo.json");
     }
     const file = fs.readFileSync(manifestPath, {
       encoding: "utf8",
