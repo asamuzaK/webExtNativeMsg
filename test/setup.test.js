@@ -806,11 +806,11 @@ describe("handleBrowserConfigDir", () => {
     } else if (IS_MAC) {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      fs.unlinkSync(path.resolve(...browser.hostMac, "foobar.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostMac, "foobar.json"));
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      fs.unlinkSync(path.resolve(...browser.hostLinux, "foobar.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostLinux, "foobar.json"));
     }
     stubSpawn.restore();
   });
