@@ -1098,7 +1098,7 @@ describe("handleBrowserInput", () => {
     vars.callback = stubFunc;
     vars.overwriteConfig = true;
     await handleBrowserInput("firefox");
-    const {calledOnce: infoCalled} = stubInfo;
+    const {called: infoCalled} = stubInfo;
     stubInfo.restore();
     assert.strictEqual(stubRlClose.callCount, i + 1);
     assert.strictEqual(stubRlQues.callCount, j);
