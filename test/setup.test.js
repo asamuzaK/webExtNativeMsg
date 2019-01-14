@@ -736,7 +736,7 @@ describe("_createManifest", () => {
       manifestPath = path.join(os.homedir(), "Library", "Application Support",
                                "Mozilla", "NativeMessagingHosts", "foo.json");
     } else {
-      manifestPath = path.join(os.homedir(), ".config", ".mozilla",
+      manifestPath = path.join(os.homedir(), ".mozilla",
                                "native-messaging-hosts", "foo.json");
     }
     const file = fs.readFileSync(manifestPath, {
