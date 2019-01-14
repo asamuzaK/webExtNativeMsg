@@ -10,7 +10,7 @@ const {
 } = require("../modules/file-util");
 const {quoteArg} = require("../modules/common");
 const {assert} = require("chai");
-const {afterEach, beforeEach, describe, it} = require("mocha");
+const {describe, it} = require("mocha");
 const childProcess = require("child_process");
 const fs = require("fs");
 const os = require("os");
@@ -540,6 +540,7 @@ describe("_handleRegClose", () => {
     });
     const stubCallback =
       sinon.stub(setup, "_handleSetupCallback").callsFake(() => true);
+    const i = stubCallback.callCount;
     const res = setup._handleRegClose(0);
     const {calledOnce: infoCalled} = stubInfo;
     stubInfo.restore();
@@ -548,10 +549,12 @@ describe("_handleRegClose", () => {
                                "NativeMessagingHosts", "foo");
       assert.isTrue(infoCalled);
       assert.strictEqual(infoMsg, `Created: ${regKey}`);
+      assert.strictEqual(stubCallback.callCount, i + 1);
       assert.isTrue(res);
     } else {
       assert.isFalse(infoCalled);
       assert.isUndefined(infoMsg);
+      assert.strictEqual(stubCallback.callCount, i);
       assert.isNull(res);
     }
   });
@@ -731,10 +734,9 @@ describe("_createManifest", () => {
       manifestPath = path.join(configDir, "foo.json");
     } else if (IS_MAC) {
       manifestPath = path.join(os.homedir(), "Library", "Application Support",
-                               "Google", "Chrome", "NativeMessagingHosts",
-                               "foo.json");
+                               "Mozilla", "NativeMessagingHosts", "foo.json");
     } else {
-      manifestPath = path.join(os.homedir(), ".config", "google-chrome",
+      manifestPath = path.join(os.homedir(), ".config", ".mozilla",
                                "NativeMessagingHosts", "foo.json");
     }
     const file = fs.readFileSync(manifestPath, {
@@ -926,7 +928,7 @@ describe("_createFiles", () => {
     const stubShell = sinon.stub(setup, "_createShellScript");
     const stubManifest = sinon.stub(setup, "_createManifest").resolves("foo");
     const stubCallback =
-      sinon.stub(setup, "_handleSetupCallback").callsFake(() => undefined);
+      sinon.stub(setup, "_handleSetupCallback").callsFake(() => true);
     const res = await setup._createFiles();
     assert.isTrue(stubConfig.calledOnce);
     assert.isTrue(stubShell.calledOnce);
@@ -936,7 +938,7 @@ describe("_createFiles", () => {
       assert.isNull(res);
     } else {
       assert.isTrue(stubCallback.calledOnce);
-      assert.isUndefined(res);
+      assert.isTrue(res);
     }
   });
 });
@@ -1230,8 +1232,8 @@ describe("_handleBrowserInput", () => {
   it("should call function", async () => {
     const stubRlClose = sinon.stub().callsFake(() => undefined);
     const stubRlQues = sinon.stub().callsFake(() => undefined);
-    const dir = path.join(TMPDIR, "webextnativemsg");
-    const configPath = await createDirectory(path.join(dir, "config"));
+    const configPath =
+      await createDirectory(path.join(DIR_CWD, "test", "tmp", "config"));
     const setup = new Setup({
       configPath,
       browser: "firefox",
@@ -1252,7 +1254,7 @@ describe("_handleBrowserInput", () => {
     assert.strictEqual(stubRlClose.callCount, i + 1);
     assert.strictEqual(stubRlQues.callCount, j);
     assert.strictEqual(stubFunc.callCount, k + 1);
-    await removeDir(dir, TMPDIR);
+    await removeDir(configPath, DIR_CWD);
   });
 
   it("should ask question", async () => {
@@ -1261,8 +1263,7 @@ describe("_handleBrowserInput", () => {
     const stubRlQues = sinon.stub().callsFake(msg => {
       rlQues = msg;
     });
-    const dir = path.join(TMPDIR, "webextnativemsg");
-    const configPath = path.join(dir, "config");
+    const configPath = path.join(DIR_CWD, "test", "tmp", "config");
     const browserConfigPath =
       await createDirectory(path.join(configPath, "firefox"));
     const setup = new Setup({
@@ -1289,7 +1290,7 @@ describe("_handleBrowserInput", () => {
       rlQues,
       `${browserConfigPath} already exists. Overwrite? [y/n]\n`
     );
-    await removeDir(dir, TMPDIR);
+    await removeDir(configPath, DIR_CWD);
   });
 });
 
@@ -1359,8 +1360,8 @@ describe("run", () => {
       close: stubRlClose,
       question: stubRlQues,
     });
-    const dir = path.join(TMPDIR, "webextnativemsg");
-    const configPath = await createDirectory(path.join(dir, "config"));
+    const configPath =
+      await createDirectory(path.join(DIR_CWD, "test", "tmp", "config"));
     const setup = new Setup({
       configPath,
       browser: "firefox",
@@ -1380,6 +1381,6 @@ describe("run", () => {
     assert.strictEqual(stubRlClose.callCount, k + 1);
     assert.strictEqual(stubFunc.callCount, l + 1);
     stubRl.restore();
-    await removeDir(dir, TMPDIR);
+    await removeDir(configPath, DIR_CWD);
   });
 });
