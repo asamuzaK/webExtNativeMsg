@@ -1,14 +1,18 @@
-/* eslint-disable no-magic-numbers */
+/* eslint-disable camelcase, no-magic-numbers */
 "use strict";
 /* api */
 const {
   Setup,
-  abortSetup, createConfig, createFiles, createReg, createShellScript,
+  abortSetup, createConfigDir, createFiles, createManifest, createReg,
+  createShellScript,
   getBrowserConfigDir, getBrowserData, handleBrowserConfigDir,
   handleBrowserInput, handleRegClose, handleRegStderr, handleSetupCallback,
   vars,
 } = require("../modules/setup");
-const {createDirectory, removeDir} = require("../modules/file-util");
+const {browserData} = require("../modules/browser-data");
+const {
+  createDirectory, isDir, isFile, removeDir,
+} = require("../modules/file-util");
 const {quoteArg} = require("../modules/common");
 const {assert} = require("chai");
 const {afterEach, beforeEach, describe, it} = require("mocha");
@@ -147,43 +151,344 @@ describe("handleSetupCallback", () => {
   });
 });
 
-describe("createConfig", () => {
+describe("handleRegStdErr", () => {
+  if (IS_WIN) {
+    it("should console error", () => {
+      let err;
+      const data = "foo";
+      const stubErr = sinon.stub(console, "error").callsFake(msg => {
+        err = msg;
+      });
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+      handleRegStderr(data);
+      stubErr.restore();
+      assert.strictEqual(err, `stderr: ${reg}: ${data}`);
+    });
+  }
+});
+
+describe("handleRegClose", () => {
   beforeEach(() => {
     vars.browser = null;
-    vars.configDir = null;
-    vars.configPath = null;
+    vars.hostName = null;
   });
   afterEach(() => {
     vars.browser = null;
-    vars.configDir = null;
-    vars.configPath = null;
+    vars.hostName = null;
+  });
+
+  it("should warn", () => {
+    let warnMsg;
+    const stubWarn = sinon.stub(console, "warn").callsFake(msg => {
+      warnMsg = msg;
+    });
+    const res = handleRegClose(1);
+    const {calledOnce: warnCalled} = stubWarn;
+    stubWarn.restore();
+    if (IS_WIN) {
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+      assert.isTrue(warnCalled);
+      assert.strictEqual(warnMsg, `${reg} exited with 1.`);
+    } else {
+      assert.isFalse(warnCalled);
+      assert.isUndefined(warnMsg);
+    }
+    assert.isNull(res);
+  });
+
+  it("should call function", async () => {
+    let infoMsg;
+    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+      infoMsg = msg;
+    });
+    const stubCallback = sinon.stub().callsFake(() => true);
+    const i = stubCallback.callCount;
+    vars.browser = {
+      regWin: ["foo", "bar"],
+    };
+    vars.hostName = "baz";
+    vars.callback = stubCallback;
+    const res = handleRegClose(0);
+    const {calledOnce: infoCalled} = stubInfo;
+    stubInfo.restore();
+    if (IS_WIN) {
+      assert.isTrue(infoCalled);
+      assert.strictEqual(infoMsg, `Created: ${path.join("foo", "bar", "baz")}`);
+      assert.strictEqual(stubCallback.callCount, i + 1);
+      assert.isTrue(res);
+    } else {
+      assert.isFalse(infoCalled);
+      assert.isUndefined(infoMsg);
+      assert.strictEqual(stubCallback.callCount, i);
+      assert.isNull(res);
+    }
+  });
+});
+
+describe("createReg", () => {
+  it("should throw if no argument given", async () => {
+    await createReg().catch(e => {
+      assert.strictEqual(e.message, "Expected String but got Undefined.");
+    });
+  });
+
+  it("should throw if manifestPath not given", async () => {
+    await createReg("foo").catch(e => {
+      assert.strictEqual(e.message, "Expected String but got Undefined.");
+    });
+  });
+
+  it("should throw if regWin not given", async () => {
+    await createReg("foo", "bar").catch(e => {
+      assert.strictEqual(e.message, "Expected Array but got Undefined.");
+    });
+  });
+
+  it("should spawn child process", async () => {
+    const stubSpawn = sinon.stub(childProcess, "spawn").returns({
+      on: a => a,
+      stderr: {
+        on: a => a,
+      },
+    });
+    const i = stubSpawn.callCount;
+    const res = await createReg("foo", "bar", ["baz"]);
+    if (IS_WIN) {
+      assert.strictEqual(stubSpawn.callCount, i + 1);
+      assert.isObject(res);
+    } else {
+      assert.strictEqual(stubSpawn.callCount, i);
+      assert.isNull(res);
+    }
+    stubSpawn.restore();
+  });
+});
+
+describe("createManifest", () => {
+  beforeEach(() => {
+    vars.browser = null;
+    vars.hostDesc = null;
+    vars.hostName = null;
+    vars.chromeExtIds = null;
+    vars.webExtIds = null;
+    vars.manifestPath = null;
+  });
+  afterEach(() => {
+    vars.browser = null;
+    vars.hostDesc = null;
+    vars.hostName = null;
+    vars.chromeExtIds = null;
+    vars.webExtIds = null;
+    vars.manifestPath = null;
   });
 
   it("should throw", async () => {
-    await createConfig().catch(e => {
+    await createManifest().catch(e => {
+      assert.instanceOf(e, Error);
+      assert.strictEqual(e.message, "No such file: undefined.");
+    });
+  });
+
+  it("should throw", async () => {
+    const file = path.join(DIR_CWD, IS_WIN && "foo.cmd" || "foo.sh");
+    await createManifest(file).catch(e => {
+      assert.instanceOf(e, Error);
+      assert.strictEqual(e.message, `No such file: ${file}.`);
+    });
+  });
+
+  it("should throw", async () => {
+    const file =
+      path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+    await createManifest(file).catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, "Expected Object but got Null.");
+    });
+  });
+
+  it("should throw", async () => {
+    const file =
+      path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+    vars.browser = browserData.firefox;
+    await createManifest(file).catch(e => {
       assert.instanceOf(e, TypeError);
       assert.strictEqual(e.message, "Expected String but got Null.");
     });
   });
 
-  it("should get path", async () => {
+  it("should throw", async () => {
+    const file =
+      path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+    vars.browser = browserData.firefox;
+    vars.hostDesc = "foo bar";
+    await createManifest(file).catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, "Expected String but got Null.");
+    });
+  });
+
+  it("should throw", async () => {
+    const file =
+      path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+    vars.browser = browserData.firefox;
+    vars.hostDesc = "foo bar";
+    vars.hostName = "foo";
+    await createManifest(file).catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, "Expected Array but got Null.");
+    });
+  });
+
+  // Windows
+  if (IS_WIN) {
+    it("should throw", async () => {
+      const file =
+        path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+      vars.browser = browserData.firefox;
+      vars.hostDesc = "foo bar";
+      vars.hostName = "foo";
+      vars.webExtIds = ["foo@bar"];
+      await createManifest(file).catch(e => {
+        assert.instanceOf(e, Error);
+        assert.strictEqual(e.message, "No such directory: undefined.");
+      });
+    });
+
+    it("should throw", async () => {
+      const file =
+        path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+      vars.browser = browserData.chrome;
+      vars.hostDesc = "foo bar";
+      vars.hostName = "foo";
+      vars.chromeExtIds = ["chrome-extension://foo"];
+      await createManifest(file).catch(e => {
+        assert.instanceOf(e, Error);
+        assert.strictEqual(e.message, "No such directory: undefined.");
+      });
+    });
+  }
+
+  it("should create manifest", async () => {
     let infoMsg;
-    const dirPath = path.join(TMPDIR, "firefox");
     const stubInfo = sinon.stub(console, "info").callsFake(msg => {
       infoMsg = msg;
     });
-    vars.browser = {
-      alias: "firefox",
-    };
-    vars.configDir = TMPDIR;
-    const res = await createConfig();
-    const {calledOnce} = stubInfo;
+    const stubSpawn = sinon.stub(childProcess, "spawn").returns({
+      on: a => a,
+      stderr: {
+        on: a => a,
+      },
+    });
+    const i = stubSpawn.callCount;
+    const dir = path.join(TMPDIR, "webextnativemsg");
+    const configDir =
+      await createDirectory(path.join(dir, "config", "firefox"));
+    const shellPath =
+      path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+    vars.browser = browserData.firefox;
+    vars.hostDesc = "foo bar";
+    vars.hostName = "foo";
+    vars.webExtIds = ["foo@bar"];
+    const res = await createManifest(shellPath, configDir);
+    const {calledOnce: infoCalled} = stubInfo;
     stubInfo.restore();
-    assert.isTrue(calledOnce);
-    assert.strictEqual(infoMsg, `Created: ${dirPath}`);
-    assert.strictEqual(res, dirPath);
-    assert.strictEqual(vars.configPath, dirPath);
-    removeDir(dirPath, TMPDIR);
+    let manifestPath;
+    if (IS_WIN) {
+      manifestPath = path.join(configDir, "foo.json");
+    } else if (IS_MAC) {
+      manifestPath = path.join(os.homedir(), "Library", "Application Support",
+                               "Mozilla", "NativeMessagingHosts", "foo.json");
+    } else {
+      manifestPath = path.join(os.homedir(), ".mozilla",
+                               "native-messaging-hosts", "foo.json");
+    }
+    const file = fs.readFileSync(manifestPath, {
+      encoding: "utf8",
+      flag: "r",
+    });
+    const parsedFile = JSON.parse(file);
+    assert.isTrue(infoCalled);
+    assert.strictEqual(infoMsg, `Created: ${manifestPath}`);
+    if (IS_WIN) {
+      assert.strictEqual(stubSpawn.callCount, i + 1);
+    } else {
+      assert.strictEqual(stubSpawn.callCount, i);
+    }
+    assert.strictEqual(res, manifestPath);
+    assert.strictEqual(vars.manifestPath, manifestPath);
+    assert.isTrue(isFile(manifestPath));
+    assert.isTrue(file.endsWith("\n"));
+    assert.deepEqual(parsedFile, {
+      allowed_extensions: ["foo@bar"],
+      description: "foo bar",
+      name: "foo",
+      path: shellPath,
+      type: "stdio",
+    });
+    stubSpawn.restore();
+    await removeDir(dir, TMPDIR);
+  });
+
+  it("should create manifest", async () => {
+    let infoMsg;
+    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+      infoMsg = msg;
+    });
+    const stubSpawn = sinon.stub(childProcess, "spawn").returns({
+      on: a => a,
+      stderr: {
+        on: a => a,
+      },
+    });
+    const i = stubSpawn.callCount;
+    const dir = path.join(TMPDIR, "webextnativemsg");
+    const configDir =
+      await createDirectory(path.join(dir, "config", "chrome"));
+    const shellPath =
+      path.join(DIR_CWD, "test", "file", IS_WIN && "test.cmd" || "test.sh");
+    vars.browser = browserData.chrome;
+    vars.hostDesc = "foo bar";
+    vars.hostName = "foo";
+    vars.chromeExtIds = ["chrome-extension://foo"];
+    const res = await createManifest(shellPath, configDir);
+    const {calledOnce: infoCalled} = stubInfo;
+    stubInfo.restore();
+    let manifestPath;
+    if (IS_WIN) {
+      manifestPath = path.join(configDir, "foo.json");
+    } else if (IS_MAC) {
+      manifestPath = path.join(os.homedir(), "Library", "Application Support",
+                               "Google", "Chrome", "NativeMessagingHosts",
+                               "foo.json");
+    } else {
+      manifestPath = path.join(os.homedir(), ".config", "google-chrome",
+                               "NativeMessagingHosts", "foo.json");
+    }
+    const file = fs.readFileSync(manifestPath, {
+      encoding: "utf8",
+      flag: "r",
+    });
+    const parsedFile = JSON.parse(file);
+    assert.isTrue(infoCalled);
+    assert.strictEqual(infoMsg, `Created: ${manifestPath}`);
+    if (IS_WIN) {
+      assert.strictEqual(stubSpawn.callCount, i + 1);
+    } else {
+      assert.strictEqual(stubSpawn.callCount, i);
+    }
+    assert.strictEqual(res, manifestPath);
+    assert.strictEqual(vars.manifestPath, manifestPath);
+    assert.isTrue(isFile(manifestPath));
+    assert.isTrue(file.endsWith("\n"));
+    assert.deepEqual(parsedFile, {
+      allowed_origins: ["chrome-extension://foo"],
+      description: "foo bar",
+      name: "foo",
+      path: shellPath,
+      type: "stdio",
+    });
+    stubSpawn.restore();
+    await removeDir(dir, TMPDIR);
   });
 });
 
@@ -293,96 +598,44 @@ describe("createShellScript", () => {
   });
 });
 
-describe("handleRegStdErr", () => {
-  if (IS_WIN) {
-    it("should console error", () => {
-      let err;
-      const data = "foo";
-      const stubErr = sinon.stub(console, "error").callsFake(msg => {
-        err = msg;
-      });
-      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-      handleRegStderr(data);
-      stubErr.restore();
-      assert.strictEqual(err, `stderr: ${reg}: ${data}`);
-    });
-  }
-});
-
-describe("handleRegClose", () => {
+describe("createConfigDir", () => {
   beforeEach(() => {
     vars.browser = null;
-    vars.hostName = null;
+    vars.configDir = null;
+    vars.configPath = null;
   });
   afterEach(() => {
     vars.browser = null;
-    vars.hostName = null;
+    vars.configDir = null;
+    vars.configPath = null;
   });
 
-  if (IS_WIN) {
-    it("should warn", () => {
-      let wrn;
-      const stubWarn = sinon.stub(console, "warn").callsFake(msg => {
-        wrn = msg;
-      });
-      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-      handleRegClose(1);
-      stubWarn.restore();
-      assert.strictEqual(wrn, `${reg} exited with 1.`);
-    });
-
-    it("should call function", async () => {
-      let infoMsg;
-      vars.browser = {
-        regWin: ["foo"],
-      };
-      vars.hostName = "bar";
-      const stubInfo = sinon.stub(console, "info").callsFake(msg => {
-        infoMsg = msg;
-      });
-      await handleRegClose(0);
-      stubInfo.restore();
-      assert.strictEqual(infoMsg, `Created: ${path.join("foo", "bar")}`);
-    });
-  }
-});
-
-describe("createReg", () => {
-  it("should throw if no argument given", async () => {
-    await createReg().catch(e => {
-      assert.strictEqual(e.message, "Expected String but got Undefined.");
+  it("should throw", async () => {
+    await createConfigDir().catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, "Expected String but got Null.");
     });
   });
 
-  it("should throw if manifestPath not given", async () => {
-    await createReg("foo").catch(e => {
-      assert.strictEqual(e.message, "Expected String but got Undefined.");
+  it("should get path", async () => {
+    let infoMsg;
+    const dirPath = path.join(TMPDIR, "firefox");
+    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+      infoMsg = msg;
     });
-  });
-
-  it("should throw if regWin not given", async () => {
-    await createReg("foo", "bar").catch(e => {
-      assert.strictEqual(e.message, "Expected Array but got Undefined.");
-    });
-  });
-
-  it("should spawn child process", async () => {
-    const stubSpawn = sinon.stub(childProcess, "spawn").returns({
-      on: a => a,
-      stderr: {
-        on: a => a,
-      },
-    });
-    const i = stubSpawn.callCount;
-    const res = await createReg("foo", "bar", ["baz"]);
-    if (IS_WIN) {
-      assert.strictEqual(stubSpawn.callCount, i + 1);
-      assert.isObject(res);
-    } else {
-      assert.strictEqual(stubSpawn.callCount, i);
-      assert.isNull(res);
-    }
-    stubSpawn.restore();
+    vars.browser = {
+      alias: "firefox",
+    };
+    vars.configDir = TMPDIR;
+    const res = await createConfigDir();
+    const {calledOnce} = stubInfo;
+    stubInfo.restore();
+    assert.isTrue(calledOnce);
+    assert.strictEqual(infoMsg, `Created: ${dirPath}`);
+    assert.strictEqual(res, dirPath);
+    assert.strictEqual(vars.configPath, dirPath);
+    assert.isTrue(isDir(dirPath));
+    removeDir(dirPath, TMPDIR);
   });
 });
 
@@ -408,55 +661,6 @@ describe("createFiles", () => {
     vars.callback = null;
   });
 
-  it("should throw", async () => {
-    await createFiles().catch(e => {
-      assert.strictEqual(e.message, "Expected Object but got Null.");
-    });
-  });
-
-  it("should throw", async () => {
-    vars.browser = {};
-    await createFiles().catch(e => {
-      assert.strictEqual(e.message, "Expected String but got Null.");
-    });
-  });
-
-  it("should throw", async () => {
-    vars.browser = {};
-    vars.hostDesc = "foo bar";
-    await createFiles().catch(e => {
-      assert.strictEqual(e.message, "Expected String but got Null.");
-    });
-  });
-
-  it("should throw", async () => {
-    const stubInfo = sinon.stub(console, "info");
-    vars.browser = getBrowserData("firefox");
-    vars.hostDesc = "foo bar";
-    vars.hostName = "baz";
-    vars.configDir = path.join(TMPDIR, "webextnativemsg", "config");
-    vars.mainFile = path.resolve(path.join("test", "file", "test.js"));
-    await createFiles().catch(e => {
-      stubInfo.restore();
-      assert.strictEqual(e.message, "Expected Array but got Null.");
-    });
-    await removeDir(path.join(TMPDIR, "webextnativemsg"), TMPDIR);
-  });
-
-  it("should throw", async () => {
-    const stubInfo = sinon.stub(console, "info");
-    vars.browser = getBrowserData("chrome");
-    vars.hostDesc = "foo bar";
-    vars.hostName = "baz";
-    vars.configDir = path.join(TMPDIR, "webextnativemsg", "config");
-    vars.mainFile = path.resolve(path.join("test", "file", "test.js"));
-    await createFiles().catch(e => {
-      stubInfo.restore();
-      assert.strictEqual(e.message, "Expected Array but got Null.");
-    });
-    await removeDir(path.join(TMPDIR, "webextnativemsg"), TMPDIR);
-  });
-
   it("should call function", async () => {
     const stubInfo = sinon.stub(console, "info");
     const stubSpawn = sinon.stub(childProcess, "spawn").returns({
@@ -465,10 +669,10 @@ describe("createFiles", () => {
         on: a => a,
       },
     });
-    const stubFunc = sinon.stub();
+    const stubFunc = sinon.stub().callsFake(arg => arg);
     const i = stubSpawn.callCount;
     const j = stubFunc.callCount;
-    const browser = getBrowserData("firefox");
+    const browser = browserData.firefox;
     const configDir = path.join(DIR_CWD, "test", "file", "tmp");
     vars.browser = browser;
     vars.configDir = configDir;
@@ -478,30 +682,23 @@ describe("createFiles", () => {
     vars.hostName = "foo";
     vars.mainFile = path.join("test", "file", "test.js");
     vars.callback = stubFunc;
-    await createFiles();
+    const res = await createFiles();
     const {called: infoCalled} = stubInfo;
     stubInfo.restore();
     assert.isTrue(infoCalled);
     if (IS_WIN) {
       assert.strictEqual(stubSpawn.callCount, i + 1);
       assert.strictEqual(stubFunc.callCount, j);
-      assert.strictEqual(vars.manifestPath,
-                         path.resolve(configDir, "firefox", "foo.json"));
+      assert.isNull(res);
     } else if (IS_MAC) {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      assert.strictEqual(
-        vars.manifestPath,
-        path.resolve(...browser.hostMac, "foo.json")
-      );
+      assert.isTrue(res);
       fs.unlinkSync(path.resolve(...browser.hostMac, "foo.json"));
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      assert.strictEqual(
-        vars.manifestPath,
-        path.resolve(...browser.hostLinux, "foo.json")
-      );
+      assert.isTrue(res);
       fs.unlinkSync(path.resolve(...browser.hostLinux, "foo.json"));
     }
     stubSpawn.restore();
@@ -519,7 +716,7 @@ describe("createFiles", () => {
     const stubFunc = sinon.stub();
     const i = stubSpawn.callCount;
     const j = stubFunc.callCount;
-    const browser = getBrowserData("chrome");
+    const browser = browserData.chrome;
     const configDir = path.join(DIR_CWD, "test", "file", "tmp");
     vars.browser = browser;
     vars.configDir = configDir;
@@ -568,7 +765,7 @@ describe("createFiles", () => {
       },
     });
     const stubFunc = sinon.stub();
-    const browser = getBrowserData("firefox");
+    const browser = browserData.firefox;
     const configDir = path.join(DIR_CWD, "test", "file", "tmp");
     vars.browser = browser;
     vars.configDir = configDir;
@@ -603,7 +800,7 @@ describe("createFiles", () => {
       },
     });
     const stubFunc = sinon.stub();
-    const browser = getBrowserData("chrome");
+    const browser = browserData.chrome;
     const configDir = path.join(DIR_CWD, "test", "file", "tmp");
     vars.browser = browser;
     vars.configDir = configDir;
@@ -668,7 +865,7 @@ describe("handleBrowserConfigDir", () => {
     });
     const stubRlClose = sinon.stub().callsFake(() => undefined);
     const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
-    vars.browser = getBrowserData("firefox");
+    vars.browser = browserData.firefox;
     vars.configDir = path.join(DIR_CWD, "test", "file", "config");
     vars.hostName = "foo";
     vars.rl = {
@@ -694,7 +891,7 @@ describe("handleBrowserConfigDir", () => {
     });
     const stubRlClose = sinon.stub().callsFake(() => undefined);
     const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
-    vars.browser = getBrowserData("firefox");
+    vars.browser = browserData.firefox;
     vars.configDir = path.join(DIR_CWD, "test", "file", "config");
     vars.hostName = "foo";
     vars.rl = {
@@ -720,7 +917,7 @@ describe("handleBrowserConfigDir", () => {
     });
     const stubRlClose = sinon.stub().callsFake(() => undefined);
     const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
-    vars.browser = getBrowserData("firefox");
+    vars.browser = browserData.firefox;
     vars.configDir = path.join(DIR_CWD, "test", "file", "config");
     vars.hostName = "foo";
     vars.rl = {
@@ -746,7 +943,7 @@ describe("handleBrowserConfigDir", () => {
     });
     const stubRlClose = sinon.stub().callsFake(() => undefined);
     const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
-    vars.browser = getBrowserData("firefox");
+    vars.browser = browserData.firefox;
     vars.configDir = path.join(DIR_CWD, "test", "file", "config");
     vars.hostName = "foo";
     vars.rl = {
@@ -778,7 +975,7 @@ describe("handleBrowserConfigDir", () => {
     const i = stubSpawn.callCount;
     const j = stubFunc.callCount;
     const configDir = path.join(DIR_CWD, "test", "file", "config");
-    vars.browser = getBrowserData("firefox");
+    vars.browser = browserData.firefox;
     vars.configDir = configDir;
     vars.hostName = "foo";
     vars.rl = {
@@ -830,7 +1027,7 @@ describe("handleBrowserConfigDir", () => {
     const i = stubSpawn.callCount;
     const j = stubFunc.callCount;
     const configDir = path.join(DIR_CWD, "test", "file", "config");
-    vars.browser = getBrowserData("firefox");
+    vars.browser = browserData.firefox;
     vars.configDir = configDir;
     vars.hostName = "foo";
     vars.rl = {
@@ -882,7 +1079,7 @@ describe("handleBrowserConfigDir", () => {
     const i = stubSpawn.callCount;
     const j = stubFunc.callCount;
     const configDir = path.join(DIR_CWD, "test", "file", "config");
-    vars.browser = getBrowserData("firefox");
+    vars.browser = browserData.firefox;
     vars.configDir = configDir;
     vars.hostName = "foo";
     vars.rl = {
@@ -1049,7 +1246,7 @@ describe("handleBrowserInput", () => {
     const j = stubRlQues.callCount;
     const k = stubSpawn.callCount;
     const l = stubFunc.callCount;
-    const browser = getBrowserData("firefox");
+    const browser = browserData.firefox;
     const dirPath = path.join(DIR_CWD, "test", "file", "config", "firefox");
     vars.browser = browser;
     vars.configDir = path.join(DIR_CWD, "test", "file", "config");
@@ -1085,7 +1282,7 @@ describe("handleBrowserInput", () => {
     const k = stubSpawn.callCount;
     const l = stubFunc.callCount;
     const m = stubInfo.callCount;
-    const browser = getBrowserData("firefox");
+    const browser = browserData.firefox;
     vars.browser = browser;
     vars.configDir = path.join(DIR_CWD, "test", "tmp", "config");
     vars.rl = {

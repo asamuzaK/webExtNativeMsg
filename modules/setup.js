@@ -61,10 +61,9 @@ const getBrowserData = key => {
   let browser;
   key = isString(key) && key.toLowerCase().trim();
   if (key) {
-    const items = Object.keys(browserData);
-    for (const item of items) {
+    const items = Object.entries(browserData);
+    for (const [item, obj] of items) {
       if (item === key) {
-        const obj = browserData[item];
         if (IS_WIN && obj.regWin || IS_MAC && obj.hostMac ||
             !IS_WIN && !IS_MAC && obj.hostLinux) {
           browser = browserData[item];
@@ -83,14 +82,13 @@ const getBrowserData = key => {
 const getBrowserConfigDir = () => {
   const {browser, configDir} = vars;
   let dir;
-  if (browser && isString(configDir)) {
+  if (browser) {
     const {alias, aliasLinux, aliasMac, aliasWin} = browser;
-    if (isString(alias)) {
-      dir = IS_WIN &&
-            path.join(configDir, isString(aliasWin) && aliasWin || alias) ||
-            IS_MAC &&
-            path.join(configDir, isString(aliasMac) && aliasMac || alias) ||
-            path.join(configDir, isString(aliasLinux) && aliasLinux || alias);
+    const label = IS_WIN && (aliasWin || alias) ||
+                  IS_MAC && (aliasMac || alias) ||
+                  !IS_WIN && !IS_MAC && (aliasLinux || alias);
+    if (isString(configDir) && isString(label)) {
+      dir = path.join(configDir, label);
     }
   }
   return dir || null;
@@ -113,53 +111,6 @@ const handleSetupCallback = () => {
 };
 
 /**
- * create config directory
- * @returns {string} - config directory path
- */
-const createConfig = async () => {
-  const dir = getBrowserConfigDir();
-  if (!isString(dir)) {
-    throw new TypeError(`Expected String but got ${getType(dir)}.`);
-  }
-  const configPath = await createDirectory(dir, PERM_DIR);
-  console.info(`Created: ${configPath}`);
-  vars.configPath = configPath;
-  return configPath;
-};
-
-/**
- * create shell script
- * @param {string} configPath - config directory path
- * @returns {string} - shell script path
- */
-const createShellScript = async configPath => {
-  if (await !isDir(configPath)) {
-    throw new Error(`No such directory: ${configPath}.`);
-  }
-  const {hostName, mainFile} = vars;
-  if (!isString(hostName)) {
-    throw new TypeError(`Expected String but got ${getType(hostName)}.`);
-  }
-  if (!isString(mainFile)) {
-    throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
-  }
-  const appPath = process.execPath;
-  const filePath = path.resolve(path.join(DIR_CWD, mainFile));
-  const cmd = isFile(filePath) &&
-              `${quoteArg(appPath)} ${quoteArg(filePath)}` || quoteArg(appPath);
-  const content = IS_WIN && `@echo off\n${cmd}\n` ||
-                  `#!${process.env.SHELL}\n${cmd}\n`;
-  const shellExt = IS_WIN && "cmd" || "sh";
-  const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
-  await createFile(shellPath, content, {
-    encoding: CHAR, flag: "w", mode: PERM_EXEC,
-  });
-  console.info(`Created: ${shellPath}`);
-  vars.shellPath = shellPath;
-  return shellPath;
-};
-
-/**
  * handle create registry stderr
  * @param {*} data - data
  * @returns {void}
@@ -174,21 +125,23 @@ const handleRegStderr = data => {
 /**
  * handle create registry close
  * @param {number} code - exit code
- * @returns {void}
+ * @returns {?AsyncFunction} - handleSetupCallback()
  */
 const handleRegClose = code => {
+  let func;
   if (IS_WIN) {
     if (code === 0) {
       const {browser, hostName} = vars;
       const {regWin} = browser;
       const regKey = path.join(...regWin, hostName);
       console.info(`Created: ${regKey}`);
-      handleSetupCallback();
+      func = handleSetupCallback();
     } else {
       const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
       console.warn(`${reg} exited with ${code}.`);
     }
   }
+  return func || null;
 };
 
 /**
@@ -227,13 +180,18 @@ const createReg = async (hostName, manifestPath, regWin) => {
 };
 
 /**
- * create files
- * @returns {void}
+ * create manifest
+ * @param {string} shellPath - shell script path
+ * @param {string} configDir - config directory path
+ * @returns {string} - manifest path
  */
-const createFiles = async () => {
+const createManifest = async (shellPath, configDir) => {
+  if (!isFile(shellPath)) {
+    throw new Error(`No such file: ${shellPath}.`);
+  }
   const {browser, hostDesc, hostName, chromeExtIds, webExtIds} = vars;
   if (!browser) {
-    throw new Error(`Expected Object but got ${getType(browser)}.`);
+    throw new TypeError(`Expected Object but got ${getType(browser)}.`);
   }
   if (!isString(hostDesc)) {
     throw new TypeError(`Expected String but got ${getType(hostDesc)}.`);
@@ -241,8 +199,6 @@ const createFiles = async () => {
   if (!isString(hostName)) {
     throw new TypeError(`Expected String but got ${getType(hostName)}.`);
   }
-  const configPath = await createConfig();
-  const shellPath = await createShellScript(configPath);
   const {hostLinux, hostMac, regWin, type} = browser;
   const allowedField = {
     [EXT_CHROME]: {
@@ -267,20 +223,82 @@ const createFiles = async () => {
   };
   const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
   const fileName = `${hostName}.json`;
-  const manifestPath = path.resolve(
-    IS_WIN && path.join(configPath, fileName) ||
-    IS_MAC && path.join(...hostMac, fileName) ||
-    path.join(...hostLinux, fileName)
-  );
   const hostDir = IS_MAC && hostMac || !IS_WIN && hostLinux;
-  IS_WIN && await createReg(hostName, manifestPath, regWin) ||
-  hostDir && await createDirectory(path.join(...hostDir), PERM_DIR);
-  await createFile(manifestPath, content, {
+  const hostDirPath = hostDir && path.join(...hostDir);
+  if (IS_WIN && !isDir(configDir)) {
+    throw new Error(`No such directory: ${configDir}.`);
+  }
+  const filePath = path.resolve(hostDirPath || configDir, fileName);
+  hostDirPath && !isDir(hostDirPath) && await createDirectory(hostDirPath) ||
+  IS_WIN && await createReg(hostName, filePath, regWin);
+  const manifestPath = await createFile(filePath, content, {
     encoding: CHAR, flag: "w", mode: PERM_FILE,
   });
   console.info(`Created: ${manifestPath}`);
   vars.manifestPath = manifestPath;
-  !IS_WIN && handleSetupCallback();
+  return manifestPath;
+};
+
+/**
+ * create shell script
+ * @param {string} configPath - config directory path
+ * @returns {string} - shell script path
+ */
+const createShellScript = async configPath => {
+  if (await !isDir(configPath)) {
+    throw new Error(`No such directory: ${configPath}.`);
+  }
+  const {hostName, mainFile} = vars;
+  if (!isString(hostName)) {
+    throw new TypeError(`Expected String but got ${getType(hostName)}.`);
+  }
+  if (!isString(mainFile)) {
+    throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
+  }
+  const appPath = process.execPath;
+  const filePath = path.resolve(path.join(DIR_CWD, mainFile));
+  const cmd = isFile(filePath) &&
+              `${quoteArg(appPath)} ${quoteArg(filePath)}` || quoteArg(appPath);
+  const content = IS_WIN && `@echo off\n${cmd}\n` ||
+                  `#!${process.env.SHELL}\n${cmd}\n`;
+  const shellExt = IS_WIN && "cmd" || "sh";
+  const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
+  await createFile(shellPath, content, {
+    encoding: CHAR, flag: "w", mode: PERM_EXEC,
+  });
+  console.info(`Created: ${shellPath}`);
+  vars.shellPath = shellPath;
+  return shellPath;
+};
+
+/**
+ * create config directory
+ * @returns {string} - config directory path
+ */
+const createConfigDir = async () => {
+  const dir = getBrowserConfigDir();
+  if (!isString(dir)) {
+    throw new TypeError(`Expected String but got ${getType(dir)}.`);
+  }
+  const configPath = await createDirectory(dir, PERM_DIR);
+  console.info(`Created: ${configPath}`);
+  vars.configPath = configPath;
+  return configPath;
+};
+
+/**
+ * create files
+ * @returns {?AsyncFunction} - handleSetupCallback()
+ */
+const createFiles = async () => {
+  const configDir = await createConfigDir();
+  const shellPath = await createShellScript(configDir);
+  const manifestPath = await createManifest(shellPath, configDir);
+  let func;
+  if (isString(configDir) && isString(shellPath) && isString(manifestPath)) {
+    func = !IS_WIN && handleSetupCallback();
+  }
+  return func || null;
 };
 
 /**
@@ -531,7 +549,8 @@ class Setup {
 
 module.exports = {
   Setup,
-  abortSetup, createConfig, createFiles, createReg, createShellScript,
+  abortSetup, createConfigDir, createFiles, createManifest, createReg,
+  createShellScript,
   getBrowserConfigDir, getBrowserData, handleBrowserConfigDir,
   handleBrowserInput, handleRegClose, handleRegStderr, handleSetupCallback,
   vars,
