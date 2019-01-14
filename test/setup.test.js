@@ -858,11 +858,11 @@ describe("handleBrowserConfigDir", () => {
     } else if (IS_MAC) {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      fs.unlinkSync(path.resolve(...browser.hostMac, "foo.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostMac, "foo.json"));
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      fs.unlinkSync(path.resolve(...browser.hostLinux, "foo.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostLinux, "foo.json"));
     }
     stubSpawn.restore();
   });
@@ -910,11 +910,11 @@ describe("handleBrowserConfigDir", () => {
     } else if (IS_MAC) {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      fs.unlinkSync(path.resolve(...browser.hostMac, "foo.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostMac, "foo.json"));
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      fs.unlinkSync(path.resolve(...browser.hostLinux, "foo.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostLinux, "foo.json"));
     }
     stubSpawn.restore();
   });
@@ -1110,12 +1110,12 @@ describe("handleBrowserInput", () => {
       assert.strictEqual(stubSpawn.callCount, k);
       assert.strictEqual(stubFunc.callCount, l + 1);
       assert.isTrue(infoCalled);
-      fs.unlinkSync(path.resolve(...browser.hostMac, "foo.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostMac, "foo.json"));
     } else {
       assert.strictEqual(stubSpawn.callCount, k);
       assert.strictEqual(stubFunc.callCount, l + 1);
       assert.isTrue(infoCalled);
-      fs.unlinkSync(path.resolve(...browser.hostLinux, "foo.json"));
+      fs.unlinkSync(path.resolve(...vars.browser.hostLinux, "foo.json"));
     }
     stubSpawn.restore();
     await removeDir(path.join(DIR_CWD, "test", "tmp", "config", DIR_CWD));
