@@ -1649,11 +1649,11 @@ describe("Setup", () => {
       } else if (IS_MAC) {
         assert.strictEqual(stubSpawn.callCount, l);
         assert.strictEqual(stubFunc.callCount, m + 1);
-        fs.unlinkSync(path.resolve(...browser.hostMac, "foo.json"));
+        fs.unlinkSync(path.resolve(...vars.browser.hostMac, "foo.json"));
       } else {
         assert.strictEqual(stubSpawn.callCount, l);
         assert.strictEqual(stubFunc.callCount, m + 1);
-        fs.unlinkSync(path.resolve(...browser.hostLinux, "foo.json"));
+        fs.unlinkSync(path.resolve(...vars.browser.hostLinux, "foo.json"));
       }
       stubRl.restore();
       stubSpawn.restore();
@@ -1661,4 +1661,3 @@ describe("Setup", () => {
     });
   });
 });
-
