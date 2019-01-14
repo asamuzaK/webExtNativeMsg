@@ -1083,6 +1083,7 @@ describe("handleBrowserInput", () => {
     const j = stubRlQues.callCount;
     const k = stubSpawn.callCount;
     const l = stubFunc.callCount;
+    const m = stubInfo.callCount;
     const browser = getBrowserData("firefox");
     vars.browser = browser;
     vars.configDir = path.join(DIR_CWD, "test", "tmp", "config");
@@ -1098,23 +1099,26 @@ describe("handleBrowserInput", () => {
     vars.callback = stubFunc;
     vars.overwriteConfig = true;
     await handleBrowserInput("firefox");
-    const {called: infoCalled} = stubInfo;
+    const {called: infoCalled, callCount: infoCallCount} = stubInfo;
     stubInfo.restore();
     assert.strictEqual(stubRlClose.callCount, i + 1);
     assert.strictEqual(stubRlQues.callCount, j);
     if (IS_WIN) {
       assert.strictEqual(stubSpawn.callCount, k + 1);
       assert.strictEqual(stubFunc.callCount, l);
-      assert.isFalse(infoCalled);
+      assert.isTrue(infoCalled);
+      assert.strictEqual(infoCallCount, m + 3);
     } else if (IS_MAC) {
       assert.strictEqual(stubSpawn.callCount, k);
       assert.strictEqual(stubFunc.callCount, l + 1);
       assert.isTrue(infoCalled);
+      assert.strictEqual(infoCallCount, m + 3);
       fs.unlinkSync(path.resolve(...vars.browser.hostMac, "foo.json"));
     } else {
       assert.strictEqual(stubSpawn.callCount, k);
       assert.strictEqual(stubFunc.callCount, l + 1);
       assert.isTrue(infoCalled);
+      assert.strictEqual(infoCallCount, m + 3);
       fs.unlinkSync(path.resolve(...vars.browser.hostLinux, "foo.json"));
     }
     stubSpawn.restore();
