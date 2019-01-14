@@ -693,12 +693,12 @@ describe("createFiles", () => {
     } else if (IS_MAC) {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      assert.isTrue(res);
+      assert.isObject(res);
       fs.unlinkSync(path.resolve(...browser.hostMac, "foo.json"));
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.strictEqual(stubFunc.callCount, j + 1);
-      assert.isTrue(res);
+      assert.isObject(res);
       fs.unlinkSync(path.resolve(...browser.hostLinux, "foo.json"));
     }
     stubSpawn.restore();
