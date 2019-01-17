@@ -47,7 +47,7 @@ const handleSetupCallback = () => {
   let func;
   const callback = values.get("callback");
   if (typeof callback === "function") {
-    const configDirPath = values.get("configPath");
+    const configDirPath = values.get("configDir");
     const shellScriptPath = values.get("shellPath");
     const manifestPath = values.get("manifestPath");
     func = callback({
