@@ -62,7 +62,7 @@ describe("handleSetupCallback", () => {
   });
 
   it("should get null", () => {
-    values.set("configPath", "foo");
+    values.set("configDir", "foo");
     values.set("shellPath", "bar");
     values.set("manifestPath", "baz");
     values.set("callback", {});
@@ -72,7 +72,7 @@ describe("handleSetupCallback", () => {
 
   it("should call function", () => {
     const stubFunc = sinon.stub().callsFake(a => a);
-    values.set("configPath", "foo");
+    values.set("configDir", "foo");
     values.set("shellPath", "bar");
     values.set("manifestPath", "baz");
     values.set("callback", stubFunc);
@@ -152,60 +152,6 @@ describe("handleRegClose", () => {
       assert.isFalse(stubFunc.called);
     }
   });
-  /*
-  it("should warn", () => {
-    let wrn, info;
-    const stubWarn = sinon.stub(console, "warn").callsFake(msg => {
-      wrn = msg;
-    });
-    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
-      info = msg;
-    });
-    const setup = new Setup();
-    const res = setup._handleRegClose(1);
-    const {calledOnce: warnCalled} = stubWarn;
-    stubWarn.restore();
-    if (IS_WIN) {
-      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-      assert.isTrue(warnCalled);
-      assert.strictEqual(wrn, `${reg} exited with 1.`);
-    } else {
-      assert.isFalse(warnCalled);
-      assert.isUndefined(wrn);
-    }
-    assert.isNull(res);
-  });
-
-  it("should call function", () => {
-    let info;
-    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
-      infoMsg = msg;
-    });
-    const setup = new Setup({
-      browser: "firefox",
-      hostName: "foo",
-    });
-    const stubCallback =
-      sinon.stub(setup, "_handleSetupCallback").callsFake(() => true);
-    const i = stubCallback.callCount;
-    const res = setup._handleRegClose(0);
-    const {calledOnce: infoCalled} = stubInfo;
-    stubInfo.restore();
-    if (IS_WIN) {
-      const regKey = path.join("HKEY_CURRENT_USER", "SOFTWARE", "Mozilla",
-                               "NativeMessagingHosts", "foo");
-      assert.isTrue(infoCalled);
-      assert.strictEqual(infoMsg, `Created: ${regKey}`);
-      assert.strictEqual(stubCallback.callCount, i + 1);
-      assert.isTrue(res);
-    } else {
-      assert.isFalse(infoCalled);
-      assert.isUndefined(infoMsg);
-      assert.strictEqual(stubCallback.callCount, i);
-      assert.isNull(res);
-    }
-  });
-  */
 });
 
 describe("handleRegStdErr", () => {
