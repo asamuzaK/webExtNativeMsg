@@ -101,7 +101,6 @@ describe("handleRegClose", () => {
     });
     const stubExit = sinon.stub(process, "exit");
     const stubFunc = sinon.stub();
-    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
     const regKey = path.join("HKEY_CURRENT_USER", "SOFTWARE", "Mozilla",
                              "NativeMessagingHosts", "foo");
     values.set("regKey", regKey);
@@ -112,6 +111,7 @@ describe("handleRegClose", () => {
     stubInfo.restore();
     stubExit.restore();
     if (IS_WIN) {
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
       assert.isTrue(infoCalled);
       assert.isTrue(exitCalled);
       assert.strictEqual(info, `Setup aborted: ${reg} exited with 1.`);
