@@ -15,7 +15,11 @@
   "main": "./index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "nyc --reporter=text mocha test --exit"
+    "test": "nyc --reporter=text mocha test/*.test.js --exit",
+    "test:setup": "cd test/app && node setup"
+  },
+  "dependencies": {
+    "readline-sync": "^1.4.9"
   },
   "devDependencies": {
     "chai": "^4.2.0",

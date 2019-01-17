@@ -5,13 +5,13 @@
 /* api */
 const {ChildProcess} = require("./child-process");
 const {browserData} = require("./browser-data");
-const {getType, isString, logErr, quoteArg, throwErr} = require("./common");
+const {getType, isString, quoteArg, throwErr} = require("./common");
 const {
   createDirectory, createFile, getAbsPath, isDir, isFile,
 } = require("./file-util");
 const path = require("path");
 const process = require("process");
-const readline = require("readline");
+const readline = require("readline-sync");
 
 /* constants */
 const {
@@ -25,22 +25,8 @@ const PERM_DIR = 0o700;
 const PERM_EXEC = 0o700;
 const PERM_FILE = 0o600;
 
-/* variables */
-const vars = {
-  browser: null,
-  callback: null,
-  chromeExtIds: null,
-  configDir: null,
-  configPath: null,
-  hostDesc: null,
-  hostName: null,
-  mainFile: null,
-  manifestPath: null,
-  overwriteConfig: false,
-  rl: null,
-  shellPath: null,
-  webExtIds: null,
-};
+/* created path values */
+const values = new Map();
 
 /**
  * abort setup
@@ -48,8 +34,62 @@ const vars = {
  * @returns {void}
  */
 const abortSetup = msg => {
+  values.clear();
   console.info(`Setup aborted: ${msg}`);
-  process.exit(1);
+  process.exit();
+};
+
+/**
+ * handle setup callback
+ * @returns {?Function} - callback
+ */
+const handleSetupCallback = () => {
+  let func;
+  const callback = values.get("callback");
+  if (typeof callback === "function") {
+    const configDirPath = values.get("configPath");
+    const shellScriptPath = values.get("shellPath");
+    const manifestPath = values.get("manifestPath");
+    func = callback({
+      configDirPath, manifestPath, shellScriptPath,
+    });
+  }
+  values.clear();
+  return func || null;
+};
+
+/**
+ * handle create registry close
+ * @param {number} code - exit code
+ * @returns {?AsyncFunction} - handleSetupCallback()
+ */
+const handleRegClose = code => {
+  let func;
+  if (IS_WIN) {
+    if (code === 0) {
+      const regKey = values.get("regKey");
+      console.info(`Created: ${regKey}`);
+      func = handleSetupCallback();
+    } else {
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+      func = abortSetup(`${reg} exited with ${code}.`);
+    }
+  }
+  return func || null;
+};
+
+/**
+ * handle registry stderr
+ * @param {*} data - data
+ * @returns {Function} - abortSetup()
+ */
+const handleRegStderr = data => {
+  let func;
+  if (IS_WIN) {
+    data && console.error(`stderr: ${data.toString()}`);
+    func = abortSetup("Failed to create registry key.");
+  }
+  return func || null;
 };
 
 /**
@@ -73,301 +113,6 @@ const getBrowserData = key => {
     }
   }
   return browser || null;
-};
-
-/**
- * get browser specific config directory
- * @returns {?string} - config directory
- */
-const getBrowserConfigDir = () => {
-  const {browser, configDir} = vars;
-  let dir;
-  if (browser) {
-    const {alias, aliasLinux, aliasMac, aliasWin} = browser;
-    const label = IS_WIN && (aliasWin || alias) ||
-                  IS_MAC && (aliasMac || alias) ||
-                  !IS_WIN && !IS_MAC && (aliasLinux || alias);
-    if (isString(configDir) && isString(label)) {
-      dir = path.join(configDir, label);
-    }
-  }
-  return dir || null;
-};
-
-/**
- * handle setup callback
- * @returns {?Function} - callback
- */
-const handleSetupCallback = () => {
-  const {
-    callback, configPath: configDirPath, shellPath: shellScriptPath,
-    manifestPath,
-  } = vars;
-  let func;
-  if (typeof callback === "function") {
-    func = callback({configDirPath, shellScriptPath, manifestPath});
-  }
-  return func || null;
-};
-
-/**
- * handle create registry stderr
- * @param {*} data - data
- * @returns {void}
- */
-const handleRegStderr = data => {
-  if (IS_WIN) {
-    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-    data && console.error(`stderr: ${reg}: ${data}`);
-  }
-};
-
-/**
- * handle create registry close
- * @param {number} code - exit code
- * @returns {?AsyncFunction} - handleSetupCallback()
- */
-const handleRegClose = code => {
-  let func;
-  if (IS_WIN) {
-    if (code === 0) {
-      const {browser, hostName} = vars;
-      const {regWin} = browser;
-      const regKey = path.join(...regWin, hostName);
-      console.info(`Created: ${regKey}`);
-      func = handleSetupCallback();
-    } else {
-      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-      console.warn(`${reg} exited with ${code}.`);
-    }
-  }
-  return func || null;
-};
-
-/**
- * create registry
- * @param {string} hostName - host name
- * @param {string} manifestPath - manifest file path
- * @param {Array} regWin - reg dir array
- * @returns {Object} - child process
- */
-const createReg = async (hostName, manifestPath, regWin) => {
-  if (!isString(hostName)) {
-    throw new TypeError(`Expected String but got ${getType(hostName)}.`);
-  }
-  if (!isString(manifestPath)) {
-    throw new TypeError(`Expected String but got ${getType(manifestPath)}.`);
-  }
-  if (!Array.isArray(regWin)) {
-    throw new TypeError(`Expected Array but got ${getType(regWin)}.`);
-  }
-  let proc;
-  if (IS_WIN) {
-    const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
-    const regKey = path.join(...regWin, hostName);
-    const args = ["add", regKey, "/ve", "/d", manifestPath, "/f"];
-    const opt = {
-      cwd: null,
-      encoding: CHAR,
-      env: process.env,
-    };
-    proc = await (new ChildProcess(reg, args, opt)).spawn();
-    proc.on("error", throwErr);
-    proc.stderr.on("data", handleRegStderr);
-    proc.on("close", handleRegClose);
-  }
-  return proc || null;
-};
-
-/**
- * create manifest
- * @param {string} shellPath - shell script path
- * @param {string} configDir - config directory path
- * @returns {string} - manifest path
- */
-const createManifest = async (shellPath, configDir) => {
-  if (!isFile(shellPath)) {
-    throw new Error(`No such file: ${shellPath}.`);
-  }
-  const {browser, hostDesc, hostName, chromeExtIds, webExtIds} = vars;
-  if (!browser) {
-    throw new TypeError(`Expected Object but got ${getType(browser)}.`);
-  }
-  if (!isString(hostDesc)) {
-    throw new TypeError(`Expected String but got ${getType(hostDesc)}.`);
-  }
-  if (!isString(hostName)) {
-    throw new TypeError(`Expected String but got ${getType(hostName)}.`);
-  }
-  const {hostLinux, hostMac, regWin, type} = browser;
-  const allowedField = {
-    [EXT_CHROME]: {
-      key: "allowed_origins",
-      value: chromeExtIds,
-    },
-    [EXT_WEB]: {
-      key: "allowed_extensions",
-      value: webExtIds,
-    },
-  };
-  const {key, value} = allowedField[type];
-  if (!Array.isArray(value)) {
-    throw new TypeError(`Expected Array but got ${getType(value)}.`);
-  }
-  const manifest = {
-    [key]: [...value],
-    description: hostDesc,
-    name: hostName,
-    path: shellPath,
-    type: "stdio",
-  };
-  const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
-  const fileName = `${hostName}.json`;
-  const hostDir = IS_MAC && hostMac || !IS_WIN && hostLinux;
-  const hostDirPath = hostDir && path.join(...hostDir);
-  if (IS_WIN && !isDir(configDir)) {
-    throw new Error(`No such directory: ${configDir}.`);
-  }
-  const filePath = path.resolve(hostDirPath || configDir, fileName);
-  hostDirPath && !isDir(hostDirPath) && await createDirectory(hostDirPath) ||
-  IS_WIN && await createReg(hostName, filePath, regWin);
-  const manifestPath = await createFile(filePath, content, {
-    encoding: CHAR, flag: "w", mode: PERM_FILE,
-  });
-  console.info(`Created: ${manifestPath}`);
-  vars.manifestPath = manifestPath;
-  return manifestPath;
-};
-
-/**
- * create shell script
- * @param {string} configPath - config directory path
- * @returns {string} - shell script path
- */
-const createShellScript = async configPath => {
-  if (await !isDir(configPath)) {
-    throw new Error(`No such directory: ${configPath}.`);
-  }
-  const {hostName, mainFile} = vars;
-  if (!isString(hostName)) {
-    throw new TypeError(`Expected String but got ${getType(hostName)}.`);
-  }
-  if (!isString(mainFile)) {
-    throw new TypeError(`Expected String but got ${getType(mainFile)}.`);
-  }
-  const appPath = process.execPath;
-  const filePath = path.resolve(path.join(DIR_CWD, mainFile));
-  const cmd = isFile(filePath) &&
-              `${quoteArg(appPath)} ${quoteArg(filePath)}` || quoteArg(appPath);
-  const content = IS_WIN && `@echo off\n${cmd}\n` ||
-                  `#!${process.env.SHELL}\n${cmd}\n`;
-  const shellExt = IS_WIN && "cmd" || "sh";
-  const shellPath = path.join(configPath, `${hostName}.${shellExt}`);
-  await createFile(shellPath, content, {
-    encoding: CHAR, flag: "w", mode: PERM_EXEC,
-  });
-  console.info(`Created: ${shellPath}`);
-  vars.shellPath = shellPath;
-  return shellPath;
-};
-
-/**
- * create config directory
- * @returns {string} - config directory path
- */
-const createConfigDir = async () => {
-  const dir = getBrowserConfigDir();
-  if (!isString(dir)) {
-    throw new TypeError(`Expected String but got ${getType(dir)}.`);
-  }
-  const configPath = await createDirectory(dir, PERM_DIR);
-  console.info(`Created: ${configPath}`);
-  vars.configPath = configPath;
-  return configPath;
-};
-
-/**
- * create files
- * @returns {?AsyncFunction} - handleSetupCallback()
- */
-const createFiles = async () => {
-  const configDir = await createConfigDir();
-  const shellPath = await createShellScript(configDir);
-  const manifestPath = await createManifest(shellPath, configDir);
-  let func;
-  if (isString(configDir) && isString(shellPath) && isString(manifestPath)) {
-    func = !IS_WIN && handleSetupCallback();
-  }
-  return func || null;
-};
-
-/**
- * handle browser config directory input
- * @param {string} ans - user input
- * @returns {AsyncFunction|Function} - createFiles() / abortSetup()
- */
-const handleBrowserConfigDir = ans => {
-  const dir = getBrowserConfigDir();
-  if (!isString(dir)) {
-    throw new TypeError(`Expected String but got ${getType(dir)}.`);
-  }
-  const {rl} = vars;
-  const msg = `${dir} already exists.`;
-  let func;
-  rl && rl.close();
-  if (isString(ans)) {
-    ans = ans.trim();
-    if (/^y(?:es)?$/i.test(ans)) {
-      func = createFiles().catch(logErr);
-    } else {
-      func = abortSetup(msg);
-    }
-  } else {
-    func = abortSetup(msg);
-  }
-  return func;
-};
-
-/**
- * handle browser input
- * @param {string} ans - user input
- * @returns {AsyncFunction|Function} - createFiles() / rl.question() /
- *                                     abortSetup()
- */
-const handleBrowserInput = ans => {
-  const {overwriteConfig, rl} = vars;
-  const msg = "Browser not specified.";
-  let func;
-  if (isString(ans)) {
-    ans = ans.trim();
-    if (ans.length) {
-      const browser = getBrowserData(ans);
-      vars.browser = browser;
-      if (browser) {
-        const dir = getBrowserConfigDir();
-        if (!isString(dir)) {
-          throw new TypeError(`Expected String but got ${getType(dir)}.`);
-        }
-        if (isDir(dir) && rl && !overwriteConfig) {
-          func = rl.question(`${dir} already exists. Overwrite? [y/n]\n`,
-                             handleBrowserConfigDir);
-        } else {
-          rl && rl.close();
-          func = createFiles().catch(logErr);
-        }
-      } else {
-        rl && rl.close();
-        func = abortSetup(`${ans} not supported.`);
-      }
-    } else {
-      rl && rl.close();
-      func = abortSetup(msg);
-    }
-  } else {
-    rl && rl.close();
-    func = abortSetup(msg);
-  }
-  return func;
 };
 
 /* Setup */
@@ -394,7 +139,6 @@ class Setup {
     this._configDir = isString(hostName) &&
                       path.join(DIR_CONFIG, hostName, "config") ||
                       path.join(DIR_CWD, "config");
-    this._overwriteConfig = !!overwriteConfig;
     this._hostDesc = isString(hostDescription) && hostDescription || null;
     this._hostName = isString(hostName) && hostName || null;
     this._mainFile = isString(mainScriptFile) && mainScriptFile || "index.js";
@@ -404,6 +148,9 @@ class Setup {
     this._webExtIds = Array.isArray(webExtensionIds) &&
                       webExtensionIds.length && webExtensionIds || null;
     this._callback = typeof callback === "function" && callback || null;
+    this._overwriteConfig = !!overwriteConfig;
+    this._readline = readline;
+    this._browserConfigDir;
     if (isString(configPath) && configPath.length) {
       this._setConfigDir(configPath);
     }
@@ -422,62 +169,62 @@ class Setup {
   }
   set browser(browser) {
     this._browser = isString(browser) && getBrowserData(browser) || null;
-    vars.browser = this._browser;
   }
+
   get configPath() {
     return this._configDir;
   }
   set configPath(dir) {
     this._setConfigDir(dir);
   }
+
   get hostDescription() {
     return this._hostDesc;
   }
   set hostDescription(desc) {
     this._hostDesc = isString(desc) && desc || null;
-    vars.hostDesc = this._hostDesc;
   }
+
   get hostName() {
     return this._hostName;
   }
   set hostName(name) {
     this._hostName = isString(name) && name || null;
-    vars.hostName = this._hostName;
   }
+
   get mainScriptFile() {
     return this._mainFile;
   }
   set mainScriptFile(name) {
     this._mainFile = isString(name) && name || "index.js";
-    vars.mainFile = this._mainFile;
   }
+
   get chromeExtensionIds() {
     return this._chromeExtIds;
   }
   set chromeExtensionIds(arr) {
     this._chromeExtIds = Array.isArray(arr) && arr.length && arr || null;
-    vars.chromeExtIds = this._chromeExtIds;
   }
+
   get webExtensionIds() {
     return this._webExtIds;
   }
   set webExtensionIds(arr) {
     this._webExtIds = Array.isArray(arr) && arr.length && arr || null;
-    vars.webExtIds = this._webExtIds;
   }
+
   get callback() {
     return this._callback;
   }
   set callback(func) {
     this._callback = typeof func === "function" && func || null;
-    vars.callback = this._callback;
   }
+
   get overwriteConfig() {
     return this._overwriteConfig;
   }
   set overwriteConfig(overwrite) {
     this._overwriteConfig = !!overwrite;
-    vars.overwriteConfig = this._overwriteConfig;
   }
 
   /**
@@ -487,51 +234,260 @@ class Setup {
    */
   _setConfigDir(dir) {
     const dirPath = getAbsPath(dir);
-    if (!dirPath) {
+    if (!isString(dirPath)) {
       throw new Error(`Failed to normalize ${dir}`);
     }
     if (!dirPath.startsWith(DIR_HOME)) {
-      throw new Error(`Config path is not sub directory of ${DIR_HOME}.`);
+      throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
     }
     this._configDir = dirPath;
-    vars.configDir = this._configDir;
+  }
+
+  /**
+   * get browser specific config directory
+   * @returns {?string} - config directory
+   */
+  _getBrowserConfigDir() {
+    let dir;
+    if (this._browser) {
+      const {
+        alias, aliasLinux, aliasMac, aliasWin, hostLinux, hostMac, regWin,
+      } = this._browser;
+      const label = IS_WIN && regWin && (aliasWin || alias) ||
+                    IS_MAC && hostMac && (aliasMac || alias) ||
+                    !IS_WIN && !IS_MAC && hostLinux && (aliasLinux || alias);
+      if (this._configDir && isString(label)) {
+        dir = path.join(this._configDir, label);
+      }
+    }
+    return dir || null;
+  }
+
+  /**
+   * create registry
+   * @param {string} manifestPath - manifest path
+   * @returns {Object} - child process
+   */
+  async _createReg(manifestPath) {
+    if (!isFile(manifestPath)) {
+      throw new Error(`No such file: ${manifestPath}.`);
+    }
+    if (!this._browser) {
+      throw new TypeError(`Expected Object but got ${getType(this._browser)}.`);
+    }
+    if (!isString(this._hostName)) {
+      throw new TypeError(
+        `Expected String but got ${getType(this._hostName)}.`
+      );
+    }
+    let proc;
+    if (IS_WIN) {
+      const {regWin} = this._browser;
+      const regKey = path.join(...regWin, this._hostName);
+      const reg = path.join(process.env.WINDIR, "system32", "reg.exe");
+      const args = ["add", regKey, "/ve", "/d", manifestPath, "/f"];
+      const opt = {
+        cwd: null,
+        encoding: CHAR,
+        env: process.env,
+      };
+      values.set("regKey", regKey);
+      proc = await (new ChildProcess(reg, args, opt)).spawn();
+      proc.on("error", throwErr);
+      proc.stderr.on("data", handleRegStderr);
+      proc.on("close", handleRegClose);
+    }
+    return proc || null;
+  }
+
+  /**
+   * create manifest
+   * @param {string} shellPath - shell script path
+   * @param {string} configDir - config directory path
+   * @returns {string} - manifest path
+   */
+  async _createManifest(shellPath, configDir) {
+    if (!isFile(shellPath)) {
+      throw new Error(`No such file: ${shellPath}.`);
+    }
+    if (!this._browser) {
+      throw new TypeError(`Expected Object but got ${getType(this._browser)}.`);
+    }
+    if (!isString(this._hostDesc)) {
+      throw new TypeError(
+        `Expected String but got ${getType(this._hostDesc)}.`
+      );
+    }
+    if (!isString(this._hostName)) {
+      throw new TypeError(
+        `Expected String but got ${getType(this._hostName)}.`
+      );
+    }
+    const {hostLinux, hostMac, type} = this._browser;
+    const allowedField = {
+      [EXT_CHROME]: {
+        key: "allowed_origins",
+        value: this._chromeExtIds,
+      },
+      [EXT_WEB]: {
+        key: "allowed_extensions",
+        value: this._webExtIds,
+      },
+    };
+    const {key, value} = allowedField[type];
+    if (!Array.isArray(value)) {
+      throw new TypeError(`Expected Array but got ${getType(value)}.`);
+    }
+    const manifest = {
+      [key]: [...value],
+      description: this._hostDesc,
+      name: this._hostName,
+      path: shellPath,
+      type: "stdio",
+    };
+    const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
+    const fileName = `${this._hostName}.json`;
+    const hostDir = IS_MAC && path.join(...hostMac) ||
+                    !IS_WIN && path.join(...hostLinux);
+    if (IS_WIN && !isDir(configDir)) {
+      throw new Error(`No such directory: ${configDir}.`);
+    }
+    const manifestPath = path.resolve(hostDir || configDir, fileName);
+    hostDir && !isDir(hostDir) && await createDirectory(hostDir);
+    await createFile(manifestPath, content, {
+      encoding: CHAR, flag: "w", mode: PERM_FILE,
+    });
+    console.info(`Created: ${manifestPath}`);
+    return manifestPath;
+  }
+
+  /**
+   * create shell script
+   * @param {string} configDir - config directory path
+   * @returns {string} - shell script path
+   */
+  async _createShellScript(configDir) {
+    if (!isDir(configDir)) {
+      throw new Error(`No such directory: ${configDir}.`);
+    }
+    if (!isString(this._hostName)) {
+      throw new TypeError(
+        `Expected String but got ${getType(this._hostName)}.`
+      );
+    }
+    const appPath = process.execPath;
+    const filePath = path.resolve(path.join(DIR_CWD, this._mainFile));
+    const cmd = isFile(filePath) &&
+                `${quoteArg(appPath)} ${quoteArg(filePath)}` ||
+                quoteArg(appPath);
+    const content = IS_WIN && `@echo off\n${cmd}\n` ||
+                    `#!${process.env.SHELL}\n${cmd}\n`;
+    const shellExt = IS_WIN && "cmd" || "sh";
+    const shellPath = path.join(configDir, `${this._hostName}.${shellExt}`);
+    await createFile(shellPath, content, {
+      encoding: CHAR, flag: "w", mode: PERM_EXEC,
+    });
+    console.info(`Created: ${shellPath}`);
+    return shellPath;
+  }
+
+  /**
+   * create config directory
+   * @returns {string} - config directory path
+   */
+  async _createConfigDir() {
+    if (!isString(this._browserConfigDir)) {
+      throw new TypeError(
+        `Expected String but got ${getType(this._browserConfigDir)}.`
+      );
+    }
+    const configDir = await createDirectory(this._browserConfigDir, PERM_DIR);
+    console.info(`Created: ${configDir}`);
+    return configDir;
+  }
+
+  /**
+   * create files
+   * @returns {AsyncFunction|Function} - createReg(), handleSetupCallback(),
+   *                                     abortSetup(),
+   */
+  async _createFiles() {
+    let func;
+    const configDir = await this._createConfigDir();
+    const shellPath = await this._createShellScript(configDir);
+    const manifestPath = await this._createManifest(shellPath, configDir);
+    if (isDir(configDir) && isFile(shellPath) && isFile(manifestPath)) {
+      values.set("configDir", configDir);
+      values.set("shellPath", shellPath);
+      values.set("manifestPath", manifestPath);
+      values.set("callback", this._callback);
+      func = IS_WIN && this._createReg(manifestPath) || handleSetupCallback();
+    } else {
+      func = abortSetup("Failed to create files.");
+    }
+    return func;
+  }
+
+  /**
+   * handle browser config directory input
+   * @returns {AsyncFunction|Function} - createFiles(), abortSetup()
+   */
+  async _handleBrowserConfigDir() {
+    if (!isString(this._browserConfigDir)) {
+      throw new TypeError(
+        `Expected String but got ${getType(this._browserConfigDir)}.`
+      );
+    }
+    let func;
+    if (isDir(this._browserConfigDir) && !this._overwriteConfig) {
+      const dir = this._browserConfigDir;
+      const ans =
+        this._readline.keyInYNStrict(`${dir} already exists. Overwrite?`);
+      if (ans) {
+        func = this._createFiles();
+      } else {
+        func = abortSetup(`${dir} already exists.`);
+      }
+    } else {
+      func = this._createFiles();
+    }
+    return func;
+  }
+
+  /**
+   * handle browser input
+   * @param {string} arr - browser array
+   * @returns {AsyncFunction|Function} - handleBrowserConfigDir(), abortSetup()
+   */
+  async _handleBrowserInput(arr) {
+    if (!Array.isArray(arr)) {
+      throw new TypeError(`Expected Array but got ${getType(arr)}.`);
+    }
+    let func;
+    const i = this._readline.keyInSelect(arr, "Select a browser.");
+    if (Number.isInteger(i) && i >= 0) {
+      this._browser = getBrowserData(arr[i]);
+    }
+    if (this._browser) {
+      this._browserConfigDir = this._getBrowserConfigDir();
+      func = this._handleBrowserConfigDir();
+    } else {
+      func = abortSetup("Browser not specified.");
+    }
+    return func;
   }
 
   /**
    * run setup
-   * @returns {?AsyncFunction} - createFiles()
+   * @returns {AsyncFunction} - handleBrowserInput(), handleBrowserConfigDir()
    */
   run() {
     let func;
-    vars.browser = this._browser;
-    vars.callback = this._callback;
-    vars.chromeExtIds = this._chromeExtIds;
-    vars.configDir = this._configDir;
-    vars.hostDesc = this._hostDesc;
-    vars.hostName = this._hostName;
-    vars.mainFile = this._mainFile;
-    vars.overwriteConfig = this._overwriteConfig;
-    vars.webExtIds = this._webExtIds;
-    vars.rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    if (!vars.rl) {
-      throw new Error("Failed to run setup.");
-    }
-    if (this._browser) {
-      const dir = getBrowserConfigDir();
-      if (isDir(dir) && !this._overwriteConfig) {
-        vars.rl.question(`${dir} already exists. Overwrite? [y/n]\n`,
-                         handleBrowserConfigDir);
-      } else {
-        vars.rl.close();
-        func = createFiles().catch(logErr);
-      }
+    this._browserConfigDir = this._getBrowserConfigDir();
+    if (this._browserConfigDir) {
+      func = this._handleBrowserConfigDir().catch(throwErr);
     } else {
       const arr = [];
-      const msg =
-        "Enter which browser you would like to set up the host for:\n";
       const items = Object.entries(browserData);
       for (const [item, obj] of items) {
         if ((IS_WIN && obj.regWin || IS_MAC && obj.hostMac ||
@@ -541,17 +497,14 @@ class Setup {
           arr.push(item);
         }
       }
-      vars.rl.question(`${msg}[${arr.join(" ")}]\n`, handleBrowserInput);
+      func = this._handleBrowserInput(arr).catch(throwErr);
     }
-    return func || null;
+    return func;
   }
 }
 
 module.exports = {
   Setup,
-  abortSetup, createConfigDir, createFiles, createManifest, createReg,
-  createShellScript,
-  getBrowserConfigDir, getBrowserData, handleBrowserConfigDir,
-  handleBrowserInput, handleRegClose, handleRegStderr, handleSetupCallback,
-  vars,
+  abortSetup, getBrowserData, handleRegClose, handleRegStderr,
+  handleSetupCallback, values,
 };

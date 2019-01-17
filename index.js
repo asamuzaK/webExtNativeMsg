@@ -14,7 +14,7 @@ const {
 
 module.exports = {
   ChildProcess, CmdArgs, Input, Output, Setup,
-  convertUriToFilePath, createDir, createDirectory, createFile, getAbsPath,
-  getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
-  isFile, isSubDir, readFile, removeDir,
+  convertUriToFilePath, createDir, createDirectory, createFile,
+  getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat,
+  isDir, isExecutable, isFile, isSubDir, readFile, removeDir,
 };
