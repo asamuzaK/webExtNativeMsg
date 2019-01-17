@@ -151,6 +151,16 @@ const removeDir = (dir, baseDir) => {
 };
 
 /**
+ * remove the directory and it's files
+ * @param {string} dir - directory path
+ * @param {string} baseDir - base directory path
+ * @returns {void}
+ */
+const removeDirectory = async (dir, baseDir) => {
+  await removeDir(dir, baseDir);
+};
+
+/**
  * create a directory
  * NOTE: Deprecated. Remove in the future.
  * @param {Array} arr - directory array
@@ -244,5 +254,5 @@ const readFile = async (file, opt = {encoding: null, flag: "r"}) => {
 module.exports = {
   convertUriToFilePath, createDir, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
-  isExecutable, isFile, isSubDir, removeDir, readFile,
+  isExecutable, isFile, isSubDir, removeDir, removeDirectory, readFile,
 };

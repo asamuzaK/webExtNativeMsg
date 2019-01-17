@@ -2,9 +2,9 @@
 /* api */
 const {URL} = require("url");
 const {
-  convertUriToFilePath, createDir, createDirectory, createFile, getAbsPath,
-  getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
-  isExecutable, isFile, isSubDir, removeDir, readFile,
+  convertUriToFilePath, createDir, createDirectory, createFile,
+  getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat,
+  isDir, isExecutable, isFile, isSubDir, removeDir, removeDirectory, readFile,
 } = require("../modules/file-util");
 const {assert} = require("chai");
 const {describe, it} = require("mocha");
@@ -196,7 +196,57 @@ describe("removeDir", () => {
     const foo = path.join(TMPDIR, "foo");
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);
-    assert.throws(() => removeDir(foo, dirPath));
+    assert.throws(() => removeDir(foo, dirPath),
+                  `${foo} is not a subdirectory of ${dirPath}.`);
+    await fs.rmdirSync(dirPath);
+    await fs.rmdirSync(foo);
+  });
+});
+
+describe("removeDirectory", () => {
+  it("should remove dir and it's files", async () => {
+    const dirPath = path.join(TMPDIR, "webextnativemsg");
+    fs.mkdirSync(dirPath);
+    const subDirPath = path.join(dirPath, "foo");
+    fs.mkdirSync(subDirPath);
+    const filePath = path.join(subDirPath, "test.txt");
+    const value = "test file.\n";
+    await createFile(filePath, value, {
+      encoding: "utf8", flag: "w", mode: PERM_FILE,
+    });
+    const res1 = await Promise.all([
+      fs.existsSync(dirPath),
+      fs.existsSync(subDirPath),
+      fs.existsSync(filePath),
+    ]);
+    await removeDirectory(dirPath, TMPDIR);
+    const res2 = await Promise.all([
+      fs.existsSync(dirPath),
+      fs.existsSync(subDirPath),
+      fs.existsSync(filePath),
+    ]);
+    assert.deepEqual(res1, [true, true, true]);
+    assert.deepEqual(res2, [false, false, false]);
+  });
+
+  it("should ignore if dir is not a directory", async () => {
+    const foo = path.resolve("foo");
+    assert.isFalse(isDir(foo));
+    await removeDirectory(foo, TMPDIR).catch(e => {
+      assert.isUndefined(e);
+    });
+  });
+
+  it("should throw if dir is not subdirectory of base dir", async () => {
+    const dirPath = path.join(TMPDIR, "webextnativemsg");
+    const foo = path.join(TMPDIR, "foo");
+    await fs.mkdirSync(dirPath);
+    await fs.mkdirSync(foo);
+    await removeDirectory(foo, dirPath).catch(e => {
+      assert.instanceOf(e, Error);
+      assert.strictEqual(e.message,
+                         `${foo} is not a subdirectory of ${dirPath}.`);
+    });
     await fs.rmdirSync(dirPath);
     await fs.rmdirSync(foo);
   });
