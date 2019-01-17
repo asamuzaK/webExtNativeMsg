@@ -17,11 +17,6 @@ const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
 
 const map = new Map();
 
-/**
- * callback
- * @param {Object} arg - arg
- * @returns {void}
- */
 const appCallback = async arg => {
   const {manifestPath} = arg;
   map.set("manifestPath", manifestPath);
@@ -38,10 +33,6 @@ const stubSpawn = sinon.stub(childProcess, "spawn").callsFake((cmd, args) => {
   };
 });
 
-/**
- * clean
- * @returns {void}
- */
 const clean = () => {
   const file = map.get("manifestPath");
   if (isFile(file)) {
@@ -52,7 +43,6 @@ const clean = () => {
   map.clear();
 };
 
-/* run setup script */
 (async () => {
   const setup = new Setup({
     configPath: path.join(TMPDIR, "test-app"),
