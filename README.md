@@ -235,6 +235,15 @@ Note: first argument should be array of directory label, like `["path", "to", "d
 * @returns {?string} - directory path
 -->
 
+### Async Function removeDirectory(dir, baseDir)
+
+Remove the directory and it's files.
+Note: `dir` should be subdirectory of `baseDir`.
+
+* @param {string} dir - directory path
+* @param {string} baseDir - base directory path
+* @returns {void}
+
 ### Async Function createDirectory(dir, mode)
 
 Create a directory.
