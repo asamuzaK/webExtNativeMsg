@@ -61,7 +61,7 @@ const handleSetupCallback = () => {
 /**
  * handle create registry close
  * @param {number} code - exit code
- * @returns {?AsyncFunction} - handleSetupCallback()
+ * @returns {?Function} - handleSetupCallback()
  */
 const handleRegClose = code => {
   let func;
