@@ -442,7 +442,7 @@ class Setup {
     if (isDir(this._browserConfigDir) && !this._overwriteConfig) {
       const dir = this._browserConfigDir;
       const ans =
-        this._readline.keyInYNStrict(`${dir} already exists. Overwrite?`);
+        this._readline.keyInYNStrict(`${dir} already exists.\nOverwrite?`);
       if (ans) {
         func = this._createFiles();
       } else {
