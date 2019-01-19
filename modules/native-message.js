@@ -24,22 +24,24 @@ class Input {
    * @returns {Array} - message array
    */
   _decoder() {
-    const arr = [];
+    let arr = [];
     if (Buffer.isBuffer(this._input)) {
       if (!this._length && this._input.length >= BYTE_LEN) {
         this._length = IS_BE && this._input.readUIntBE(0, BYTE_LEN) ||
                        this._input.readUIntLE(0, BYTE_LEN);
         this._input = this._input.slice(BYTE_LEN);
       }
-      if (this._length) {
-        if (this._input.length > this._length) {
-          throw new Error("Failed to decode message.");
-        }
-        if (this._input.length === this._length) {
-          const buf = this._input.slice(0, this._length);
-          arr.push(JSON.parse(buf.toString(CHAR)));
-          this._input = null;
-          this._length = null;
+      if (this._length && this._input.length >= this._length) {
+        const buf = this._input.slice(0, this._length);
+        arr.push(JSON.parse(buf.toString(CHAR)));
+        this._input = this._input.length > this._length &&
+                      this._input.slice(this._length) || null;
+        this._length = null;
+        if (this._input) {
+          const cur = this._decoder();
+          if (cur.length) {
+            arr = arr.concat(cur);
+          }
         }
       }
     }

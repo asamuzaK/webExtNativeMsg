@@ -33,19 +33,6 @@ describe("decode", () => {
     assert.isNull(input.decode(Buffer.alloc(4)));
   });
 
-  it("should throw if length exceeds", () => {
-    const input = new Input();
-    if (IS_BE) {
-      assert.throws(() =>
-        input.decode(Buffer.from([0, 0, 0, 5, 34, 116, 101, 115, 116, 34]))
-      );
-    } else {
-      assert.throws(() =>
-        input.decode(Buffer.from([5, 0, 0, 0, 34, 116, 101, 115, 116, 34]))
-      );
-    }
-  });
-
   it("should decode buffer to array of message", () => {
     const input = new Input();
     if (IS_BE) {
@@ -64,13 +51,51 @@ describe("decode", () => {
   it("should decode buffer to array of message", () => {
     const input = new Input();
     if (IS_BE) {
-      input.decode(Buffer.from([0, 0, 0, 6]));
+      const msg1 = input.decode(Buffer.from([0, 0, 0, 6]));
       const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
+      assert.isNull(msg1);
       assert.deepEqual(msg2, ["test"]);
     } else {
-      input.decode(Buffer.from([6, 0, 0, 0]));
+      const msg1 = input.decode(Buffer.from([6, 0, 0, 0]));
       const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
+      assert.isNull(msg1);
       assert.deepEqual(msg2, ["test"]);
+    }
+  });
+
+  it("should decode buffer to array of message", () => {
+    const input = new Input();
+    if (IS_BE) {
+      const msg1 = input.decode(
+        Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34, 0, 0, 0, 6])
+      );
+      const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
+      assert.deepEqual(msg1, ["test"]);
+      assert.deepEqual(msg2, ["test"]);
+    } else {
+      const msg1 = input.decode(
+        Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34, 6, 0, 0, 0])
+      );
+      const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
+      assert.deepEqual(msg1, ["test"]);
+      assert.deepEqual(msg2, ["test"]);
+    }
+  });
+
+  it("should decode buffer to array of message", () => {
+    const input = new Input();
+    if (IS_BE) {
+      const msg = input.decode(Buffer.from([
+        0, 0, 0, 6, 34, 116, 101, 115, 116, 34,
+        0, 0, 0, 6, 34, 116, 101, 115, 116, 34,
+      ]));
+      assert.deepEqual(msg, ["test", "test"]);
+    } else {
+      const msg = input.decode(Buffer.from([
+        6, 0, 0, 0, 34, 116, 101, 115, 116, 34,
+        6, 0, 0, 0, 34, 116, 101, 115, 116, 34,
+      ]));
+      assert.deepEqual(msg, ["test", "test"]);
     }
   });
 });
