@@ -1206,7 +1206,7 @@ describe("_handleBrowserInput", () => {
     assert.isFalse(stubConfigDir.called);
     assert.isTrue(infoCalled);
     assert.isTrue(exitCalled);
-    assert.strictEqual(info, "Setup aborted: Browser not specified.");
+    assert.strictEqual(info, "Setup aborted: Browser is not specified.");
     assert.isUndefined(res);
   });
 
