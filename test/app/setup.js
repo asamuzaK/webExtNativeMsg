@@ -32,7 +32,7 @@ const stubSpawn = sinon.stub(childProcess, "spawn").callsFake((cmd, args) => {
     },
     stdout: {
       on: arg => arg,
-    }
+    },
   };
 });
 
