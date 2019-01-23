@@ -5,10 +5,10 @@
 "use strict";
 const {Setup, isFile, removeDir} = require("../../index");
 const childProcess = require("child_process");
+const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const process = require("process");
-const fs = require("fs");
 const readline = require("readline-sync");
 const sinon = require("sinon");
 
@@ -30,6 +30,9 @@ const stubSpawn = sinon.stub(childProcess, "spawn").callsFake((cmd, args) => {
     stderr: {
       on: arg => arg,
     },
+    stdout: {
+      on: arg => arg,
+    }
   };
 });
 
