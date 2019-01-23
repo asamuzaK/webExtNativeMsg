@@ -472,7 +472,7 @@ class Setup {
       this._browserConfigDir = this._getBrowserConfigDir();
       func = this._handleBrowserConfigDir();
     } else {
-      func = abortSetup("Browser not specified.");
+      func = abortSetup("Browser is not specified.");
     }
     return func;
   }
