@@ -141,10 +141,9 @@ class ChildProcess {
   /**
    * spawn child process
    * @param {string} [file] - file
-   * @param {boolean} [pos] - file after cmd args
    * @returns {Object} - child process
    */
-  async spawn(file, pos = false) {
+  async spawn(file) {
     if (!isExecutable(this._cmd)) {
       throw new Error(`${this._cmd} is not executable.`);
     }
@@ -154,7 +153,7 @@ class ChildProcess {
     if (isString(file)) {
       const filePath = quoteArg(file);
       const fileArg = (new CmdArgs(filePath)).toArray();
-      args = pos && this._args.concat(fileArg) || fileArg.concat(this._args);
+      args = this._args.concat(fileArg);
     } else {
       args = this._args;
     }
