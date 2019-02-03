@@ -180,9 +180,8 @@ CmdArgs methods:
   * @returns {string} - arguments string or empty string
 
 ChildProcess method:
-* spawn(file, pos): Spawn child process. Async.
+* spawn(file): Spawn child process. Async.
   * @param {string} [file] - file path
-  * @param {boolean} [pos] - put file path after cmd args. Defaults to `false`.
   * @returns {Object} - child process
 
 ### Function convertUriToFilePath(uri)
