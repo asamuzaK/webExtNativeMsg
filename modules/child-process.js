@@ -147,17 +147,11 @@ class ChildProcess {
     if (!isExecutable(this._cmd)) {
       throw new Error(`${this._cmd} is not executable.`);
     }
-    const cmd = this._cmd;
-    const opt = this._opt;
-    let args;
     if (isString(file)) {
-      const filePath = quoteArg(file);
-      const fileArg = (new CmdArgs(filePath)).toArray();
-      args = this._args.concat(fileArg);
-    } else {
-      args = this._args;
+      const [filePath] = (new CmdArgs(quoteArg(file))).toArray();
+      this._args.push(filePath);
     }
-    return childProcess.spawn(cmd, args, opt);
+    return childProcess.spawn(this._cmd, this._args, this._opt);
   }
 }
 
