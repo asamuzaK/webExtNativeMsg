@@ -50,6 +50,14 @@ const browserData = {
     regWin: null,
     type: EXT_CHROME,
   },
+  brave: {
+    alias: "brave",
+    aliasWin: "chrome",
+    hostLinux: null,
+    hostMac: null,
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    type: EXT_CHROME,
+  },
   centbrowser: {
     alias: "centbrowser",
     aliasWin: "chrome",

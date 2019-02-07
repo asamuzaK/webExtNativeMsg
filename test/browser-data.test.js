@@ -99,6 +99,28 @@ describe("Chromium", () => {
   });
 });
 
+describe("Brave", () => {
+  it("should contain centbrowser property", () => {
+    assert.property(browserData, "brave");
+  });
+
+  it("should contain alias and type keys", () => {
+    assert.containsAllKeys(browserData.brave, ["alias", "type"]);
+  });
+
+  it("should contain alter alias key", () => {
+    assert.containsAllKeys(browserData.brave, ["aliasWin"]);
+  });
+
+  it("should contain host keys", () => {
+    assert.containsAllKeys(browserData.brave,
+                           ["hostLinux", "hostMac", "regWin"]);
+    assert.isNull(browserData.brave.hostLinux);
+    assert.isNull(browserData.brave.hostMac);
+    assert.isArray(browserData.brave.regWin);
+  });
+});
+
 describe("CentBrowser", () => {
   it("should contain centbrowser property", () => {
     assert.property(browserData, "centbrowser");
