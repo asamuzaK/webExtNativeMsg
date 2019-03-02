@@ -23,10 +23,10 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^5.14.1",
+    "eslint": "^5.15.0",
     "mocha": "^6.0.2",
     "nyc": "^13.3.0",
-    "sinon": "^7.2.5"
+    "sinon": "^7.2.6"
   },
   "version": "4.0.0-b.3"
 }
