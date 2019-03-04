@@ -155,14 +155,13 @@ const cmdArgs = (new CmdArgs(arg)).toArray();
 
 const app = path.resolve(path.join("path", "to", "myApp.exe"));
 const file = path.resolve(path.join("path", "to", "myFile.txt"));
-const pos = false;
 const opt = {
   cwd: null,
   encoding: "utf8",
   env: process.env,
 };
 
-const proc = (new ChildProcess(app, cmdArgs, opt)).spawn(file, pos).catch(e => {
+const proc = (new ChildProcess(app, cmdArgs, opt)).spawn(file).catch(e => {
   throw e;
 });
 ```
