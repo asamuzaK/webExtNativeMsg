@@ -21,9 +21,9 @@ const {
 const DIR_CONFIG = IS_WIN && DIR_CONFIG_WIN || IS_MAC && DIR_CONFIG_MAC ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
-const PERM_DIR = 0o700;
-const PERM_EXEC = 0o700;
-const PERM_FILE = 0o600;
+const PERM_DIR = 0o755;
+const PERM_EXEC = 0o755;
+const PERM_FILE = 0o644;
 
 /* created path values */
 const values = new Map();
