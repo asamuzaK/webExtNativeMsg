@@ -7,6 +7,12 @@
 
 Helper modules for WebExtensions native messaging host.
 
+## Install
+
+```
+> npm i web-ext-native-msg
+```
+
 ## Supported browsers
 
 |Browser      |Windows|Linux  |Mac    |
