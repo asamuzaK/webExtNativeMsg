@@ -2,7 +2,7 @@
 /* api */
 const {URL} = require("url");
 const {
-  convertUriToFilePath, createDir, createDirectory, createFile,
+  convertUriToFilePath, createDirectory, createFile,
   getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat,
   isDir, isExecutable, isFile, isSubDir, removeDir, removeDirectory, readFile,
 } = require("../modules/file-util");
@@ -77,25 +77,6 @@ describe("convertUriToFilePath", () => {
   it("should get null if protocol does not match", () => {
     const uri = "http://example.com";
     assert.isNull(convertUriToFilePath(uri));
-  });
-});
-
-describe("createDir", () => {
-  it("should get string", () => {
-    const dirArr = [TMPDIR, "webextnativemsg", 1];
-    const dirString = path.join(TMPDIR, "webextnativemsg", "1");
-    const dir = createDir(dirArr);
-    assert.strictEqual(dir, dirString);
-    fs.rmdirSync(dirString);
-    fs.rmdirSync(path.join(TMPDIR, "webextnativemsg"));
-  });
-
-  it("should get null if given array is empty", () => {
-    assert.isNull(createDir([]));
-  });
-
-  it("should throw if given argument is not an array", () => {
-    assert.throws(() => createDir(), "Expected Array but got Undefined.");
   });
 });
 

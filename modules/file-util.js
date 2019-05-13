@@ -4,7 +4,7 @@
 "use strict";
 /* api */
 const {URL} = require("url");
-const {getType, isString, stringifyPositiveInt} = require("./common");
+const {getType, isString} = require("./common");
 const fs = require("fs");
 const path = require("path");
 const {promises: fsPromise} = fs;
@@ -162,30 +162,6 @@ const removeDirectory = async (dir, baseDir) => {
 
 /**
  * create a directory
- * NOTE: Deprecated. Remove in the future.
- * @param {Array} arr - directory array
- * @param {string|number} [mode] - permission
- * @returns {?string} - directory path
- */
-const createDir = (arr, mode = PERM_DIR) => {
-  if (!Array.isArray(arr)) {
-    throw new TypeError(`Expected Array but got ${getType(arr)}.`);
-  }
-  const dir = arr.length && arr.reduce((p, c) => {
-    let d;
-    p = isString(p) && p || stringifyPositiveInt(p, true);
-    if (p) {
-      const v = isString(c) && c || stringifyPositiveInt(c, true);
-      d = v && path.join(p, v) || p;
-      !fs.existsSync(d) && fs.mkdirSync(d, mode);
-    }
-    return d;
-  });
-  return isDir(dir) && dir || null;
-};
-
-/**
- * create a directory
  * @param {string} dir - directory path to create
  * @param {number} [mode] - permission
  * @returns {string} - directory path
@@ -252,7 +228,7 @@ const readFile = async (file, opt = {encoding: null, flag: "r"}) => {
 };
 
 module.exports = {
-  convertUriToFilePath, createDir, createDirectory, createFile, getAbsPath,
+  convertUriToFilePath, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
   isExecutable, isFile, isSubDir, removeDir, removeDirectory, readFile,
 };

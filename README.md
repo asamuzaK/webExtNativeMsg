@@ -223,18 +223,6 @@ Note: `dir` should be subdirectory of `baseDir`.
 * @param {string} baseDir - base directory path
 * @returns {void}
 
-### Function createDir(arr, mode)
-
-Note: Deprecated. Will be removed in the future release.
-<!--
-Create a directory.
-Note: first argument should be array of directory label, like `["path", "to", "dir"]`.
-
-* @param {Array} arr - directory array
-* @param {string|number} [mode] - permission. Defaults to `0o777`
-* @returns {?string} - directory path
--->
-
 ### Async Function removeDirectory(dir, baseDir)
 
 Remove the directory and it's files.
