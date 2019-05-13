@@ -15,6 +15,7 @@ const process = require("process");
 
 /* constants */
 const {IS_WIN} = require("../modules/constant");
+const DIR_CWD = process.cwd();
 const PERM_EXEC = 0o700;
 const PERM_FILE = 0o600;
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
@@ -236,12 +237,25 @@ describe("removeDirectory", () => {
 describe("getAbsPath", () => {
   it("should get string", () => {
     const p = "test.txt";
-    const n = path.resolve(p);
+    const n = path.resolve(DIR_CWD, p);
     assert.strictEqual(getAbsPath(p), n);
   });
 
-  it("should get null if string is not given", () => {
-    assert.isNull(getAbsPath());
+  it("should get string", () => {
+    const p = "~/test.txt";
+    const n = path.resolve(DIR_CWD, "~/test.txt");
+    assert.strictEqual(getAbsPath(p), n);
+  });
+
+  it("should get string", () => {
+    const p = "bar/../foo/test.txt";
+    const n = path.resolve(DIR_CWD, "foo/test.txt");
+    assert.strictEqual(getAbsPath(p), n);
+  });
+
+  it("should throw", () => {
+    assert.throws(() => getAbsPath(),
+                  "Expected String but got Undefined");
   });
 });
 

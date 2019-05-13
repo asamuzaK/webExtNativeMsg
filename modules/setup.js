@@ -233,10 +233,10 @@ class Setup {
    * @returns {void}
    */
   _setConfigDir(dir) {
-    const dirPath = getAbsPath(dir);
-    if (!isString(dirPath)) {
-      throw new Error(`Failed to normalize ${dir}`);
+    if (!isString(dir)) {
+      throw new TypeError(`Expected String but got ${getType(dir)}.`);
     }
+    const dirPath = getAbsPath(dir);
     if (!dirPath.startsWith(DIR_HOME)) {
       throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
     }

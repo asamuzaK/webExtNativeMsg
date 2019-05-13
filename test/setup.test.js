@@ -558,7 +558,8 @@ describe("Setup", () => {
 describe("_setConfigDir", () => {
   it("should throw if dir is not given", () => {
     const setup = new Setup();
-    assert.throws(() => setup._setConfigDir(), "Failed to normalize undefined");
+    assert.throws(() => setup._setConfigDir(),
+                  "Expected String but got Undefined");
   });
 
   it("should throw if dir is not subdirectory of user's home dir", () => {

@@ -10,7 +10,7 @@ const path = require("path");
 const {promises: fsPromise} = fs;
 
 /* constants */
-const {DIR_HOME, IS_WIN} = require("./constant");
+const {IS_WIN} = require("./constant");
 const MASK_BIT = 0o111;
 const PERM_DIR = 0o777;
 const PERM_FILE = 0o666;
@@ -40,14 +40,11 @@ const convertUriToFilePath = uri => {
  * @returns {?string} - absolute file path
  */
 const getAbsPath = file => {
-  let abs;
-  if (isString(file)) {
-    file = path.normalize(file);
-    file.startsWith("~") && (file = file.replace(/^~/, DIR_HOME));
-    !path.isAbsolute(file) && (file = path.resolve(file));
-    abs = file;
+  if (!isString(file)) {
+    throw new TypeError(`Expected String but got ${getType(file)}.`);
   }
-  return abs || null;
+  const abs = path.resolve(file);
+  return abs;
 };
 
 /**
@@ -174,13 +171,11 @@ const createDirectory = async (dir, mode = PERM_DIR) => {
     throw new TypeError(`Expected Number but got ${getType(mode)}.`);
   }
   const dirPath = path.resolve(path.normalize(dir));
-  if (!isDir(dirPath)) {
-    const opt = {
-      mode,
-      recursive: true,
-    };
-    await fsPromise.mkdir(dirPath, opt);
-  }
+  const opt = {
+    mode,
+    recursive: true,
+  };
+  !isDir(dirPath) && await fsPromise.mkdir(dirPath, opt);
   return dirPath;
 };
 
