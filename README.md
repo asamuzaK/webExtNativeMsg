@@ -16,7 +16,7 @@ Helper modules for WebExtensions native messaging host.
 |Chrome       |   ✓   |   ✓   |   ✓   |
 |Chrome Canary|   ✓ *2|       |   ✓   |
 |Chromium     |       |   ✓   |   ✓   |
-|Brave        |   ✓ *2|       |       |
+|Brave        |   ✓ *2|   ✓   |       |
 |CentBrowser  |   ✓ *2|       |       |
 |Kinza        |   ✓ *2|       |       |
 |Opera        |   ✓ *2|       |   ✓ *2|
