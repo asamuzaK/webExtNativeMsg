@@ -7,7 +7,7 @@ const {
   DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_HOME, EXT_CHROME, EXT_WEB,
 } = require("./constant");
 const HKCU_SOFTWARE = ["HKEY_CURRENT_USER", "SOFTWARE"];
-const HOST_DIR_LABEL = "NativeMessagingHosts";
+const NM_HOSTS = "NativeMessagingHosts";
 
 /* browser config data */
 const browserData = {
@@ -15,8 +15,8 @@ const browserData = {
   firefox: {
     alias: "firefox",
     hostLinux: [DIR_HOME, ".mozilla", "native-messaging-hosts"],
-    hostMac: [DIR_CONFIG_MAC, "Mozilla", HOST_DIR_LABEL],
-    regWin: [...HKCU_SOFTWARE, "Mozilla", HOST_DIR_LABEL],
+    hostMac: [DIR_CONFIG_MAC, "Mozilla", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Mozilla", NM_HOSTS],
     type: EXT_WEB,
   },
   waterfox: {
@@ -24,38 +24,38 @@ const browserData = {
     aliasWin: "firefox",
     hostLinux: null,
     hostMac: null,
-    regWin: [...HKCU_SOFTWARE, "Mozilla", HOST_DIR_LABEL],
+    regWin: [...HKCU_SOFTWARE, "Mozilla", NM_HOSTS],
     type: EXT_WEB,
   },
   /* blink */
   chrome: {
     alias: "chrome",
-    hostLinux: [DIR_CONFIG_LINUX, "google-chrome", HOST_DIR_LABEL],
-    hostMac: [DIR_CONFIG_MAC, "Google", "Chrome", HOST_DIR_LABEL],
-    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    hostLinux: [DIR_CONFIG_LINUX, "google-chrome", NM_HOSTS],
+    hostMac: [DIR_CONFIG_MAC, "Google", "Chrome", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
   chromecanary: {
     alias: "chromecanary",
     aliasWin: "chrome",
     hostLinux: null,
-    hostMac: [DIR_CONFIG_MAC, "Google", "Chrome Canary", HOST_DIR_LABEL],
-    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    hostMac: [DIR_CONFIG_MAC, "Google", "Chrome Canary", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
   chromium: {
     alias: "chromium",
-    hostLinux: [DIR_CONFIG_LINUX, "chromium", HOST_DIR_LABEL],
-    hostMac: [DIR_CONFIG_MAC, "Chromium", HOST_DIR_LABEL],
+    hostLinux: [DIR_CONFIG_LINUX, "chromium", NM_HOSTS],
+    hostMac: [DIR_CONFIG_MAC, "Chromium", NM_HOSTS],
     regWin: null,
     type: EXT_CHROME,
   },
   brave: {
     alias: "brave",
     aliasWin: "chrome",
-    hostLinux: null,
+    hostLinux: [DIR_CONFIG_LINUX, "BraveSoftware", "Brave-Browser", NM_HOSTS],
     hostMac: null,
-    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
   centbrowser: {
@@ -63,7 +63,7 @@ const browserData = {
     aliasWin: "chrome",
     hostLinux: null,
     hostMac: null,
-    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
   kinza: {
@@ -71,7 +71,7 @@ const browserData = {
     aliasWin: "chrome",
     hostLinux: null,
     hostMac: null,
-    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
   opera: {
@@ -79,16 +79,16 @@ const browserData = {
     aliasMac: "chrome",
     aliasWin: "chrome",
     hostLinux: null,
-    hostMac: [DIR_CONFIG_MAC, "Google", "Chrome", HOST_DIR_LABEL],
-    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    hostMac: [DIR_CONFIG_MAC, "Google", "Chrome", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
   vivaldi: {
     alias: "vivaldi",
     aliasWin: "chrome",
-    hostLinux: [DIR_CONFIG_LINUX, "vivaldi", HOST_DIR_LABEL],
-    hostMac: [DIR_CONFIG_MAC, "Vivaldi", HOST_DIR_LABEL],
-    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", HOST_DIR_LABEL],
+    hostLinux: [DIR_CONFIG_LINUX, "vivaldi", NM_HOSTS],
+    hostMac: [DIR_CONFIG_MAC, "Vivaldi", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
 };

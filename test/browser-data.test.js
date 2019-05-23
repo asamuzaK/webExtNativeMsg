@@ -115,7 +115,7 @@ describe("Brave", () => {
   it("should contain host keys", () => {
     assert.containsAllKeys(browserData.brave,
                            ["hostLinux", "hostMac", "regWin"]);
-    assert.isNull(browserData.brave.hostLinux);
+    assert.isArray(browserData.brave.hostLinux);
     assert.isNull(browserData.brave.hostMac);
     assert.isArray(browserData.brave.regWin);
   });
