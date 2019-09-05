@@ -30,6 +30,7 @@ const convertUriToFilePath = uri => {
   const {protocol, pathname} = new URL(uri);
   let file;
   if (protocol === "file:" && pathname) {
+    // NOTE: remove version detection when node 10 reaches EOL
     const {version: nodeVersion} = process;
     const result = compareSemVer(nodeVersion, "10.16.0");
     if (result >= 0) {
@@ -142,6 +143,7 @@ const removeDir = (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
+    // NOTE: remove version detection when node 10 reaches EOL
     const {version: nodeVersion} = process;
     const result = compareSemVer(nodeVersion, "12.10.0");
     if (result >= 0) {
