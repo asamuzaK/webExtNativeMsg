@@ -3,10 +3,12 @@
  */
 "use strict";
 /* api */
-const {URL} = require("url");
+const {URL, fileURLToPath} = require("url");
+const {compareSemVer} = require("semver-parser");
 const {getType, isString} = require("./common");
 const fs = require("fs");
 const path = require("path");
+const process = require("process");
 const {promises: fsPromise} = fs;
 
 /* constants */
@@ -28,8 +30,14 @@ const convertUriToFilePath = uri => {
   const {protocol, pathname} = new URL(uri);
   let file;
   if (protocol === "file:" && pathname) {
-    file = IS_WIN && path.normalize(decodeURIComponent(pathname).slice(1)) ||
-           decodeURIComponent(pathname);
+    const {version: nodeVersion} = process;
+    const result = compareSemVer(nodeVersion, "10.16.0");
+    if (result >= 0) {
+      file = fileURLToPath(uri);
+    } else {
+      file = IS_WIN && path.normalize(decodeURIComponent(pathname).slice(1)) ||
+             decodeURIComponent(pathname);
+    }
   }
   return file || null;
 };
@@ -134,16 +142,22 @@ const removeDir = (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    const files = fs.readdirSync(dir);
-    files.length && files.forEach(file => {
-      const cur = path.join(dir, file);
-      if (fs.lstatSync(cur).isDirectory()) {
-        removeDir(cur, baseDir);
-      } else {
-        fs.unlinkSync(cur);
-      }
-    });
-    fs.rmdirSync(dir);
+    const {version: nodeVersion} = process;
+    const result = compareSemVer(nodeVersion, "12.10.0");
+    if (result >= 0) {
+      fs.rmdirSync(dir, {recursive: true});
+    } else {
+      const files = fs.readdirSync(dir);
+      files.length && files.forEach(file => {
+        const cur = path.join(dir, file);
+        if (fs.lstatSync(cur).isDirectory()) {
+          removeDir(cur, baseDir);
+        } else {
+          fs.unlinkSync(cur);
+        }
+      });
+      fs.rmdirSync(dir);
+    }
   }
 };
 

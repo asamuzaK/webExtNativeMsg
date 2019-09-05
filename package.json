@@ -19,13 +19,15 @@
     "test:setup": "cd test/app && node setup"
   },
   "dependencies": {
-    "readline-sync": "^1.4.10"
+    "readline-sync": "^1.4.10",
+    "semver-parser": "^3.0.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.3.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
+    "rewiremock": "^3.13.7",
     "sinon": "^7.4.2"
   },
   "version": "4.2.3"
