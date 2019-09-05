@@ -175,6 +175,10 @@ describe("createFile", () => {
 
 describe("removeDir", () => {
   it("should remove dir and it's files", async () => {
+    const stubFunc = sinon.stub().returns(0);
+    const stubSemverParser = {
+      compareSemVer: stubFunc,
+    };
     const dirPath = path.join(TMPDIR, "webextnativemsg");
     fs.mkdirSync(dirPath);
     const subDirPath = path.join(dirPath, "foo");
@@ -189,7 +193,44 @@ describe("removeDir", () => {
       fs.existsSync(subDirPath),
       fs.existsSync(filePath),
     ]);
-    removeDir(dirPath, TMPDIR);
+    rewiremock("semver-parser").with(stubSemverParser);
+    rewiremock.enable();
+    const fuJs = require("../modules/file-util");
+    fuJs.removeDir(dirPath, TMPDIR);
+    rewiremock.disable();
+    const res2 = await Promise.all([
+      fs.existsSync(dirPath),
+      fs.existsSync(subDirPath),
+      fs.existsSync(filePath),
+    ]);
+    assert.deepEqual(res1, [true, true, true]);
+    assert.deepEqual(res2, [false, false, false]);
+  });
+
+  it("should remove dir and it's files", async () => {
+    const stubFunc = sinon.stub().returns(-1);
+    const stubSemverParser = {
+      compareSemVer: stubFunc,
+    };
+    const dirPath = path.join(TMPDIR, "webextnativemsg");
+    fs.mkdirSync(dirPath);
+    const subDirPath = path.join(dirPath, "foo");
+    fs.mkdirSync(subDirPath);
+    const filePath = path.join(subDirPath, "test.txt");
+    const value = "test file.\n";
+    await createFile(filePath, value, {
+      encoding: "utf8", flag: "w", mode: PERM_FILE,
+    });
+    const res1 = await Promise.all([
+      fs.existsSync(dirPath),
+      fs.existsSync(subDirPath),
+      fs.existsSync(filePath),
+    ]);
+    rewiremock("semver-parser").with(stubSemverParser);
+    rewiremock.enable();
+    const fuJs = require("../modules/file-util");
+    fuJs.removeDir(dirPath, TMPDIR);
+    rewiremock.disable();
     const res2 = await Promise.all([
       fs.existsSync(dirPath),
       fs.existsSync(subDirPath),

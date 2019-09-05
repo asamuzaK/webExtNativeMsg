@@ -142,16 +142,22 @@ const removeDir = (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    const files = fs.readdirSync(dir);
-    files.length && files.forEach(file => {
-      const cur = path.join(dir, file);
-      if (fs.lstatSync(cur).isDirectory()) {
-        removeDir(cur, baseDir);
-      } else {
-        fs.unlinkSync(cur);
-      }
-    });
-    fs.rmdirSync(dir);
+    const {version: nodeVersion} = process;
+    const result = compareSemVer(nodeVersion, "12.10.0");
+    if (result >= 0) {
+      fs.rmdirSync(dir, {recursive: true});
+    } else {
+      const files = fs.readdirSync(dir);
+      files.length && files.forEach(file => {
+        const cur = path.join(dir, file);
+        if (fs.lstatSync(cur).isDirectory()) {
+          removeDir(cur, baseDir);
+        } else {
+          fs.unlinkSync(cur);
+        }
+      });
+      fs.rmdirSync(dir);
+    }
   }
 };
 
