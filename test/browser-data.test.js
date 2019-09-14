@@ -100,7 +100,7 @@ describe("Chromium", () => {
 });
 
 describe("Brave", () => {
-  it("should contain centbrowser property", () => {
+  it("should contain brave property", () => {
     assert.property(browserData, "brave");
   });
 
