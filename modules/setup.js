@@ -292,7 +292,7 @@ class Setup {
         env: process.env,
       };
       values.set("regKey", regKey);
-      proc = await (new ChildProcess(reg, args, opt)).spawn();
+      proc = await new ChildProcess(reg, args, opt).spawn();
       proc.on("error", throwErr);
       proc.stderr.on("data", handleRegStderr);
       proc.on("close", handleRegClose);

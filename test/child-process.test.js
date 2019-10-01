@@ -195,7 +195,7 @@ describe("ChildProcess", () => {
   /* method */
   describe("spawn", () => {
     it("should throw if given command is not executable", async () => {
-      await (new ChildProcess()).spawn().catch(e => {
+      await new ChildProcess().spawn().catch(e => {
         assert.strictEqual(e.message, "null is not executable.");
       });
     });
@@ -206,7 +206,7 @@ describe("ChildProcess", () => {
         path.join("test", "file", "test.sh")
       );
       await fs.chmodSync(app, PERM_EXEC);
-      const proc = await (new ChildProcess(app)).spawn();
+      const proc = await new ChildProcess(app).spawn();
       proc.on("close", code => {
         assert.strictEqual(code, 0);
       });
@@ -218,7 +218,7 @@ describe("ChildProcess", () => {
         path.join("test", "file", "test 2.sh")
       );
       await fs.chmodSync(app, PERM_EXEC);
-      const proc = await (new ChildProcess(app)).spawn();
+      const proc = await new ChildProcess(app).spawn();
       proc.on("close", code => {
         assert.strictEqual(code, 0);
       });
@@ -238,7 +238,7 @@ describe("ChildProcess", () => {
         assert.strictEqual(cmdArgs.length, 1);
         assert.strictEqual(filePath, file);
       });
-      await (new ChildProcess(app)).spawn(file);
+      await new ChildProcess(app).spawn(file);
       const {calledOnce} = stub;
       stub.restore();
       assert.isTrue(calledOnce);
@@ -258,7 +258,7 @@ describe("ChildProcess", () => {
         assert.strictEqual(cmdArgs.length, 1);
         assert.strictEqual(filePath, file);
       });
-      await (new ChildProcess(app)).spawn(file, true);
+      await new ChildProcess(app).spawn(file, true);
       const {calledOnce} = stub;
       stub.restore();
       assert.isTrue(calledOnce);
@@ -281,7 +281,7 @@ describe("ChildProcess", () => {
         assert.strictEqual(arg2, "-b");
         assert.strictEqual(arg3, file);
       });
-      await (new ChildProcess(app, arg)).spawn(file);
+      await new ChildProcess(app, arg).spawn(file);
       const {calledOnce} = stub;
       stub.restore();
       assert.isTrue(calledOnce);

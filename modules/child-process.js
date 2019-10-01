@@ -133,7 +133,7 @@ class ChildProcess {
   constructor(cmd, args, opt) {
     this._cmd = isString(cmd) && cmd || null;
     this._args = Array.isArray(args) && args ||
-                 isString(args) && (new CmdArgs(args)).toArray() || [];
+                 isString(args) && new CmdArgs(args).toArray() || [];
     this._opt = getType(opt) === "Object" && opt ||
                 {cwd: null, env: process.env};
   }
@@ -148,7 +148,7 @@ class ChildProcess {
       throw new Error(`${this._cmd} is not executable.`);
     }
     if (isString(file)) {
-      const [filePath] = (new CmdArgs(quoteArg(file))).toArray();
+      const [filePath] = new CmdArgs(quoteArg(file)).toArray();
       this._args.push(filePath);
     }
     return childProcess.spawn(this._cmd, this._args, this._opt);
