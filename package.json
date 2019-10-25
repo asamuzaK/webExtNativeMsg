@@ -25,9 +25,9 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.5.1",
-    "mocha": "^6.2.1",
+    "mocha": "^6.2.2",
     "nyc": "^14.1.1",
-    "rewiremock": "^3.13.7",
+    "rewiremock": "^3.13.9",
     "sinon": "^7.5.0"
   },
   "version": "4.3.0"
