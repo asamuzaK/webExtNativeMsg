@@ -167,10 +167,10 @@ describe("createFile", () => {
       createFile(file).catch(e => {
         assert.strictEqual(
           e.message,
-          "Expected String, Buffer, Uint8Array but got Undefined."
+          "Expected String, Buffer, Uint8Array but got Undefined.",
         );
       });
-    }
+    },
   );
 });
 
@@ -401,7 +401,7 @@ describe("isExecutable", () => {
   it("should get true if file is executable", () => {
     const p = path.resolve(
       IS_WIN && path.join("test", "file", "test.cmd") ||
-      path.join("test", "file", "test.sh")
+      path.join("test", "file", "test.sh"),
     );
     fs.chmodSync(p, PERM_EXEC);
     assert.strictEqual(isExecutable(p), true);

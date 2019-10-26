@@ -277,7 +277,7 @@ class Setup {
     }
     if (!isString(this._hostName)) {
       throw new TypeError(
-        `Expected String but got ${getType(this._hostName)}.`
+        `Expected String but got ${getType(this._hostName)}.`,
       );
     }
     let proc;
@@ -315,12 +315,12 @@ class Setup {
     }
     if (!isString(this._hostDesc)) {
       throw new TypeError(
-        `Expected String but got ${getType(this._hostDesc)}.`
+        `Expected String but got ${getType(this._hostDesc)}.`,
       );
     }
     if (!isString(this._hostName)) {
       throw new TypeError(
-        `Expected String but got ${getType(this._hostName)}.`
+        `Expected String but got ${getType(this._hostName)}.`,
       );
     }
     const {hostLinux, hostMac, type} = this._browser;
@@ -372,7 +372,7 @@ class Setup {
     }
     if (!isString(this._hostName)) {
       throw new TypeError(
-        `Expected String but got ${getType(this._hostName)}.`
+        `Expected String but got ${getType(this._hostName)}.`,
       );
     }
     const appPath = process.execPath;
@@ -398,7 +398,7 @@ class Setup {
   async _createConfigDir() {
     if (!isString(this._browserConfigDir)) {
       throw new TypeError(
-        `Expected String but got ${getType(this._browserConfigDir)}.`
+        `Expected String but got ${getType(this._browserConfigDir)}.`,
       );
     }
     const configDir = await createDirectory(this._browserConfigDir, PERM_DIR);
@@ -435,7 +435,7 @@ class Setup {
   async _handleBrowserConfigDir() {
     if (!isString(this._browserConfigDir)) {
       throw new TypeError(
-        `Expected String but got ${getType(this._browserConfigDir)}.`
+        `Expected String but got ${getType(this._browserConfigDir)}.`,
       );
     }
     let func;

@@ -203,7 +203,7 @@ describe("ChildProcess", () => {
     it("should spawn child process", async () => {
       const app = path.resolve(
         IS_WIN && path.join("test", "file", "test.cmd") ||
-        path.join("test", "file", "test.sh")
+        path.join("test", "file", "test.sh"),
       );
       await fs.chmodSync(app, PERM_EXEC);
       const proc = await new ChildProcess(app).spawn();
@@ -215,7 +215,7 @@ describe("ChildProcess", () => {
     it("should spawn child process", async () => {
       const app = path.resolve(
         IS_WIN && path.join("test", "file", "test 2.cmd") ||
-        path.join("test", "file", "test 2.sh")
+        path.join("test", "file", "test 2.sh"),
       );
       await fs.chmodSync(app, PERM_EXEC);
       const proc = await new ChildProcess(app).spawn();
@@ -227,7 +227,7 @@ describe("ChildProcess", () => {
     it("should spawn with file path as first argument", async () => {
       const app = path.resolve(
         IS_WIN && path.join("test", "file", "test.cmd") ||
-        path.join("test", "file", "test.sh")
+        path.join("test", "file", "test.sh"),
       );
       const file = path.resolve(path.join("test", "file", "test.txt"));
       await fs.chmodSync(app, PERM_EXEC);
@@ -247,7 +247,7 @@ describe("ChildProcess", () => {
     it("should spawn with file path as first argument", async () => {
       const app = path.resolve(
         IS_WIN && path.join("test", "file", "test.cmd") ||
-        path.join("test", "file", "test.sh")
+        path.join("test", "file", "test.sh"),
       );
       const file = path.resolve(path.join("test", "file", "test.txt"));
       await fs.chmodSync(app, PERM_EXEC);
@@ -267,7 +267,7 @@ describe("ChildProcess", () => {
     it("should spawn with file path as last argument", async () => {
       const app = path.resolve(
         IS_WIN && path.join("test", "file", "test.cmd") ||
-        path.join("test", "file", "test.sh")
+        path.join("test", "file", "test.sh"),
       );
       const arg = ["-a", "-b"];
       const file = path.resolve(path.join("test", "file", "test.txt"));

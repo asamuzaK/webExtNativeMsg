@@ -566,7 +566,7 @@ describe("_setConfigDir", () => {
     const setup = new Setup();
     assert.throws(
       () => setup._setConfigDir("/foo/bar"),
-      `${path.normalize("/foo/bar")} is not sub directory of ${DIR_HOME}.`
+      `${path.normalize("/foo/bar")} is not sub directory of ${DIR_HOME}.`,
     );
   });
 
@@ -927,13 +927,13 @@ describe("_createShellScript", () => {
     if (IS_WIN) {
       assert.strictEqual(
         file,
-        `@echo off\n${quoteArg(process.execPath)} ${mainFilePath}\n`
+        `@echo off\n${quoteArg(process.execPath)} ${mainFilePath}\n`,
       );
     } else {
       assert.isDefined(process.env.SHELL);
       assert.strictEqual(
         file,
-        `#!${process.env.SHELL}\n${process.execPath} ${mainFilePath}\n`
+        `#!${process.env.SHELL}\n${process.execPath} ${mainFilePath}\n`,
       );
     }
     await removeDir(dir, TMPDIR);

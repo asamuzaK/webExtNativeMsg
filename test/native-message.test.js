@@ -38,12 +38,12 @@ describe("decode", () => {
     if (IS_BE) {
       assert.deepEqual(
         input.decode(Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])),
-        ["test"]
+        ["test"],
       );
     } else {
       assert.deepEqual(
         input.decode(Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])),
-        ["test"]
+        ["test"],
       );
     }
   });
@@ -67,14 +67,14 @@ describe("decode", () => {
     const input = new Input();
     if (IS_BE) {
       const msg1 = input.decode(
-        Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34, 0, 0, 0, 6])
+        Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34, 0, 0, 0, 6]),
       );
       const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
       assert.deepEqual(msg1, ["test"]);
       assert.deepEqual(msg2, ["test"]);
     } else {
       const msg1 = input.decode(
-        Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34, 6, 0, 0, 0])
+        Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34, 6, 0, 0, 0]),
       );
       const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
       assert.deepEqual(msg1, ["test"]);
@@ -130,12 +130,12 @@ describe("encode", () => {
     if (IS_BE) {
       assert.deepEqual(
         output.encode("test"),
-        Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34])
+        Buffer.from([0, 0, 0, 6, 34, 116, 101, 115, 116, 34]),
       );
     } else {
       assert.deepEqual(
         output.encode("test"),
-        Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34])
+        Buffer.from([6, 0, 0, 0, 34, 116, 101, 115, 116, 34]),
       );
     }
   });

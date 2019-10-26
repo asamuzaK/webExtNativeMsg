@@ -214,7 +214,7 @@ const createFile = async (file, value, opt = {
   if (!isString(value) && !Buffer.isBuffer(value) &&
       !(value instanceof Uint8Array)) {
     throw new TypeError(
-      `Expected String, Buffer, Uint8Array but got ${getType(value)}.`
+      `Expected String, Buffer, Uint8Array but got ${getType(value)}.`,
     );
   }
   const filePath = path.resolve(path.normalize(file));
