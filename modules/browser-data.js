@@ -53,7 +53,7 @@ const browserData = {
     alias: "brave",
     aliasWin: "chrome",
     hostLinux: [DIR_CONFIG_LINUX, "BraveSoftware", "Brave-Browser", NM_HOSTS],
-    hostMac: null,
+    hostMac: [DIR_CONFIG_MAC, "BraveSoftware", "Brave-Browser", NM_HOSTS],
     regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
