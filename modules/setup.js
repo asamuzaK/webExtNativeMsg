@@ -133,9 +133,13 @@ class Setup {
   constructor(opt = {}) {
     const {
       browser, callback, chromeExtensionIds, configPath, hostDescription,
-      hostName, mainScriptFile, overwriteConfig, webExtensionIds,
+      hostName, mainScriptFile, overwriteConfig, supportedBrowsers,
+      webExtensionIds,
     } = opt;
     this._browser = isString(browser) && getBrowserData(browser) || null;
+    this._supportedBrowsers = Array.isArray(supportedBrowsers) &&
+                              supportedBrowsers.length && supportedBrowsers ||
+                              Object.keys(browserData);
     this._configDir = isString(hostName) &&
                       path.join(DIR_CONFIG, hostName, "config") ||
                       path.join(DIR_CWD, "config");
@@ -169,6 +173,15 @@ class Setup {
   }
   set browser(browser) {
     this._browser = isString(browser) && getBrowserData(browser) || null;
+  }
+
+  get supportedBrowsers() {
+    return this._supportedBrowsers;
+  }
+  set supportedBrowsers(arr) {
+    if (Array.isArray(arr) && arr.length) {
+      this._supportedBrowsers = arr;
+    }
   }
 
   get configPath() {
@@ -490,12 +503,12 @@ class Setup {
       const arr = [];
       const items = Object.entries(browserData);
       for (const [item, obj] of items) {
-        if ((IS_WIN && obj.regWin || IS_MAC && obj.hostMac ||
-             !IS_WIN && !IS_MAC && obj.hostLinux) &&
-            (obj.type === EXT_CHROME && this._chromeExtIds ||
-             obj.type === EXT_WEB && this._webExtIds)) {
+        this._supportedBrowsers.includes(item) &&
+        (IS_WIN && obj.regWin || IS_MAC && obj.hostMac ||
+         !IS_WIN && !IS_MAC && obj.hostLinux) &&
+        (obj.type === EXT_CHROME && this._chromeExtIds ||
+         obj.type === EXT_WEB && this._webExtIds) &&
           arr.push(item);
-        }
       }
       func = this._handleBrowserInput(arr).catch(throwErr);
     }
