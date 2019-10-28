@@ -19,25 +19,21 @@ describe("Firefox", () => {
   });
 });
 
-describe("Waterfox", () => {
-  it("should contain waterfox property", () => {
-    assert.property(browserData, "waterfox");
+describe("Waterfox Current", () => {
+  it("should contain waterfoxcurrent property", () => {
+    assert.property(browserData, "waterfoxcurrent");
   });
 
   it("should contain alias and type keys", () => {
-    assert.containsAllKeys(browserData.waterfox, ["alias", "type"]);
-  });
-
-  it("should contain alter alias key", () => {
-    assert.containsAllKeys(browserData.waterfox, ["aliasWin"]);
+    assert.containsAllKeys(browserData.waterfoxcurrent, ["alias", "type"]);
   });
 
   it("should contain host keys", () => {
-    assert.containsAllKeys(browserData.waterfox,
+    assert.containsAllKeys(browserData.waterfoxcurrent,
                            ["hostLinux", "hostMac", "regWin"]);
-    assert.isNull(browserData.waterfox.hostLinux);
-    assert.isNull(browserData.waterfox.hostMac);
-    assert.isArray(browserData.waterfox.regWin);
+    assert.isArray(browserData.waterfoxcurrent.hostLinux);
+    assert.isArray(browserData.waterfoxcurrent.hostMac);
+    assert.isArray(browserData.waterfoxcurrent.regWin);
   });
 });
 
