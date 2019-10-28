@@ -19,12 +19,11 @@ const browserData = {
     regWin: [...HKCU_SOFTWARE, "Mozilla", NM_HOSTS],
     type: EXT_WEB,
   },
-  waterfox: {
-    alias: "waterfox",
-    aliasWin: "firefox",
-    hostLinux: null,
-    hostMac: null,
-    regWin: [...HKCU_SOFTWARE, "Mozilla", NM_HOSTS],
+  waterfoxcurrent: {
+    alias: "waterfoxcurrent",
+    hostLinux: [DIR_HOME, ".waterfox", "native-messaging-hosts"],
+    hostMac: [DIR_CONFIG_MAC, "Waterfox", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Waterfox", NM_HOSTS],
     type: EXT_WEB,
   },
   /* blink */
