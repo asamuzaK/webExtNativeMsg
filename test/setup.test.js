@@ -220,6 +220,14 @@ describe("Setup", () => {
       assert.strictEqual(setup.browser, browser);
     });
 
+    it("should set supportedBrowsers", () => {
+      const supportedBrowsers = ["firefox", "chrome"];
+      const setup = new Setup({
+        supportedBrowsers,
+      });
+      assert.deepEqual(setup.supportedBrowsers, ["firefox", "chrome"]);
+    });
+
     it("should set configPath", () => {
       const configPath = path.join("test", "file", "config");
       const setup = new Setup({
@@ -305,6 +313,11 @@ describe("Setup", () => {
         browser: "firefox",
       });
       assert.deepEqual(setup.browser, "firefox");
+    });
+
+    it("should get array", () => {
+      const setup = new Setup();
+      assert.isArray(setup.supportedBrowsers);
     });
 
     it("should get string", () => {
@@ -436,6 +449,28 @@ describe("Setup", () => {
       });
       setup.browser = "firefox";
       assert.strictEqual(setup.browser, "firefox");
+    });
+
+    it("should set array", () => {
+      const setup = new Setup();
+      setup.supportedBrowsers = ["firefox", "chrome"];
+      assert.deepEqual(setup.supportedBrowsers, ["firefox", "chrome"]);
+    });
+
+    it("should keep array", () => {
+      const setup = new Setup({
+        supportedBrowsers: ["firefox", "chrome"],
+      });
+      setup.supportedBrowsers = "foo";
+      assert.deepEqual(setup.supportedBrowsers, ["firefox", "chrome"]);
+    });
+
+    it("should keep array", () => {
+      const setup = new Setup({
+        supportedBrowsers: ["firefox", "chrome"],
+      });
+      setup.supportedBrowsers = [];
+      assert.deepEqual(setup.supportedBrowsers, ["firefox", "chrome"]);
     });
 
     it("should set string", () => {
