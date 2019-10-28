@@ -12,6 +12,7 @@ Helper modules for WebExtensions native messaging host.
 |Browser         |Windows|Linux  |Mac    |
 |:---------------|:-----:|:-----:|:-----:|
 |Firefox         |   ✓   |   ✓   |   ✓   |
+|Thunderbird     |   ✓   |   ✓   |   ✓   |
 |Waterfox Current|   ✓   |   ✓   |   ✓   |
 |Chrome          |   ✓   |   ✓   |   ✓   |
 |Chrome Canary   |   ✓ *2|       |   ✓   |
@@ -64,6 +65,7 @@ Construct:
 
 Properties:
 * browser {string} - Specify the browser.
+* supportedBrowsers {Array} - List of supported browsers.
 * configPath {string} - Path to save config files.
   * On Windows, config path defaults to `C:\Users\[UserName]\AppData\Roaming\[hostName]\config\`.
   * On Mac, `~/Library/Application Support/[hostName]/config/`.
