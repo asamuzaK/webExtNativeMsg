@@ -19,6 +19,24 @@ describe("Firefox", () => {
   });
 });
 
+describe("Thunderbird", () => {
+  it("should contain thunderbird property", () => {
+    assert.property(browserData, "thunderbird");
+  });
+
+  it("should contain alias and type keys", () => {
+    assert.containsAllKeys(browserData.waterfoxcurrent, ["alias", "type"]);
+  });
+
+  it("should contain host keys", () => {
+    assert.containsAllKeys(browserData.waterfoxcurrent,
+                           ["hostLinux", "hostMac", "regWin"]);
+    assert.isArray(browserData.waterfoxcurrent.hostLinux);
+    assert.isArray(browserData.waterfoxcurrent.hostMac);
+    assert.isArray(browserData.waterfoxcurrent.regWin);
+  });
+});
+
 describe("Waterfox Current", () => {
   it("should contain waterfoxcurrent property", () => {
     assert.property(browserData, "waterfoxcurrent");

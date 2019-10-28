@@ -19,6 +19,13 @@ const browserData = {
     regWin: [...HKCU_SOFTWARE, "Mozilla", NM_HOSTS],
     type: EXT_WEB,
   },
+  thunderbird: {
+    alias: "thunderbird",
+    hostLinux: [DIR_HOME, ".thunderbird", "native-messaging-hosts"],
+    hostMac: [DIR_CONFIG_MAC, "Thunderbird", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Thunderbird", NM_HOSTS],
+    type: EXT_WEB,
+  },
   waterfoxcurrent: {
     alias: "waterfoxcurrent",
     hostLinux: [DIR_HOME, ".waterfox", "native-messaging-hosts"],
