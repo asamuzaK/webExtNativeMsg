@@ -42,7 +42,7 @@ Sample:
 ```
 const {Setup} = require("web-ext-native-msg");
 
-const postSetupHandler = info => {
+const handlerAfterSetup = info => {
   const {configDirPath, shellScriptPath, manifestPath} = info;
   // do something
 };
@@ -53,7 +53,7 @@ const setup = new Setup({
   mainScriptFile: "index.js",
   chromeExtensionIds: ["chrome-extension://xxxxxx"],
   webExtensionIds: ["mywebextension@asamuzak.jp"],
-  callback: postSetupHandler,
+  callback: handlerAfterSetup,
 });
 
 setup.run();
@@ -64,13 +64,13 @@ Construct:
   * @param {Object} [opt] - options which contains optional properties below.
 
 Properties:
-* browser {string} - Specify the browser.
-* supportedBrowsers {Array} - List of supported browsers.
-* configPath {string} - Path to save config files.
+* browser: {string} - Specify the browser.
+* supportedBrowsers: {Array} - List of supported browsers.
+* configPath: {string} - Path to save config files.
   * On Windows, config path defaults to `C:\Users\[UserName]\AppData\Roaming\[hostName]\config\`.
   * On Mac, `~/Library/Application Support/[hostName]/config/`.
   * On Linux, `~/.config/[hostName]/config/`.
-* overwriteConfig {boolean} - Overwrite config if exists. Defaults to `false`.
+* overwriteConfig: {boolean} - Overwrite config if exists. Defaults to `false`.
 * hostName: {string} - Host name.
 * hostDescription: {string} - Host description.
 * mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
