@@ -1,4 +1,7 @@
-/* eslint-disable max-nested-callbacks, no-magic-numbers, quotes */
+/*
+  eslint-disable max-nested-callbacks, no-magic-numbers,
+                 no-template-curly-in-string, quotes
+*/
 "use strict";
 /* api */
 const {
