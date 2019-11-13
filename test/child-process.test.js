@@ -310,6 +310,8 @@ describe("CmdArgs", () => {
   const cmdQuoteStr = new CmdArgs('-a --b="c d\\e"');
   const cmdQuoteStr2 = new CmdArgs('-a "--b="c d\\e""');
   const cmdQuoteArr = new CmdArgs(["-a", "--b=\"c d\\e\""]);
+  const cmdPlaceholderStr = new CmdArgs("-a ${foo} -b");
+  const cmdPlaceholderArr = new CmdArgs(["-a", "${foo}", "-b"]);
 
   it("should create an instance", () => {
     assert.instanceOf(cmd, CmdArgs);
@@ -343,6 +345,13 @@ describe("CmdArgs", () => {
     assert.instanceOf(cmdQuoteArr, CmdArgs);
   });
 
+  it("should create an instance", () => {
+    assert.instanceOf(cmdPlaceholderStr, CmdArgs);
+  });
+
+  it("should create an instance", () => {
+    assert.instanceOf(cmdPlaceholderArr, CmdArgs);
+  });
   /* methods */
   describe("toArray", () => {
     it("should get empty array", () => {
@@ -380,6 +389,14 @@ describe("CmdArgs", () => {
     it("should get arguments in array", () => {
       assert.deepEqual(cmdQuoteArr.toArray(), ["-a", "--b=\"c d\\e\""]);
     });
+
+    it("should get arguments in array", () => {
+      assert.deepEqual(cmdPlaceholderStr.toArray(), ["-a", "${foo}", "-b"]);
+    });
+
+    it("should get arguments in array", () => {
+      assert.deepEqual(cmdPlaceholderArr.toArray(), ["-a", "${foo}", "-b"]);
+    });
   });
 
   describe("toString", () => {
@@ -413,6 +430,14 @@ describe("CmdArgs", () => {
 
     it("should get arguments in string", () => {
       assert.strictEqual(cmdQuoteArr.toString(), '-a "--b=\\"c d\\\\e\\""');
+    });
+
+    it("should get arguments in string", () => {
+      assert.strictEqual(cmdPlaceholderStr.toString(), "-a ${foo} -b");
+    });
+
+    it("should get arguments in string", () => {
+      assert.strictEqual(cmdPlaceholderArr.toString(), "-a ${foo} -b");
     });
   });
 });
