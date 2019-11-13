@@ -43,7 +43,7 @@ const correctArg = arg => {
     if (/^.*\\.*$/.test(arg)) {
       arg = arg.replace(/\\(?!\\)/g, "");
     }
-    if (/".*"|'.*'/.test(arg)) {
+    if (/[^=](?:".*"|'.*')/.test(arg)) {
       arg = arg.replace(/"([^"]+)*"|'([^']+)*'/g, (m, c1, c2) => c1 || c2);
     }
   }

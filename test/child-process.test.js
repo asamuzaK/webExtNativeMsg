@@ -1,4 +1,4 @@
-/* eslint-disable max-nested-callbacks, no-magic-numbers */
+/* eslint-disable max-nested-callbacks, no-magic-numbers, quotes */
 "use strict";
 /* api */
 const {
@@ -88,6 +88,16 @@ describe("correctArg", () => {
   it("should strip quotes", () => {
     const res = correctArg("test 'a b'");
     assert.strictEqual(res, "test a b");
+  });
+
+  it("should not strip quotes if preceded by '=' sign", () => {
+    const res = correctArg("test=\"a b\"");
+    assert.strictEqual(res, "test=\"a b\"");
+  });
+
+  it("should not strip quotes if preceded by '=' sign ", () => {
+    const res = correctArg("test='a b'");
+    assert.strictEqual(res, "test='a b'");
   });
 });
 
@@ -297,6 +307,9 @@ describe("CmdArgs", () => {
   const cmdSpace = new CmdArgs(" ");
   const cmdStr = new CmdArgs("-a -b \"c d\"");
   const cmdArr = new CmdArgs(["-a", "-b", "c d"]);
+  const cmdQuoteStr = new CmdArgs('-a --b="c d\\e"');
+  const cmdQuoteStr2 = new CmdArgs('-a "--b="c d\\e""');
+  const cmdQuoteArr = new CmdArgs(["-a", "--b=\"c d\\e\""]);
 
   it("should create an instance", () => {
     assert.instanceOf(cmd, CmdArgs);
@@ -320,6 +333,14 @@ describe("CmdArgs", () => {
 
   it("should create an instance", () => {
     assert.instanceOf(cmdArr, CmdArgs);
+  });
+
+  it("should create an instance", () => {
+    assert.instanceOf(cmdQuoteStr, CmdArgs);
+  });
+
+  it("should create an instance", () => {
+    assert.instanceOf(cmdQuoteArr, CmdArgs);
   });
 
   /* methods */
@@ -347,6 +368,18 @@ describe("CmdArgs", () => {
     it("should get arguments in array", () => {
       assert.deepEqual(cmdArr.toArray(), ["-a", "-b", "c d"]);
     });
+
+    it("should get arguments in array", () => {
+      assert.deepEqual(cmdQuoteStr.toArray(), ["-a", "--b=\"c d\\e\""]);
+    });
+
+    it("should get arguments in array", () => {
+      assert.deepEqual(cmdQuoteStr2.toArray(), ["-a", "--b=\"c d\\e\""]);
+    });
+
+    it("should get arguments in array", () => {
+      assert.deepEqual(cmdQuoteArr.toArray(), ["-a", "--b=\"c d\\e\""]);
+    });
   });
 
   describe("toString", () => {
@@ -372,6 +405,14 @@ describe("CmdArgs", () => {
 
     it("should get arguments in string", () => {
       assert.strictEqual(cmdArr.toString(), "-a -b \"c d\"");
+    });
+
+    it("should get arguments in string", () => {
+      assert.strictEqual(cmdQuoteStr.toString(), '-a "--b=\\"c d\\\\e\\""');
+    });
+
+    it("should get arguments in string", () => {
+      assert.strictEqual(cmdQuoteArr.toString(), '-a "--b=\\"c d\\\\e\\""');
     });
   });
 });
