@@ -95,12 +95,12 @@ describe("correctArg", () => {
 
   it("should not strip quotes if preceded by '=' sign", () => {
     const res = correctArg("test=\"a b\"");
-    assert.strictEqual(res, "test=\"a b\"");
+    assert.strictEqual(res, "test=a b");
   });
 
   it("should not strip quotes if preceded by '=' sign ", () => {
     const res = correctArg("test='a b'");
-    assert.strictEqual(res, "test='a b'");
+    assert.strictEqual(res, "test=a b");
   });
 });
 
@@ -382,7 +382,7 @@ describe("CmdArgs", () => {
     });
 
     it("should get arguments in array", () => {
-      assert.deepEqual(cmdQuoteStr.toArray(), ["-a", "--b=\"c d\\e\""]);
+      assert.deepEqual(cmdQuoteStr.toArray(), ["-a", "--b=c d\\e"]);
     });
 
     it("should get arguments in array", () => {
@@ -428,7 +428,7 @@ describe("CmdArgs", () => {
     });
 
     it("should get arguments in string", () => {
-      assert.strictEqual(cmdQuoteStr.toString(), '-a "--b=\\"c d\\\\e\\""');
+      assert.strictEqual(cmdQuoteStr.toString(), '-a "--b=c d\\\\e"');
     });
 
     it("should get arguments in string", () => {
