@@ -93,12 +93,12 @@ describe("correctArg", () => {
     assert.strictEqual(res, "test a b");
   });
 
-  it("should not strip quotes if preceded by '=' sign", () => {
+  it("should strip quotes", () => {
     const res = correctArg("test=\"a b\"");
     assert.strictEqual(res, "test=a b");
   });
 
-  it("should not strip quotes if preceded by '=' sign ", () => {
+  it("should strip quotes", () => {
     const res = correctArg("test='a b'");
     assert.strictEqual(res, "test=a b");
   });
