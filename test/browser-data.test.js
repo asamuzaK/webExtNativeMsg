@@ -73,6 +73,24 @@ describe("Chrome", () => {
   });
 });
 
+describe("Chrome Beta", () => {
+  it("should contain chrome property", () => {
+    assert.property(browserData, "chromebeta");
+  });
+
+  it("should contain alias and type keys", () => {
+    assert.containsAllKeys(browserData.chromebeta, ["alias", "type"]);
+  });
+
+  it("should contain host keys", () => {
+    assert.containsAllKeys(browserData.chromebeta,
+                           ["hostLinux", "hostMac", "regWin"]);
+    assert.isArray(browserData.chromebeta.hostLinux);
+    assert.isNull(browserData.chromebeta.hostMac);
+    assert.isNull(browserData.chromebeta.regWin);
+  });
+});
+
 describe("Chrome Canary", () => {
   it("should contain chromecanary property", () => {
     assert.property(browserData, "chromecanary");
