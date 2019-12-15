@@ -16,6 +16,7 @@ Helper modules for WebExtensions native messaging host.
 |Waterfox Current|   ✓   |   ✓   |   ✓   |
 |Chrome          |   ✓   |   ✓   |   ✓   |
 |Chrome Canary   |   ✓ *2|       |   ✓   |
+|Chrome Beta     |       |   ✓   |       |
 |Chromium        |       |   ✓   |   ✓   |
 |Brave           |   ✓ *2|   ✓   |   ✓   |
 |CentBrowser     |   ✓ *2|       |       |
