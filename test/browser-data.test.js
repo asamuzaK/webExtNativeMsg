@@ -82,12 +82,16 @@ describe("Chrome Beta", () => {
     assert.containsAllKeys(browserData.chromebeta, ["alias", "type"]);
   });
 
+  it("should contain alter alias key", () => {
+    assert.containsAllKeys(browserData.chromebeta, ["aliasWin"]);
+  });
+
   it("should contain host keys", () => {
     assert.containsAllKeys(browserData.chromebeta,
                            ["hostLinux", "hostMac", "regWin"]);
     assert.isArray(browserData.chromebeta.hostLinux);
     assert.isNull(browserData.chromebeta.hostMac);
-    assert.isNull(browserData.chromebeta.regWin);
+    assert.isArray(browserData.chromebeta.regWin);
   });
 });
 

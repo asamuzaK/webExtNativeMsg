@@ -43,10 +43,10 @@ const browserData = {
   },
   chromebeta: {
     alias: "chromebeta",
-    aliasWin: null,
+    aliasWin: "chrome",
     hostLinux: [DIR_CONFIG_LINUX, "google-chrome-beta", NM_HOSTS],
     hostMac: null,
-    regWin: null,
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
   chromecanary: {
