@@ -80,6 +80,14 @@ const browserData = {
     regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
     type: EXT_CHROME,
   },
+  edge: {
+    alias: "edge",
+    aliasWin: "chrome",
+    hostLinux: null,
+    hostMac: [DIR_CONFIG_MAC, "Microsoft Edge", NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, "Google", "Chrome", NM_HOSTS],
+    type: EXT_CHROME,
+  },
   kinza: {
     alias: "kinza",
     aliasWin: "chrome",
