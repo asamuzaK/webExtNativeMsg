@@ -179,6 +179,28 @@ describe("CentBrowser", () => {
   });
 });
 
+describe("Edge", () => {
+  it("should contain edge property", () => {
+    assert.property(browserData, "edge");
+  });
+
+  it("should contain alias and type keys", () => {
+    assert.containsAllKeys(browserData.edge, ["alias", "type"]);
+  });
+
+  it("should contain alter alias key", () => {
+    assert.containsAllKeys(browserData.edge, ["aliasWin"]);
+  });
+
+  it("should contain host keys", () => {
+    assert.containsAllKeys(browserData.edge,
+                           ["hostLinux", "hostMac", "regWin"]);
+    assert.isNull(browserData.edge.hostLinux);
+    assert.isArray(browserData.edge.hostMac);
+    assert.isArray(browserData.edge.regWin);
+  });
+});
+
 describe("Kinza", () => {
   it("should contain kinza property", () => {
     assert.property(browserData, "kinza");
