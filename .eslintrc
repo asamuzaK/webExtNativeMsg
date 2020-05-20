@@ -317,7 +317,7 @@
         "preferType": {
           "Boolean": "boolean",
           "Number": "number",
-          "object": "object",
+          "Object": "object",
           "String": "string"
         },
         "requireParamDescription": true,
