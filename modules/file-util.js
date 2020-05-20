@@ -20,6 +20,7 @@ const SUBST = "index";
 
 /**
  * convert URI to native file path
+ *
  * @param {string} uri - URI
  * @returns {?string} - file path
  */
@@ -30,7 +31,7 @@ const convertUriToFilePath = uri => {
   const {protocol, pathname} = new URL(uri);
   let file;
   if (protocol === "file:" && pathname) {
-    // NOTE: remove version detection when node 10 reaches EOL
+    // TODO: remove version detection when node 10 reaches EOL
     const {version: nodeVersion} = process;
     const result = compareSemVer(nodeVersion, "10.16.0");
     if (result >= 0) {
@@ -45,6 +46,7 @@ const convertUriToFilePath = uri => {
 
 /**
  * get absolute path
+ *
  * @param {string} file - file path
  * @returns {?string} - absolute file path
  */
@@ -58,14 +60,16 @@ const getAbsPath = file => {
 
 /**
  * get stat
+ *
  * @param {string} file - file path
- * @returns {Object} - file stat
+ * @returns {object} - file stat
  */
 const getStat = file =>
   isString(file) && fs.existsSync(file) && fs.statSync(file) || null;
 
 /**
  * the directory is a directory
+ *
  * @param {string} dir - directory path
  * @returns {boolean} - result
  */
@@ -76,6 +80,7 @@ const isDir = dir => {
 
 /**
  * the directory is a subdirectory of a certain directory
+ *
  * @param {string} dir - directory path
  * @param {string} baseDir - base directory path
  * @returns {boolean} - result
@@ -85,6 +90,7 @@ const isSubDir = (dir, baseDir) =>
 
 /**
  * the file is a file
+ *
  * @param {string} file - file path
  * @returns {boolean} - result
  */
@@ -97,6 +103,7 @@ const isFile = file => {
  * the file is executable
  * NOTE: On Windows, fs.statSync(file).mode returns 33206 for executable
  * files like `.exe`, which is 100666 in octal.
+ *
  * @param {string} file - file path
  * @param {number} [mask] - mask bit
  * @returns {boolean} - result
@@ -110,6 +117,7 @@ const isExecutable = (file, mask = MASK_BIT) => {
 
 /**
  * get file timestamp
+ *
  * @param {string} file - file path
  * @returns {number} - timestamp
  */
@@ -120,6 +128,7 @@ const getFileTimestamp = file => {
 
 /**
  * get file name from native file path
+ *
  * @param {string} file - file path
  * @param {string} [subst] - substitute file name
  * @returns {string} - file name
@@ -134,6 +143,7 @@ const getFileNameFromFilePath = (file, subst = SUBST) => {
 
 /**
  * remove the directory and it's files
+ *
  * @param {string} dir - directory path
  * @param {string} baseDir - base directory path
  * @returns {void}
@@ -165,6 +175,7 @@ const removeDir = (dir, baseDir) => {
 
 /**
  * remove the directory and it's files
+ *
  * @param {string} dir - directory path
  * @param {string} baseDir - base directory path
  * @returns {void}
@@ -175,6 +186,7 @@ const removeDirectory = async (dir, baseDir) => {
 
 /**
  * create a directory
+ *
  * @param {string} dir - directory path to create
  * @param {number} [mode] - permission
  * @returns {string} - directory path
@@ -197,9 +209,10 @@ const createDirectory = async (dir, mode = PERM_DIR) => {
 
 /**
  * create a file
+ *
  * @param {string} file - file path to create
  * @param {string|Buffer|Uint8Array} value - value to write
- * @param {Object} [opt] - options
+ * @param {object} [opt] - options
  * @param {string} [opt.encoding] - encoding
  * @param {string} [opt.flag] - flag
  * @param {number|string} [opt.mode] - file permission
@@ -224,8 +237,9 @@ const createFile = async (file, value, opt = {
 
 /**
  * read a file
+ *
  * @param {string} file - file path
- * @param {Object} [opt] - options
+ * @param {object} [opt] - options
  * @param {string} [opt.encoding] - encoding
  * @param {string} [opt.flag] - flag
  * @returns {string|Buffer} - file content

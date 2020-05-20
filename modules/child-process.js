@@ -10,6 +10,7 @@ const process = require("process");
 
 /**
  * concat array
+ *
  * @param {Array} arrA - array
  * @param {Array} arrB - array
  * @returns {Array} - array
@@ -26,6 +27,7 @@ const concatArray = (arrA, arrB) => {
 
 /**
  * correct argument string
+ *
  * @param {string} arg - argument
  * @returns {string} - argument
  */
@@ -52,6 +54,7 @@ const correctArg = arg => {
 
 /**
  * extract argument
+ *
  * @param {string} arg - argument
  * @returns {Array} - arguments array
  */
@@ -70,6 +73,7 @@ const extractArg = arg => {
 
 /**
  * stringify argument string
+ *
  * @param {string} arg - argument
  * @returns {string} - argument
  */
@@ -91,6 +95,7 @@ const stringifyArg = arg => {
 class CmdArgs {
   /**
    * argument input
+   *
    * @param {string|Array} input - input
    */
   constructor(input) {
@@ -99,6 +104,7 @@ class CmdArgs {
 
   /**
    * arguments to array
+   *
    * @returns {Array} - arguments array
    */
   toArray() {
@@ -114,6 +120,7 @@ class CmdArgs {
 
   /**
    * arguments array to string
+   *
    * @returns {string} - arguments string
    */
   toString() {
@@ -126,9 +133,10 @@ class CmdArgs {
 class ChildProcess {
   /**
    * command, arguments and option
+   *
    * @param {string} cmd - command
    * @param {string|Array} [args] - command arguments
-   * @param {Object} [opt] - options
+   * @param {object} [opt] - options
    */
   constructor(cmd, args, opt) {
     this._cmd = isString(cmd) && cmd || null;
@@ -140,8 +148,9 @@ class ChildProcess {
 
   /**
    * spawn child process
+   *
    * @param {string} [file] - file
-   * @returns {Object} - child process
+   * @returns {object} - child process
    */
   async spawn(file) {
     if (!isExecutable(this._cmd)) {

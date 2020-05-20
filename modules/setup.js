@@ -30,6 +30,7 @@ const values = new Map();
 
 /**
  * abort setup
+ *
  * @param {string} msg - message
  * @returns {void}
  */
@@ -41,6 +42,7 @@ const abortSetup = msg => {
 
 /**
  * handle setup callback
+ *
  * @returns {?Function} - callback
  */
 const handleSetupCallback = () => {
@@ -60,6 +62,7 @@ const handleSetupCallback = () => {
 
 /**
  * handle create registry close
+ *
  * @param {number} code - exit code
  * @returns {?Function} - handleSetupCallback()
  */
@@ -80,6 +83,7 @@ const handleRegClose = code => {
 
 /**
  * handle registry stderr
+ *
  * @param {*} data - data
  * @returns {Function} - abortSetup()
  */
@@ -94,8 +98,9 @@ const handleRegStderr = data => {
 
 /**
  * get browser data
+ *
  * @param {string} key - key
- * @returns {Object} - browser data
+ * @returns {object} - browser data
  */
 const getBrowserData = key => {
   let browser;
@@ -119,7 +124,8 @@ const getBrowserData = key => {
 class Setup {
   /**
    * setup options
-   * @param {Object} [opt] - options
+   *
+   * @param {object} [opt] - options
    * @param {string} [opt.browser] - specify the browser
    * @param {string} [opt.configPath] - config path
    * @param {string} [opt.hostDescription] - host description
@@ -127,7 +133,7 @@ class Setup {
    * @param {string} [opt.mainScriptFile] - file name of the main script
    * @param {Array} [opt.chromeExtensionIds] - array of chrome extension IDs
    * @param {Array} [opt.webExtensionIds] - array of web extension IDs
-   * @param {callback} [opt.callback] - callback after setup
+   * @param {Function} [opt.callback] - callback after setup
    * @param {boolean} [opt.overwriteConfig] - overwrite config if exists
    */
   constructor(opt = {}) {
@@ -242,6 +248,7 @@ class Setup {
 
   /**
    * set config directory
+   *
    * @param {string} dir - directory path
    * @returns {void}
    */
@@ -258,6 +265,7 @@ class Setup {
 
   /**
    * get browser specific config directory
+   *
    * @returns {?string} - config directory
    */
   _getBrowserConfigDir() {
@@ -278,8 +286,9 @@ class Setup {
 
   /**
    * create registry
+   *
    * @param {string} manifestPath - manifest path
-   * @returns {Object} - child process
+   * @returns {object} - child process
    */
   async _createReg(manifestPath) {
     if (!isFile(manifestPath)) {
@@ -315,6 +324,7 @@ class Setup {
 
   /**
    * create manifest
+   *
    * @param {string} shellPath - shell script path
    * @param {string} configDir - config directory path
    * @returns {string} - manifest path
@@ -376,6 +386,7 @@ class Setup {
 
   /**
    * create shell script
+   *
    * @param {string} configDir - config directory path
    * @returns {string} - shell script path
    */
@@ -405,6 +416,7 @@ class Setup {
 
   /**
    * create config directory
+   *
    * @returns {string} - config directory path
    */
   async _createConfigDir() {
@@ -420,8 +432,8 @@ class Setup {
 
   /**
    * create files
-   * @returns {AsyncFunction|Function} - createReg(), handleSetupCallback(),
-   *                                     abortSetup(),
+   *
+   * @returns {Function} - createReg(), handleSetupCallback(), abortSetup()
    */
   async _createFiles() {
     let func;
@@ -442,7 +454,8 @@ class Setup {
 
   /**
    * handle browser config directory input
-   * @returns {AsyncFunction|Function} - createFiles(), abortSetup()
+   *
+   * @returns {Function} - createFiles(), abortSetup()
    */
   async _handleBrowserConfigDir() {
     if (!isString(this._browserConfigDir)) {
@@ -468,8 +481,9 @@ class Setup {
 
   /**
    * handle browser input
+   *
    * @param {string} arr - browser array
-   * @returns {AsyncFunction|Function} - handleBrowserConfigDir(), abortSetup()
+   * @returns {Function} - handleBrowserConfigDir(), abortSetup()
    */
   async _handleBrowserInput(arr) {
     if (!Array.isArray(arr)) {
@@ -491,7 +505,8 @@ class Setup {
 
   /**
    * run setup
-   * @returns {AsyncFunction} - handleBrowserInput(), handleBrowserConfigDir()
+   *
+   * @returns {Function} - handleBrowserInput(), handleBrowserConfigDir()
    */
   run() {
     let func;

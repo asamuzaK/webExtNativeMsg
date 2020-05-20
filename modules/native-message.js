@@ -21,6 +21,7 @@ class Input {
 
   /**
    * buffer to message
+   *
    * @returns {Array} - message array
    */
   _decoder() {
@@ -50,6 +51,7 @@ class Input {
 
   /**
    * decode message
+   *
    * @param {string|Buffer} chunk - chunk
    * @returns {?Array} - message array
    */
@@ -83,6 +85,7 @@ class Output {
 
   /**
    * message to buffer
+   *
    * @returns {?Buffer} - buffered message
    */
   _encoder() {
@@ -100,7 +103,8 @@ class Output {
 
   /**
    * encode message
-   * @param {Object} msg - message
+   *
+   * @param {object} msg - message
    * @returns {?Buffer} - buffered message
    */
   encode(msg) {
