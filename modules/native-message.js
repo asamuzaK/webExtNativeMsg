@@ -25,7 +25,7 @@ class Input {
    * @returns {Array} - message array
    */
   _decoder() {
-    const arr = [];
+    let arr = [];
     if (Buffer.isBuffer(this._input)) {
       if (!this._length && this._input.length >= BYTE_LEN) {
         this._length = IS_BE && this._input.readUIntBE(0, BYTE_LEN) ||
@@ -40,11 +40,13 @@ class Input {
         this._length = null;
         if (this._input) {
           const cur = this._decoder();
-          cur.length && arr.push(cur);
+          if (cur.length) {
+            arr = arr.concat(cur);
+          }
         }
       }
     }
-    return arr.flat();
+    return arr;
   }
 
   /**
