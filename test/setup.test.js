@@ -1,4 +1,4 @@
-/* eslint-disable camelcase, no-magic-numbers */
+/* eslint-disable camelcase, max-len, no-magic-numbers */
 "use strict";
 /* api */
 const {
@@ -1024,7 +1024,6 @@ describe("_createShellScript", () => {
     const configPath = await createDirectory(path.join(dir, "config"));
     const shellPath = path.join(configPath, IS_WIN && "foo.cmd" || "foo.sh");
     const mainScriptFile = "test/file/test3.js";
-    const mainFilePath = path.resolve(mainScriptFile);
     const setup = new Setup({
       mainScriptFile,
       hostName: "foo",
