@@ -30,6 +30,13 @@ const DIR_CWD = process.cwd();
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();
 
+beforeEach(() => {
+  values.clear();
+});
+afterEach(() => {
+  values.clear();
+});
+
 describe("abortSetup", () => {
   it("should exit with message", () => {
     let info;
@@ -49,13 +56,6 @@ describe("abortSetup", () => {
 });
 
 describe("handleSetupCallback", () => {
-  beforeEach(() => {
-    values.clear();
-  });
-  afterEach(() => {
-    values.clear();
-  });
-
   it("should get null", () => {
     const res = handleSetupCallback();
     assert.isNull(res);
@@ -87,13 +87,6 @@ describe("handleSetupCallback", () => {
 });
 
 describe("handleRegClose", () => {
-  beforeEach(() => {
-    values.clear();
-  });
-  afterEach(() => {
-    values.clear();
-  });
-
   it("should abort", async () => {
     let info;
     const stubInfo = sinon.stub(console, "info").callsFake(msg => {
@@ -696,6 +689,9 @@ describe("_createReg", () => {
     if (IS_WIN) {
       assert.strictEqual(stubSpawn.callCount, i + 1);
       assert.isObject(res);
+      assert.isTrue(res.hasOwnProperty("on"));
+      assert.isTrue(res.hasOwnProperty("stderr"));
+      assert.isTrue(res.stderr.hasOwnProperty("on"));
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.isNull(res);
