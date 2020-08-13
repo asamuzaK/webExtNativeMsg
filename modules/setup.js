@@ -399,10 +399,11 @@ class Setup {
         `Expected String but got ${getType(this._hostName)}.`,
       );
     }
-    const appPath = quoteArg(process.execPath);
-    const filePath = quoteArg(path.resolve(path.join(DIR_CWD, this._mainFile)));
-    const cmd = isFile(filePath) && `${appPath} ${quoteArg(filePath)}` ||
-                appPath;
+    const appPath = process.execPath;
+    const filePath = path.resolve(path.join(DIR_CWD, this._mainFile));
+    const cmd = isFile(filePath) &&
+                `${quoteArg(appPath)} ${quoteArg(filePath)}` ||
+                quoteArg(appPath);
     const content = IS_WIN && `@echo off\n${cmd}\n` ||
                     `#!${process.env.SHELL}\n${cmd}\n`;
     const shellExt = IS_WIN && "cmd" || "sh";

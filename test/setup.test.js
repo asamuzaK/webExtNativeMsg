@@ -962,13 +962,95 @@ describe("_createShellScript", () => {
     if (IS_WIN) {
       assert.strictEqual(
         file,
-        `@echo off\n${quoteArg(process.execPath)} ${mainFilePath}\n`,
+        `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`,
       );
     } else {
       assert.isDefined(process.env.SHELL);
       assert.strictEqual(
         file,
-        `#!${process.env.SHELL}\n${process.execPath} ${mainFilePath}\n`,
+        `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`,
+      );
+    }
+    await removeDir(dir, TMPDIR);
+  });
+
+  it("should create file", async () => {
+    let info;
+    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+      info = msg;
+    });
+    const dir = path.join(TMPDIR, "webextnativemsg");
+    const configPath = await createDirectory(path.join(dir, "config"));
+    const shellPath = path.join(configPath, IS_WIN && "foo.cmd" || "foo.sh");
+    const mainScriptFile = "test/file/test 2.js";
+    const mainFilePath = path.resolve(mainScriptFile);
+    const setup = new Setup({
+      mainScriptFile,
+      hostName: "foo",
+    });
+    const res = await setup._createShellScript(configPath);
+    const {calledOnce: infoCalled} = stubInfo;
+    stubInfo.restore();
+    const file = fs.readFileSync(shellPath, {
+      encoding: "utf8",
+      flag: "r",
+    });
+    assert.isTrue(infoCalled);
+    assert.strictEqual(info, `Created: ${shellPath}`);
+    assert.strictEqual(res, shellPath);
+    assert.isTrue(isFile(shellPath));
+    assert.isTrue(file.endsWith("\n"));
+    if (IS_WIN) {
+      assert.strictEqual(
+        file,
+        `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`,
+      );
+    } else {
+      assert.isDefined(process.env.SHELL);
+      assert.strictEqual(
+        file,
+        `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`,
+      );
+    }
+    await removeDir(dir, TMPDIR);
+  });
+
+  it("should create file", async () => {
+    let info;
+    const stubInfo = sinon.stub(console, "info").callsFake(msg => {
+      info = msg;
+    });
+    const dir = path.join(TMPDIR, "webextnativemsg");
+    const configPath = await createDirectory(path.join(dir, "config"));
+    const shellPath = path.join(configPath, IS_WIN && "foo.cmd" || "foo.sh");
+    const mainScriptFile = "test/file/test3.js";
+    const mainFilePath = path.resolve(mainScriptFile);
+    const setup = new Setup({
+      mainScriptFile,
+      hostName: "foo",
+    });
+    const res = await setup._createShellScript(configPath);
+    const {calledOnce: infoCalled} = stubInfo;
+    stubInfo.restore();
+    const file = fs.readFileSync(shellPath, {
+      encoding: "utf8",
+      flag: "r",
+    });
+    assert.isTrue(infoCalled);
+    assert.strictEqual(info, `Created: ${shellPath}`);
+    assert.strictEqual(res, shellPath);
+    assert.isTrue(isFile(shellPath));
+    assert.isTrue(file.endsWith("\n"));
+    if (IS_WIN) {
+      assert.strictEqual(
+        file,
+        `@echo off\n${quoteArg(process.execPath)}\n`,
+      );
+    } else {
+      assert.isDefined(process.env.SHELL);
+      assert.strictEqual(
+        file,
+        `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`,
       );
     }
     await removeDir(dir, TMPDIR);
