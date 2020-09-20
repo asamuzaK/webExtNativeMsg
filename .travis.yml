@@ -5,13 +5,13 @@ os:
   - osx
   - linux
 node_js:
+  - "node"
+  - "lts/*"
   - "10"
-  - "12"
-  - "14"
 
 before_script:
   - npm install
 
 script:
-  - npm run-script lint
-  - npm run-script test
+  - npm run lint
+  - npm run test
