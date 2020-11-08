@@ -1,12 +1,12 @@
 /**
  * child-process.js
  */
-"use strict";
+'use strict';
 /* api */
-const {escapeChar, getType, isString, quoteArg} = require("./common");
-const {isExecutable} = require("./file-util");
-const childProcess = require("child_process");
-const process = require("process");
+const { escapeChar, getType, isString, quoteArg } = require('./common');
+const { isExecutable } = require('./file-util');
+const childProcess = require('child_process');
+const process = require('process');
 
 /**
  * concat array
@@ -38,12 +38,12 @@ const correctArg = arg => {
   if (/^\s*(?:".*"|'.*')\s*$/.test(arg)) {
     arg = arg.trim();
     if (/^".*\\["\\].*"$/.test(arg)) {
-      arg = arg.replace(/\\"/g, "\"").replace(/\\\\/g, "\\");
+      arg = arg.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
     }
-    arg = arg.replace(/^['"]/, "").replace(/["']$/, "");
+    arg = arg.replace(/^['"]/, '').replace(/["']$/, '');
   } else {
     if (/^.*\\.*$/.test(arg)) {
-      arg = arg.replace(/\\(?!\\)/g, "");
+      arg = arg.replace(/\\(?!\\)/g, '');
     }
     if (/".*"|'.*'/.test(arg)) {
       arg = arg.replace(/"([^"]+)*"|'([^']+)*'/g, (m, c1, c2) => c1 || c2);
@@ -68,7 +68,7 @@ const extractArg = arg => {
     const reCmd = /(?:^|\s)(?:"(?:[^"\\]|\\[^"]|\\")*"|'(?:[^'\\]|\\[^']|\\')*')(?=\s|$)|(?:\\ |[^\s])+(?:"(?:[^"\\]|\\[^"]|\\")*"|'(?:[^'\\]|\\[^']|\\')*')(?:(?:\\ |[^\s])+(?:"(?:[^"\\]|\\[^"]|\\")*"|'(?:[^'\\]|\\[^']|\\')*'))*(?:\\ |[^\s])*|(?:[^"'\s\\]|\\[^\s]|\\ )+/g;
     arr = arg.match(reCmd);
   }
-  return Array.isArray(arr) && arr.map(correctArg) || [];
+  return Array.isArray(arr) ? arr.map(correctArg) : [];
 };
 
 /**
@@ -86,7 +86,7 @@ const stringifyArg = arg => {
       str = arg.trim();
     }
   } else {
-    str = "";
+    str = '';
   }
   return str;
 };
@@ -124,8 +124,8 @@ class CmdArgs {
    * @returns {string} - arguments string
    */
   toString() {
-    const args = this.toArray().map(stringifyArg).join(" ");
-    return isString(args) && args.trim() || "";
+    const args = this.toArray().map(stringifyArg).join(' ');
+    return isString(args) ? args.trim() : '';
   }
 }
 
@@ -139,11 +139,10 @@ class ChildProcess {
    * @param {object} [opt] - options
    */
   constructor(cmd, args, opt) {
-    this._cmd = isString(cmd) && cmd || null;
-    this._args = Array.isArray(args) && args ||
-                 isString(args) && new CmdArgs(args).toArray() || [];
-    this._opt = getType(opt) === "Object" && opt ||
-                {cwd: null, env: process.env};
+    this._cmd = isString(cmd) ? cmd : null;
+    this._args = new CmdArgs(args).toArray();
+    this._opt =
+      getType(opt) === 'Object' ? opt : { cwd: null, env: process.env };
   }
 
   /**
@@ -165,6 +164,10 @@ class ChildProcess {
 }
 
 module.exports = {
-  ChildProcess, CmdArgs,
-  concatArray, correctArg, extractArg, stringifyArg,
+  ChildProcess,
+  CmdArgs,
+  concatArray,
+  correctArg,
+  extractArg,
+  stringifyArg
 };
