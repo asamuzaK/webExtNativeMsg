@@ -1,7 +1,7 @@
 /**
  * common.js
  */
-"use strict";
+'use strict';
 /* constants */
 const TYPE_FROM = 8;
 const TYPE_TO = -1;
@@ -64,7 +64,7 @@ const getType = o =>
  * @param {*} o - object to check
  * @returns {boolean} - result
  */
-const isString = o => typeof o === "string" || o instanceof String;
+const isString = o => typeof o === 'string' || o instanceof String;
 
 /**
  * stringify positive integer
@@ -74,7 +74,7 @@ const isString = o => typeof o === "string" || o instanceof String;
  * @returns {?string} - stringified integer
  */
 const stringifyPositiveInt = (i, zero = false) =>
-  Number.isSafeInteger(i) && (zero && i >= 0 || i > 0) && `${i}` || null;
+  Number.isSafeInteger(i) && ((zero && i >= 0) || i > 0) ? `${i}` : null;
 
 /**
  * escape matching char
@@ -84,8 +84,7 @@ const stringifyPositiveInt = (i, zero = false) =>
  * @returns {?string} - string
  */
 const escapeChar = (str, re) =>
-  isString(str) && re && re.global &&
-  str.replace(re, (m, c) => `\\${c}`) || null;
+  isString(str) && re && re.global ? str.replace(re, (m, c) => `\\${c}`) : null;
 
 /**
  * quote arg
@@ -94,7 +93,7 @@ const escapeChar = (str, re) =>
  * @returns {string} - argument
  */
 const quoteArg = arg => {
-  if (isString(arg) && arg.includes(" ")) {
+  if (isString(arg) && arg.includes(' ')) {
     arg = `"${escapeChar(arg, /(")/g)}"`;
   }
   return arg;
@@ -108,15 +107,23 @@ const quoteArg = arg => {
  */
 const stripHtmlTags = v => {
   while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
-    v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "")
-      .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
+    v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, '')
+      .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, '\n');
   }
-  return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
-    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"")
-    .replace(/&amp;/g, "&");
+  return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, '\n\n')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&');
 };
 
 module.exports = {
-  escapeChar, getType, isString, logErr, logMsg, logWarn, quoteArg,
-  stringifyPositiveInt, stripHtmlTags, throwErr,
+  escapeChar,
+  getType,
+  isString,
+  logErr,
+  logMsg,
+  logWarn,
+  quoteArg,
+  stringifyPositiveInt,
+  stripHtmlTags,
+  throwErr
 };

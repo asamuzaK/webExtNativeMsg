@@ -1,22 +1,22 @@
 /**
  * file-util.js
  */
-"use strict";
+'use strict';
 /* api */
-const {URL, fileURLToPath} = require("url");
-const {compareSemVer} = require("semver-parser");
-const {getType, isString} = require("./common");
-const fs = require("fs");
-const path = require("path");
-const process = require("process");
-const {promises: fsPromise} = fs;
+const { URL, fileURLToPath } = require('url');
+const { compareSemVer } = require('semver-parser');
+const { getType, isString } = require('./common');
+const fs = require('fs');
+const path = require('path');
+const process = require('process');
+const { promises: fsPromise } = fs;
 
 /* constants */
-const {IS_WIN} = require("./constant");
+const { IS_WIN } = require('./constant');
 const MASK_BIT = 0o111;
 const PERM_DIR = 0o777;
 const PERM_FILE = 0o666;
-const SUBST = "index";
+const SUBST = 'index';
 
 /**
  * convert URI to native file path
@@ -28,17 +28,17 @@ const convertUriToFilePath = uri => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  const {protocol, pathname} = new URL(uri);
+  const { protocol, pathname } = new URL(uri);
   let file;
-  if (protocol === "file:" && pathname) {
+  if (protocol === 'file:' && pathname) {
     // TODO: remove version detection when node 10 reaches EOL
-    const {version: nodeVersion} = process;
-    const result = compareSemVer(nodeVersion, "10.16.0");
+    const { version: nodeVersion } = process;
+    const result = compareSemVer(nodeVersion, '10.16.0');
     if (result >= 0) {
       file = fileURLToPath(uri);
     } else {
-      file = IS_WIN && path.normalize(decodeURIComponent(pathname).slice(1)) ||
-             decodeURIComponent(pathname);
+      const decodedPath = decodeURIComponent(pathname);
+      file = IS_WIN ? path.normalize(decodedPath.slice(1)) : decodedPath;
     }
   }
   return file || null;
@@ -65,7 +65,7 @@ const getAbsPath = file => {
  * @returns {object} - file stat
  */
 const getStat = file =>
-  isString(file) && fs.existsSync(file) && fs.statSync(file) || null;
+  isString(file) && fs.existsSync(file) ? fs.statSync(file) : null;
 
 /**
  * the directory is a directory
@@ -75,7 +75,7 @@ const getStat = file =>
  */
 const isDir = dir => {
   const stat = getStat(dir);
-  return stat && stat.isDirectory() || false;
+  return stat ? stat.isDirectory() : false;
 };
 
 /**
@@ -96,7 +96,7 @@ const isSubDir = (dir, baseDir) =>
  */
 const isFile = file => {
   const stat = getStat(file);
-  return stat && stat.isFile() || false;
+  return stat ? stat.isFile() : false;
 };
 
 /**
@@ -109,10 +109,13 @@ const isFile = file => {
  * @returns {boolean} - result
  */
 const isExecutable = (file, mask = MASK_BIT) => {
+  let res;
   const stat = getStat(file);
-  return stat && (
-    !!(stat.mode & mask) || IS_WIN && /\.(?:bat|cmd|exe|ps1|wsh)$/i.test(file)
-  ) || false;
+  if (stat) {
+    res = !!(stat.mode & mask) ||
+          (IS_WIN && /\.(?:bat|cmd|exe|ps1|wsh)$/i.test(file));
+  }
+  return !!res;
 };
 
 /**
@@ -123,7 +126,7 @@ const isExecutable = (file, mask = MASK_BIT) => {
  */
 const getFileTimestamp = file => {
   const stat = getStat(file);
-  return stat && stat.mtime.getTime() || 0;
+  return stat ? stat.mtime.getTime() : 0;
 };
 
 /**
@@ -136,9 +139,13 @@ const getFileTimestamp = file => {
 const getFileNameFromFilePath = (file, subst = SUBST) => {
   let name;
   if (isString(file) && isFile(file)) {
-    name = /^([^.]+)(?:\..+)?$/.exec(path.basename(file));
+    const base = path.basename(file);
+    const extReg = /^([^.]+)(?:\..+)?$/;
+    if (extReg.test(base)) {
+      [, name] = extReg.exec(base);
+    }
   }
-  return name && name[1] || subst;
+  return name || subst;
 };
 
 /**
@@ -154,10 +161,10 @@ const removeDir = (dir, baseDir) => {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
     // NOTE: remove version detection when node 10 reaches EOL
-    const {version: nodeVersion} = process;
-    const result = compareSemVer(nodeVersion, "12.10.0");
+    const { version: nodeVersion } = process;
+    const result = compareSemVer(nodeVersion, '12.10.0');
     if (result >= 0) {
-      fs.rmdirSync(dir, {recursive: true});
+      fs.rmdirSync(dir, { recursive: true });
     } else {
       const files = fs.readdirSync(dir);
       files.length && files.forEach(file => {
@@ -201,7 +208,7 @@ const createDirectory = async (dir, mode = PERM_DIR) => {
   const dirPath = path.resolve(path.normalize(dir));
   const opt = {
     mode,
-    recursive: true,
+    recursive: true
   };
   !isDir(dirPath) && await fsPromise.mkdir(dirPath, opt);
   return dirPath;
@@ -219,7 +226,7 @@ const createDirectory = async (dir, mode = PERM_DIR) => {
  * @returns {string} - file path
  */
 const createFile = async (file, value, opt = {
-  encoding: null, flag: "w", mode: PERM_FILE,
+  encoding: null, flag: 'w', mode: PERM_FILE
 }) => {
   if (!isString(file)) {
     throw new TypeError(`Expected String but got ${getType(file)}.`);
@@ -227,7 +234,7 @@ const createFile = async (file, value, opt = {
   if (!isString(value) && !Buffer.isBuffer(value) &&
       !(value instanceof Uint8Array)) {
     throw new TypeError(
-      `Expected String, Buffer, Uint8Array but got ${getType(value)}.`,
+      `Expected String, Buffer, Uint8Array but got ${getType(value)}.`
     );
   }
   const filePath = path.resolve(path.normalize(file));
@@ -244,7 +251,7 @@ const createFile = async (file, value, opt = {
  * @param {string} [opt.flag] - flag
  * @returns {string|Buffer} - file content
  */
-const readFile = async (file, opt = {encoding: null, flag: "r"}) => {
+const readFile = async (file, opt = { encoding: null, flag: 'r' }) => {
   if (!isFile(file)) {
     throw new Error(`${file} is not a file.`);
   }
@@ -253,7 +260,18 @@ const readFile = async (file, opt = {encoding: null, flag: "r"}) => {
 };
 
 module.exports = {
-  convertUriToFilePath, createDirectory, createFile, getAbsPath,
-  getFileNameFromFilePath, getFileTimestamp, getStat, isDir,
-  isExecutable, isFile, isSubDir, removeDir, removeDirectory, readFile,
+  convertUriToFilePath,
+  createDirectory,
+  createFile,
+  getAbsPath,
+  getFileNameFromFilePath,
+  getFileTimestamp,
+  getStat,
+  isDir,
+  isExecutable,
+  isFile,
+  isSubDir,
+  removeDir,
+  removeDirectory,
+  readFile
 };

@@ -1,12 +1,12 @@
 /**
  * native-message.js
  */
-"use strict";
+'use strict';
 /* api */
-const {isString} = require("./common");
+const { isString } = require('./common');
 
 /* constants */
-const {CHAR, IS_BE} = require("./constant");
+const { CHAR, IS_BE } = require('./constant');
 const BYTE_LEN = 4;
 
 /* Input */
@@ -15,8 +15,8 @@ class Input {
    * decode message from buffer
    */
   constructor() {
-    this._input;
-    this._length;
+    this._input = null;
+    this._length = null;
   }
 
   /**
@@ -28,15 +28,17 @@ class Input {
     let arr = [];
     if (Buffer.isBuffer(this._input)) {
       if (!this._length && this._input.length >= BYTE_LEN) {
-        this._length = IS_BE && this._input.readUIntBE(0, BYTE_LEN) ||
-                       this._input.readUIntLE(0, BYTE_LEN);
+        this._length = IS_BE
+          ? this._input.readUIntBE(0, BYTE_LEN)
+          : this._input.readUIntLE(0, BYTE_LEN);
         this._input = this._input.slice(BYTE_LEN);
       }
       if (this._length && this._input.length >= this._length) {
         const buf = this._input.slice(0, this._length);
         arr.push(JSON.parse(buf.toString(CHAR)));
-        this._input = this._input.length > this._length &&
-                      this._input.slice(this._length) || null;
+        this._input = this._input.length > this._length
+          ? this._input.slice(this._length)
+          : null;
         this._length = null;
         if (this._input) {
           const cur = this._decoder();
@@ -80,7 +82,7 @@ class Input {
 class Output {
   /* encode message to buffer */
   constructor() {
-    this._output;
+    this._output = null;
   }
 
   /**
@@ -93,12 +95,12 @@ class Output {
     if (isString(msg)) {
       const buf = Buffer.from(msg);
       const len = Buffer.alloc(BYTE_LEN);
-      IS_BE && len.writeUIntBE(buf.length, 0, BYTE_LEN) ||
+      (IS_BE && len.writeUIntBE(buf.length, 0, BYTE_LEN)) ||
       len.writeUIntLE(buf.length, 0, BYTE_LEN);
       msg = Buffer.concat([len, buf]);
     }
     this._output = null;
-    return Buffer.isBuffer(msg) && msg || null;
+    return Buffer.isBuffer(msg) ? msg : null;
   }
 
   /**
@@ -113,10 +115,10 @@ class Output {
       this._output = msg;
       buf = this._encoder();
     }
-    return Buffer.isBuffer(buf) && buf || null;
+    return Buffer.isBuffer(buf) ? buf : null;
   }
 }
 
 module.exports = {
-  Input, Output,
+  Input, Output
 };
