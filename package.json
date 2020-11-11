@@ -14,7 +14,7 @@
   },
   "main": "./index.js",
   "scripts": {
-    "lint": "standardx --fix .",
+    "lint": "eslint --fix .",
     "test": "nyc --reporter=text mocha test/*.test.js --exit",
     "test:setup": "cd test/app && node setup"
   },
@@ -25,12 +25,15 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^7.13.0",
+    "eslint-config-standard": "^16.0.1",
+    "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsdoc": "^30.7.7",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
     "rewiremock": "^3.14.3",
-    "sinon": "^9.2.0",
-    "standardx": "^7.0.0"
+    "sinon": "^9.2.0"
   },
   "version": "4.8.0"
 }

@@ -1,6 +1,11 @@
 {
+  "env": {
+    "node": true,
+    "es6": true
+  },
   "extends": [
-    "plugin:jsdoc/recommended"
+    "plugin:jsdoc/recommended",
+    "standard"
   ],
   "parserOptions": {
     "ecmaVersion": 2019
