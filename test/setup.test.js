@@ -967,7 +967,7 @@ describe('_createShellScript', () => {
         `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     } else {
-      // assert.isDefined(process.env.SHELL);
+      assert.isDefined(process.env.SHELL);
       assert.strictEqual(
         file,
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
@@ -1008,7 +1008,7 @@ describe('_createShellScript', () => {
         `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     } else {
-      // assert.isDefined(process.env.SHELL);
+      assert.isDefined(process.env.SHELL);
       assert.strictEqual(
         file,
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
@@ -1048,7 +1048,7 @@ describe('_createShellScript', () => {
         `@echo off\n${quoteArg(process.execPath)}\n`
       );
     } else {
-      // assert.isDefined(process.env.SHELL);
+      assert.isDefined(process.env.SHELL);
       assert.strictEqual(
         file,
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`
