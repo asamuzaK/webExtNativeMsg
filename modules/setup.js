@@ -269,8 +269,8 @@ class Setup {
       throw new TypeError(`Expected String but got ${getType(dir)}.`);
     }
     const dirPath = getAbsPath(dir);
-    if (!dirPath.startsWith(DIR_CWD)) {
-      throw new Error(`${dirPath} is not sub directory of ${DIR_CWD}.`);
+    if (DIR_CWD.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_HOME)) {
+      throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
     }
     this._configDir = dirPath;
   }
