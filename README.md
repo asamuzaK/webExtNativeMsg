@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/asamuzaK/webExtNativeMsg.svg?branch=master)](https://travis-ci.com/asamuzaK/webExtNativeMsg)
+[![build](https://github.com/asamuzaK/webExtNativeMsg/workflows/build/badge.svg)](https://github.com/asamuzaK/webExtNativeMsg/actions?query=workflow%3Abuild)
 [![dependencies Status](https://david-dm.org/asamuzaK/webExtNativeMsg/status.svg)](https://david-dm.org/asamuzaK/webExtNativeMsg)
 [![devDependency Status](https://david-dm.org/asamuzaK/webExtNativeMsg/dev-status.svg)](https://david-dm.org/asamuzaK/webExtNativeMsg?type=dev)
 [![npm version](https://badge.fury.io/js/web-ext-native-msg.svg)](https://badge.fury.io/js/web-ext-native-msg)
