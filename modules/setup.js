@@ -413,7 +413,7 @@ class Setup {
       );
     }
     const appPath = process.execPath;
-    const filePath = path.resolve(path.join(DIR_CWD, this._mainFile));
+    const filePath = path.resolve(DIR_CWD, this._mainFile);
     const cmd = isFile(filePath)
       ? `${quoteArg(appPath)} ${quoteArg(filePath)}`
       : quoteArg(appPath);
