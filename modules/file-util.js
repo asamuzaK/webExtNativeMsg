@@ -160,7 +160,7 @@ const removeDir = (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    // NOTE: remove version detection when node 10 reaches EOL
+    // TODO: remove version detection when node 10 reaches EOL
     const { version: nodeVersion } = process;
     const result = compareSemVer(nodeVersion, '12.10.0');
     if (result >= 0) {
