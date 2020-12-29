@@ -42,20 +42,20 @@ Creates shell script, application manifest for specified browser.
 
 Sample:
 ```
-const {Setup} = require("web-ext-native-msg");
+const { Setup } = require('web-ext-native-msg');
 
 const handlerAfterSetup = info => {
-  const {configDirPath, shellScriptPath, manifestPath} = info;
+  const { configDirPath, shellScriptPath, manifestPath } = info;
   // do something
 };
 
 const setup = new Setup({
-  hostDescription: "Description of the host",
-  hostName: "hostname",
-  mainScriptFile: "index.js",
-  chromeExtensionIds: ["chrome-extension://xxxxxx"],
-  webExtensionIds: ["mywebextension@asamuzak.jp"],
-  callback: handlerAfterSetup,
+  hostDescription: 'Description of the host',
+  hostName: 'hostname',
+  mainScriptFile: 'index.js',
+  chromeExtensionIds: ['chrome-extension://xxxxxx'],
+  webExtensionIds: ['mywebextension@asamuzak.jp'],
+  callback: handlerAfterSetup
 });
 
 setup.run();
@@ -98,8 +98,8 @@ Decode / encode native messages exchanged between browser and host.
 
 Sample:
 ```
-const {Input, Output} = require("web-ext-native-msg");
-const process = require("process");
+const { Input, Output } = require('web-ext-native-msg');
+const process = require('process');
 
 const handleReject = e => {
   e = (new Output()).encode(e);
@@ -127,7 +127,7 @@ const readStdin = chunk => {
   return Promise.all(func).catch(handleReject);
 };
 
-process.stdin.on("data", readStdin);
+process.stdin.on('data', readStdin);
 ```
 
 Construct:
@@ -150,19 +150,19 @@ Spawns child process.
 
 Sample:
 ```
-const {ChildProcess, CmdArgs} = require("web-ext-native-msg");
-const path = require("path");
-const process = require("process");
+const {ChildProcess, CmdArgs} = require('web-ext-native-msg');
+const path = require('path');
+const process = require('process');
 
-const arg = "-a -b -c";
+const arg = '-a -b -c';
 const cmdArgs = (new CmdArgs(arg)).toArray();
 
-const app = path.resolve(path.join("path", "to", "myApp.exe"));
-const file = path.resolve(path.join("path", "to", "myFile.txt"));
+const app = path.resolve(path.join('path', 'to', 'myApp.exe'));
+const file = path.resolve(path.join('path', 'to', 'myFile.txt'));
 const opt = {
   cwd: null,
-  encoding: "utf8",
-  env: process.env,
+  encoding: 'utf8',
+  env: process.env
 };
 
 const proc = (new ChildProcess(app, cmdArgs, opt)).spawn(file).catch(e => {
@@ -252,7 +252,7 @@ Create a file.
 * @param {string|Buffer|Uint8Array} value - value to write
 * @param {Object} [opt] - options
 * @param {string} [opt.encoding] - encoding. Defaults to `null`
-* @param {string} [opt.flag] - flag. Defaults to `"w"`
+* @param {string} [opt.flag] - flag. Defaults to `'w'`
 * @param {number|string} [opt.mode] - file permission. Defaults to `0o666`
 * @returns {string} - file path
 
@@ -263,7 +263,7 @@ Read a file.
 * @param {string} file - file path
 * @param {Object} [opt] - options
 * @param {string} [opt.encoding] - encoding. Defaults to `null`
-* @param {string} [opt.flag] - flag. Defaults to `"r"`
+* @param {string} [opt.flag] - flag. Defaults to `'r'`
 * @returns {string|Buffer} - file content
 
 ### Function isDir(dir)
