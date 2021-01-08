@@ -90,7 +90,7 @@ describe('Chrome Beta', () => {
     assert.containsAllKeys(browserData.chromebeta,
       ['hostLinux', 'hostMac', 'regWin']);
     assert.isArray(browserData.chromebeta.hostLinux);
-    assert.isNull(browserData.chromebeta.hostMac);
+    assert.isArray(browserData.chromebeta.hostMac);
     assert.isArray(browserData.chromebeta.regWin);
   });
 });
