@@ -24,16 +24,16 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^7.16.0",
+    "eslint": "^7.17.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^30.7.9",
+    "eslint-plugin-jsdoc": "^30.7.13",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
     "rewiremock": "^3.14.3",
-    "sinon": "^9.2.2"
+    "sinon": "^9.2.3"
   },
   "version": "4.8.2"
 }
