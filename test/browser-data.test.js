@@ -13,6 +13,10 @@ describe('Firefox', () => {
     assert.containsAllKeys(browserData.firefox, ['alias', 'type']);
   });
 
+  it('should not contain alter alias key', () => {
+    assert.doesNotHaveAnyKeys(browserData.edge, ['aliasWin']);
+  });
+
   it('should contain host keys', () => {
     assert.hasAnyKeys(browserData.firefox,
       ['hostLinux', 'hostMac', 'regWin']);
@@ -26,6 +30,10 @@ describe('Thunderbird', () => {
 
   it('should contain alias and type keys', () => {
     assert.containsAllKeys(browserData.waterfoxcurrent, ['alias', 'type']);
+  });
+
+  it('should not contain alter alias key', () => {
+    assert.doesNotHaveAnyKeys(browserData.edge, ['aliasWin']);
   });
 
   it('should contain host keys', () => {
@@ -46,6 +54,10 @@ describe('Waterfox Current', () => {
     assert.containsAllKeys(browserData.waterfoxcurrent, ['alias', 'type']);
   });
 
+  it('should not contain alter alias key', () => {
+    assert.doesNotHaveAnyKeys(browserData.edge, ['aliasWin']);
+  });
+
   it('should contain host keys', () => {
     assert.containsAllKeys(browserData.waterfoxcurrent,
       ['hostLinux', 'hostMac', 'regWin']);
@@ -62,6 +74,10 @@ describe('Chrome', () => {
 
   it('should contain alias and type keys', () => {
     assert.containsAllKeys(browserData.chrome, ['alias', 'type']);
+  });
+
+  it('should not contain alter alias key', () => {
+    assert.doesNotHaveAnyKeys(browserData.edge, ['aliasWin']);
   });
 
   it('should contain host keys', () => {
@@ -126,6 +142,10 @@ describe('Chromium', () => {
     assert.containsAllKeys(browserData.chromium, ['alias', 'type']);
   });
 
+  it('should not contain alter alias key', () => {
+    assert.doesNotHaveAnyKeys(browserData.edge, ['aliasWin']);
+  });
+
   it('should contain host keys', () => {
     assert.containsAllKeys(browserData.chromium,
       ['hostLinux', 'hostMac', 'regWin']);
@@ -188,8 +208,8 @@ describe('Edge', () => {
     assert.containsAllKeys(browserData.edge, ['alias', 'type']);
   });
 
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.edge, ['aliasWin']);
+  it('should not contain alter alias key', () => {
+    assert.doesNotHaveAnyKeys(browserData.edge, ['aliasWin']);
   });
 
   it('should contain host keys', () => {

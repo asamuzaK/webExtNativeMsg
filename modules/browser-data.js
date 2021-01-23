@@ -82,10 +82,9 @@ const browserData = {
   },
   edge: {
     alias: 'edge',
-    aliasWin: 'chrome',
     hostLinux: null,
     hostMac: [DIR_CONFIG_MAC, 'Microsoft Edge', NM_HOSTS],
-    regWin: [...HKCU_SOFTWARE, 'Google', 'Chrome', NM_HOSTS],
+    regWin: [...HKCU_SOFTWARE, 'Microsoft', 'Edge', NM_HOSTS],
     type: EXT_CHROME
   },
   kinza: {
