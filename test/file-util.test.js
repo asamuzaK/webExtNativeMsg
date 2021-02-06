@@ -419,6 +419,11 @@ describe('isExecutable', () => {
     const p = path.resolve(path.join('test', 'file', 'test.txt'));
     assert.strictEqual(isExecutable(p), false);
   });
+
+  it('should get false if file does not exist', () => {
+    const p = path.resolve(path.join('test', 'file', 'foo.txt'));
+    assert.strictEqual(isExecutable(p), false);
+  });
 });
 
 describe('isFile', () => {
