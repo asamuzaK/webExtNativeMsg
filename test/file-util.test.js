@@ -26,10 +26,6 @@ const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
 
 describe('convertUriToFilePath', () => {
   it('should get string', () => {
-    const stubFunc = sinon.stub().returns(0);
-    const stubSemverParser = {
-      compareSemVer: stubFunc
-    };
     const p = path.resolve('foo/bar');
     let u;
     if (IS_WIN) {
@@ -38,32 +34,7 @@ describe('convertUriToFilePath', () => {
     } else {
       u = new URL(`file://${p}`).href;
     }
-    rewiremock('semver-parser').with(stubSemverParser);
-    rewiremock.enable();
-    const fuJs = require('../modules/file-util');
-    assert.strictEqual(fuJs.convertUriToFilePath(u), p);
-    rewiremock.disable();
-  });
-
-  it('should get string', () => {
-    const stubFunc = sinon.stub().returns(-1);
-    const stubSemverParser = {
-      compareSemVer: stubFunc
-    };
-    const p = path.resolve('foo/bar');
-    let u;
-    if (IS_WIN) {
-      const reg = new RegExp(`\\${path.sep}`, 'g');
-      u = new URL(`file:///${p.replace(reg, '/')}`).href;
-    } else {
-      u = new URL(`file://${p}`).href;
-    }
-    rewiremock('semver-parser').with(stubSemverParser);
-    rewiremock.enable();
-    const fuJs = require('../modules/file-util');
-    assert.strictEqual(fuJs.convertUriToFilePath(u), p);
     assert.strictEqual(convertUriToFilePath(u), p);
-    rewiremock.disable();
   });
 
   it('should get string', () => {
