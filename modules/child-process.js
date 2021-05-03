@@ -46,7 +46,7 @@ const correctArg = arg => {
       arg = arg.replace(/\\(?!\\)/g, '');
     }
     if (/".*"|'.*'/.test(arg)) {
-      arg = arg.replace(/"([^"a-zA-Z\d\s$@&'()\^|[\]{};*?<>`\\]+)*"|'([^']+)*'/g, (m, c1, c2) => c1 || c2);
+      arg = arg.replace(/"([^"]{1,4096})*"|'([^']{1,4096})*'/g, (m, c1, c2) => c1 || c2);
     }
   }
   return arg;
