@@ -28,18 +28,10 @@ const convertUriToFilePath = uri => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  const { protocol, pathname } = new URL(uri);
+  const { protocol } = new URL(uri);
   let file;
-  if (protocol === 'file:' && pathname) {
-    // TODO: remove version detection when node 10 reaches EOL
-    const { version: nodeVersion } = process;
-    const result = compareSemVer(nodeVersion, '10.16.0');
-    if (result >= 0) {
-      file = fileURLToPath(uri);
-    } else {
-      const decodedPath = decodeURIComponent(pathname);
-      file = IS_WIN ? path.normalize(decodedPath.slice(1)) : decodedPath;
-    }
+  if (protocol === 'file:') {
+    file = fileURLToPath(uri);
   }
   return file || null;
 };
