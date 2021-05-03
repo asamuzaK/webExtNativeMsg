@@ -125,7 +125,7 @@ class CmdArgs {
    */
   toString() {
     const args = this.toArray().map(stringifyArg).join(' ');
-    return isString(args) ? args.trim() : '';
+    return args.trim();
   }
 }
 

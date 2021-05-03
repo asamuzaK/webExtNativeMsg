@@ -169,6 +169,150 @@ describe('stringifyArg', () => {
   });
 });
 
+/* CmdArgs */
+describe('CmdArgs', () => {
+  const cmd = new CmdArgs();
+  const cmdEmptyStr = new CmdArgs('');
+  const cmdEmptyArr = new CmdArgs([]);
+  const cmdSpace = new CmdArgs(' ');
+  const cmdStr = new CmdArgs('-a -b "c d"');
+  const cmdArr = new CmdArgs(['-a', '-b', 'c d']);
+  const cmdQuoteStr = new CmdArgs('-a --b="c d\\e"');
+  const cmdQuoteStr2 = new CmdArgs('-a "--b="c d\\e""');
+  const cmdQuoteArr = new CmdArgs(['-a', '--b="c d\\e"']);
+  const cmdPlaceholderStr = new CmdArgs('-a ${foo} -b');
+  const cmdPlaceholderArr = new CmdArgs(['-a', '${foo}', '-b']);
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmd, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdEmptyStr, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdEmptyArr, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdSpace, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdStr, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdArr, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdQuoteStr, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdQuoteArr, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdPlaceholderStr, CmdArgs);
+  });
+
+  it('should create an instance', () => {
+    assert.instanceOf(cmdPlaceholderArr, CmdArgs);
+  });
+
+  /* methods */
+  describe('toArray', () => {
+    it('should get empty array', () => {
+      assert.deepEqual(cmd.toArray(), []);
+    });
+
+    it('should get empty array', () => {
+      assert.deepEqual(cmdEmptyStr.toArray(), []);
+    });
+
+    it('should get empty array', () => {
+      assert.deepEqual(cmdEmptyArr.toArray(), []);
+    });
+
+    it('should get empty array', () => {
+      assert.deepEqual(cmdSpace.toArray(), []);
+    });
+
+    it('should get arguments in array', () => {
+      assert.deepEqual(cmdStr.toArray(), ['-a', '-b', 'c d']);
+    });
+
+    it('should get arguments in array', () => {
+      assert.deepEqual(cmdArr.toArray(), ['-a', '-b', 'c d']);
+    });
+
+    it('should get arguments in array', () => {
+      assert.deepEqual(cmdQuoteStr.toArray(), ['-a', '--b=c d\\e']);
+    });
+
+    it('should get arguments in array', () => {
+      assert.deepEqual(cmdQuoteStr2.toArray(), ['-a', '--b="c d\\e"']);
+    });
+
+    it('should get arguments in array', () => {
+      assert.deepEqual(cmdQuoteArr.toArray(), ['-a', '--b="c d\\e"']);
+    });
+
+    it('should get arguments in array', () => {
+      assert.deepEqual(cmdPlaceholderStr.toArray(), ['-a', '${foo}', '-b']);
+    });
+
+    it('should get arguments in array', () => {
+      assert.deepEqual(cmdPlaceholderArr.toArray(), ['-a', '${foo}', '-b']);
+    });
+  });
+
+  describe('toString', () => {
+    it('should get empty string', () => {
+      assert.strictEqual(cmd.toString(), '');
+    });
+
+    it('should get empty string', () => {
+      assert.strictEqual(cmdEmptyStr.toString(), '');
+    });
+
+    it('should get empty string', () => {
+      assert.strictEqual(cmdEmptyArr.toString(), '');
+    });
+
+    it('should get empty string', () => {
+      assert.strictEqual(cmdSpace.toString(), '');
+    });
+
+    it('should get arguments in string', () => {
+      assert.strictEqual(cmdStr.toString(), '-a -b "c d"');
+    });
+
+    it('should get arguments in string', () => {
+      assert.strictEqual(cmdArr.toString(), '-a -b "c d"');
+    });
+
+    it('should get arguments in string', () => {
+      assert.strictEqual(cmdQuoteStr.toString(), '-a "--b=c d\\\\e"');
+    });
+
+    it('should get arguments in string', () => {
+      assert.strictEqual(cmdQuoteArr.toString(), '-a "--b=\\"c d\\\\e\\""');
+    });
+
+    it('should get arguments in string', () => {
+      assert.strictEqual(cmdPlaceholderStr.toString(), '-a ${foo} -b');
+    });
+
+    it('should get arguments in string', () => {
+      assert.strictEqual(cmdPlaceholderArr.toString(), '-a ${foo} -b');
+    });
+  });
+});
+
 /* ChildProcess */
 describe('ChildProcess', () => {
   it('should create an instance', () => {
@@ -290,149 +434,6 @@ describe('ChildProcess', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.isTrue(calledOnce);
-    });
-  });
-});
-
-/* CmdArgs */
-describe('CmdArgs', () => {
-  const cmd = new CmdArgs();
-  const cmdEmptyStr = new CmdArgs('');
-  const cmdEmptyArr = new CmdArgs([]);
-  const cmdSpace = new CmdArgs(' ');
-  const cmdStr = new CmdArgs('-a -b "c d"');
-  const cmdArr = new CmdArgs(['-a', '-b', 'c d']);
-  const cmdQuoteStr = new CmdArgs('-a --b="c d\\e"');
-  const cmdQuoteStr2 = new CmdArgs('-a "--b="c d\\e""');
-  const cmdQuoteArr = new CmdArgs(['-a', '--b="c d\\e"']);
-  const cmdPlaceholderStr = new CmdArgs('-a ${foo} -b');
-  const cmdPlaceholderArr = new CmdArgs(['-a', '${foo}', '-b']);
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmd, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdEmptyStr, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdEmptyArr, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdSpace, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdStr, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdArr, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdQuoteStr, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdQuoteArr, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdPlaceholderStr, CmdArgs);
-  });
-
-  it('should create an instance', () => {
-    assert.instanceOf(cmdPlaceholderArr, CmdArgs);
-  });
-  /* methods */
-  describe('toArray', () => {
-    it('should get empty array', () => {
-      assert.deepEqual(cmd.toArray(), []);
-    });
-
-    it('should get empty array', () => {
-      assert.deepEqual(cmdEmptyStr.toArray(), []);
-    });
-
-    it('should get empty array', () => {
-      assert.deepEqual(cmdEmptyArr.toArray(), []);
-    });
-
-    it('should get empty array', () => {
-      assert.deepEqual(cmdSpace.toArray(), []);
-    });
-
-    it('should get arguments in array', () => {
-      assert.deepEqual(cmdStr.toArray(), ['-a', '-b', 'c d']);
-    });
-
-    it('should get arguments in array', () => {
-      assert.deepEqual(cmdArr.toArray(), ['-a', '-b', 'c d']);
-    });
-
-    it('should get arguments in array', () => {
-      assert.deepEqual(cmdQuoteStr.toArray(), ['-a', '--b=c d\\e']);
-    });
-
-    it('should get arguments in array', () => {
-      assert.deepEqual(cmdQuoteStr2.toArray(), ['-a', '--b="c d\\e"']);
-    });
-
-    it('should get arguments in array', () => {
-      assert.deepEqual(cmdQuoteArr.toArray(), ['-a', '--b="c d\\e"']);
-    });
-
-    it('should get arguments in array', () => {
-      assert.deepEqual(cmdPlaceholderStr.toArray(), ['-a', '${foo}', '-b']);
-    });
-
-    it('should get arguments in array', () => {
-      assert.deepEqual(cmdPlaceholderArr.toArray(), ['-a', '${foo}', '-b']);
-    });
-  });
-
-  describe('toString', () => {
-    it('should get empty string', () => {
-      assert.strictEqual(cmd.toString(), '');
-    });
-
-    it('should get empty string', () => {
-      assert.strictEqual(cmdEmptyStr.toString(), '');
-    });
-
-    it('should get empty string', () => {
-      assert.strictEqual(cmdEmptyArr.toString(), '');
-    });
-
-    it('should get empty string', () => {
-      assert.strictEqual(cmdSpace.toString(), '');
-    });
-
-    it('should get arguments in string', () => {
-      assert.strictEqual(cmdStr.toString(), '-a -b "c d"');
-    });
-
-    it('should get arguments in string', () => {
-      assert.strictEqual(cmdArr.toString(), '-a -b "c d"');
-    });
-
-    it('should get arguments in string', () => {
-      assert.strictEqual(cmdQuoteStr.toString(), '-a "--b=c d\\\\e"');
-    });
-
-    it('should get arguments in string', () => {
-      assert.strictEqual(cmdQuoteArr.toString(), '-a "--b=\\"c d\\\\e\\""');
-    });
-
-    it('should get arguments in string', () => {
-      assert.strictEqual(cmdPlaceholderStr.toString(), '-a ${foo} -b');
-    });
-
-    it('should get arguments in string', () => {
-      assert.strictEqual(cmdPlaceholderArr.toString(), '-a ${foo} -b');
     });
   });
 });
