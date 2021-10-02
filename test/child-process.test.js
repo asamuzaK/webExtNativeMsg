@@ -1,19 +1,20 @@
 /* eslint-disable no-template-curly-in-string */
-'use strict';
 /* api */
-const {
+import { assert } from 'chai';
+import { describe, it } from 'mocha';
+import childProcess from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import process from 'process';
+import sinon from 'sinon';
+import { IS_WIN } from '../modules/constant.js';
+
+/* test */
+import {
   ChildProcess, CmdArgs, concatArray, correctArg, extractArg, stringifyArg
-} = require('../modules/child-process');
-const { assert } = require('chai');
-const { describe, it } = require('mocha');
-const childProcess = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const process = require('process');
-const sinon = require('sinon');
+} from '../modules/child-process.js';
 
 /* constants */
-const { IS_WIN } = require('../modules/constant');
 const PERM_EXEC = 0o700;
 const PERM_FILE = 0o600;
 

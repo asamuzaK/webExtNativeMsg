@@ -1,23 +1,23 @@
 /**
  * setup.js
  */
-'use strict';
-/* api */
-const { ChildProcess } = require('./child-process');
-const { browserData } = require('./browser-data');
-const { getType, isString, quoteArg, throwErr } = require('./common');
-const {
-  createDirectory, createFile, getAbsPath, isDir, isFile
-} = require('./file-util');
-const path = require('path');
-const process = require('process');
-const readline = require('readline-sync');
 
-/* constants */
-const {
+/* api */
+import { ChildProcess } from './child-process.js';
+import { browserData } from './browser-data.js';
+import { getType, isString, quoteArg, throwErr } from './common.js';
+import {
+  createDirectory, createFile, getAbsPath, isDir, isFile
+} from './file-util.js';
+import path from 'path';
+import process from 'process';
+import readline from 'readline-sync';
+import {
   CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
   EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN
-} = require('./constant');
+} from './constant.js';
+
+/* constants */
 const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
@@ -26,7 +26,7 @@ const PERM_EXEC = 0o755;
 const PERM_FILE = 0o644;
 
 /* created path values */
-const values = new Map();
+export const values = new Map();
 
 /**
  * abort setup
@@ -34,7 +34,7 @@ const values = new Map();
  * @param {string} msg - message
  * @returns {void}
  */
-const abortSetup = msg => {
+export const abortSetup = msg => {
   values.clear();
   console.info(`Setup aborted: ${msg}`);
   process.exit();
@@ -45,7 +45,7 @@ const abortSetup = msg => {
  *
  * @returns {?Function} - callback
  */
-const handleSetupCallback = () => {
+export const handleSetupCallback = () => {
   let res;
   const func = values.get('callback');
   if (typeof func === 'function') {
@@ -64,7 +64,7 @@ const handleSetupCallback = () => {
  * @param {number} code - exit code
  * @returns {?Function} - handleSetupCallback()
  */
-const handleRegClose = code => {
+export const handleRegClose = code => {
   let func;
   if (IS_WIN) {
     if (code === 0) {
@@ -85,7 +85,7 @@ const handleRegClose = code => {
  * @param {*} data - data
  * @returns {Function} - abortSetup()
  */
-const handleRegStderr = data => {
+export const handleRegStderr = data => {
   let func;
   if (IS_WIN) {
     data && console.error(`stderr: ${data.toString()}`);
@@ -100,7 +100,7 @@ const handleRegStderr = data => {
  * @param {string} key - key
  * @returns {object} - browser data
  */
-const getBrowserData = key => {
+export const getBrowserData = key => {
   let browser;
   key = isString(key) && key.toLowerCase().trim();
   if (key) {
@@ -119,7 +119,7 @@ const getBrowserData = key => {
 };
 
 /* Setup */
-class Setup {
+export class Setup {
   /**
    * setup options
    *
@@ -547,13 +547,3 @@ class Setup {
     return func;
   }
 }
-
-module.exports = {
-  Setup,
-  abortSetup,
-  getBrowserData,
-  handleRegClose,
-  handleRegStderr,
-  handleSetupCallback,
-  values
-};

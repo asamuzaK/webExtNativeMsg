@@ -1,14 +1,13 @@
-'use strict';
 /* api */
-const { assert } = require('chai');
-const { describe, it } = require('mocha');
-const { isString } = require('../modules/common');
+import { assert } from 'chai';
+import { describe, it } from 'mocha';
+import { isString } from '../modules/common.js';
 
-/* constant */
-const {
+/* test */
+import {
   CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
   EXT_CHROME, EXT_WEB, INDENT, IS_BE, IS_LE, IS_MAC, IS_WIN
-} = require('../modules/constant');
+} from '../modules/constant.js';
 
 describe('string constants', () => {
   it('should get string', () => {

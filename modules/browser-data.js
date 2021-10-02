@@ -1,16 +1,18 @@
 /**
  * browser-data.js
  */
-'use strict';
-/* constants */
-const {
+
+/* api */
+import {
   DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_HOME, EXT_CHROME, EXT_WEB
-} = require('./constant');
+} from './constant.js';
+
+/* constants */
 const HKCU_SOFTWARE = ['HKEY_CURRENT_USER', 'SOFTWARE'];
 const NM_HOSTS = 'NativeMessagingHosts';
 
 /* browser config data */
-const browserData = {
+export const browserData = {
   /* gecko */
   firefox: {
     alias: 'firefox',
@@ -112,8 +114,4 @@ const browserData = {
     regWin: [...HKCU_SOFTWARE, 'Google', 'Chrome', NM_HOSTS],
     type: EXT_CHROME
   }
-};
-
-module.exports = {
-  browserData
 };

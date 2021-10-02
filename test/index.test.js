@@ -1,13 +1,14 @@
-'use strict';
 /* api */
-const {
+import { assert } from 'chai';
+import { describe, it } from 'mocha';
+
+/* test */
+import {
   ChildProcess, CmdArgs, Input, Output, Setup,
   convertUriToFilePath, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
   isFile, isSubDir, readFile, removeDir
-} = require('../index');
-const { assert } = require('chai');
-const { describe, it } = require('mocha');
+} from '../index.js';
 
 /* Classes */
 describe('Classes', () => {

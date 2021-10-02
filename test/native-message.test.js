@@ -1,11 +1,10 @@
-'use strict';
 /* api */
-const { Input, Output } = require('../modules/native-message');
-const { assert } = require('chai');
-const { describe, it } = require('mocha');
+import { assert } from 'chai';
+import { describe, it } from 'mocha';
+import { IS_BE } from '../modules/constant.js';
 
-/* constant */
-const { IS_BE } = require('../modules/constant');
+/* test */
+import { Input, Output } from '../modules/native-message.js';
 
 /* Input */
 describe('Input', () => {

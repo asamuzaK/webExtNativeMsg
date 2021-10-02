@@ -1,8 +1,9 @@
-'use strict';
 /* api */
-const { browserData } = require('../modules/browser-data');
-const { assert } = require('chai');
-const { describe, it } = require('mocha');
+import { assert } from 'chai';
+import { describe, it } from 'mocha';
+
+/* test */
+import { browserData } from '../modules/browser-data.js';
 
 describe('Firefox', () => {
   it('should contain firefox property', () => {
