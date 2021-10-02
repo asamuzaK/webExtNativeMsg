@@ -3,7 +3,7 @@
  */
 'use strict';
 /* api */
-const { URL, fileURLToPath } = require('url');
+const { fileURLToPath } = require('url');
 const { compareSemVer } = require('semver-parser');
 const { getType, isString } = require('./common');
 const fs = require('fs');
