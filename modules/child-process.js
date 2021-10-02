@@ -1,12 +1,12 @@
 /**
  * child-process.js
  */
-'use strict';
+
 /* api */
-const { escapeChar, getType, isString, quoteArg } = require('./common');
-const { isExecutable } = require('./file-util');
-const childProcess = require('child_process');
-const process = require('process');
+import { escapeChar, getType, isString, quoteArg } from './common.js';
+import { isExecutable } from './file-util.js';
+import childProcess from 'child_process';
+import process from 'process';
 
 /**
  * concat array
@@ -15,7 +15,7 @@ const process = require('process');
  * @param {Array} arrB - array
  * @returns {Array} - array
  */
-const concatArray = (arrA, arrB) => {
+export const concatArray = (arrA, arrB) => {
   if (!Array.isArray(arrA)) {
     throw new TypeError(`Expected Array but got ${getType(arrA)}.`);
   }
@@ -31,7 +31,7 @@ const concatArray = (arrA, arrB) => {
  * @param {string} arg - argument
  * @returns {string} - argument
  */
-const correctArg = arg => {
+export const correctArg = arg => {
   if (!isString(arg)) {
     throw new TypeError(`Expected String but got ${getType(arg)}.`);
   }
@@ -58,7 +58,7 @@ const correctArg = arg => {
  * @param {string} arg - argument
  * @returns {Array} - arguments array
  */
-const extractArg = arg => {
+export const extractArg = arg => {
   if (!isString(arg)) {
     throw new TypeError(`Expected String but got ${getType(arg)}.`);
   }
@@ -77,7 +77,7 @@ const extractArg = arg => {
  * @param {string} arg - argument
  * @returns {string} - argument
  */
-const stringifyArg = arg => {
+export const stringifyArg = arg => {
   let str;
   if (isString(arg)) {
     if (/["'\\\s]/.test(arg)) {
@@ -92,7 +92,7 @@ const stringifyArg = arg => {
 };
 
 /* CmdArgs */
-class CmdArgs {
+export class CmdArgs {
   /**
    * argument input
    *
@@ -130,7 +130,7 @@ class CmdArgs {
 }
 
 /* Child process */
-class ChildProcess {
+export class ChildProcess {
   /**
    * command, arguments and option
    *
@@ -162,12 +162,3 @@ class ChildProcess {
     return childProcess.spawn(this._cmd, this._args, this._opt);
   }
 }
-
-module.exports = {
-  ChildProcess,
-  CmdArgs,
-  concatArray,
-  correctArg,
-  extractArg,
-  stringifyArg
-};

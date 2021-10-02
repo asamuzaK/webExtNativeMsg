@@ -1,28 +1,29 @@
-'use strict';
 /* api */
-const {
+import { assert } from 'chai';
+import { afterEach, beforeEach, describe, it } from 'mocha';
+import {
+  createDirectory, isDir, isFile, removeDir
+} from '../modules/file-util.js';
+import { quoteArg } from '../modules/common.js';
+import childProcess from 'child_process';
+import fs, { promises as fsPromise } from 'fs';
+import os from 'os';
+import path from 'path';
+import process from 'process';
+import readline from 'readline-sync';
+import sinon from 'sinon';
+import {
+  DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME, IS_MAC, IS_WIN
+} from '../modules/constant.js';
+
+/* test */
+import {
   Setup,
   abortSetup, getBrowserData, handleRegClose, handleRegStderr,
   handleSetupCallback, values
-} = require('../modules/setup');
-const {
-  createDirectory, isDir, isFile, removeDir
-} = require('../modules/file-util');
-const { quoteArg } = require('../modules/common');
-const { assert } = require('chai');
-const { afterEach, beforeEach, describe, it } = require('mocha');
-const childProcess = require('child_process');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const process = require('process');
-const readline = require('readline-sync');
-const sinon = require('sinon');
+} from '../modules/setup.js';
 
 /* constant */
-const {
-  DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME, IS_MAC, IS_WIN
-} = require('../modules/constant');
 const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
@@ -821,6 +822,7 @@ describe('_createManifest', () => {
     const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
       info = msg;
     });
+    const spyWrite = sinon.spy(fsPromise, 'writeFile');
     const dir = path.join(TMPDIR, 'webextnativemsg');
     const configDir =
       await createDirectory(path.join(dir, 'config', 'firefox'));
@@ -834,7 +836,9 @@ describe('_createManifest', () => {
     });
     const res = await setup._createManifest(shellPath, configDir);
     const { calledOnce: infoCalled } = stubInfo;
+    const { calledOnce: writeCalled } = spyWrite;
     stubInfo.restore();
+    spyWrite.restore();
     let manifestPath;
     if (IS_WIN) {
       manifestPath = path.join(configDir, 'foo.json');
@@ -851,6 +855,7 @@ describe('_createManifest', () => {
     });
     const parsedFile = JSON.parse(file);
     assert.isTrue(infoCalled);
+    assert.isTrue(writeCalled);
     assert.strictEqual(info, `Created: ${manifestPath}`);
     assert.strictEqual(res, manifestPath);
     assert.isTrue(isFile(manifestPath));
@@ -870,6 +875,7 @@ describe('_createManifest', () => {
     const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
       info = msg;
     });
+    const spyWrite = sinon.spy(fsPromise, 'writeFile');
     const dir = path.join(TMPDIR, 'webextnativemsg');
     const configDir =
       await createDirectory(path.join(dir, 'config', 'chrome'));
@@ -883,7 +889,9 @@ describe('_createManifest', () => {
     });
     const res = await setup._createManifest(shellPath, configDir);
     const { calledOnce: infoCalled } = stubInfo;
+    const { calledOnce: writeCalled } = spyWrite;
     stubInfo.restore();
+    spyWrite.restore();
     let manifestPath;
     if (IS_WIN) {
       manifestPath = path.join(configDir, 'foo.json');
@@ -900,6 +908,7 @@ describe('_createManifest', () => {
     });
     const parsedFile = JSON.parse(file);
     assert.isTrue(infoCalled);
+    assert.isTrue(writeCalled);
     assert.strictEqual(info, `Created: ${manifestPath}`);
     assert.strictEqual(res, manifestPath);
     assert.isTrue(isFile(manifestPath));

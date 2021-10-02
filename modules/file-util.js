@@ -1,18 +1,15 @@
 /**
  * file-util.js
  */
-'use strict';
+
 /* api */
-const { fileURLToPath } = require('url');
-const { compareSemVer } = require('semver-parser');
-const { getType, isString } = require('./common');
-const fs = require('fs');
-const path = require('path');
-const process = require('process');
-const { promises: fsPromise } = fs;
+import { fileURLToPath } from 'url';
+import { getType, isString } from './common.js';
+import fs, { promises as fsPromise } from 'fs';
+import path from 'path';
+import { IS_WIN } from './constant.js';
 
 /* constants */
-const { IS_WIN } = require('./constant');
 const MASK_BIT = 0o111;
 const PERM_DIR = 0o777;
 const PERM_FILE = 0o666;
@@ -24,7 +21,7 @@ const SUBST = 'index';
  * @param {string} uri - URI
  * @returns {?string} - file path
  */
-const convertUriToFilePath = uri => {
+export const convertUriToFilePath = uri => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
@@ -42,7 +39,7 @@ const convertUriToFilePath = uri => {
  * @param {string} file - file path
  * @returns {?string} - absolute file path
  */
-const getAbsPath = file => {
+export const getAbsPath = file => {
   if (!isString(file)) {
     throw new TypeError(`Expected String but got ${getType(file)}.`);
   }
@@ -56,7 +53,7 @@ const getAbsPath = file => {
  * @param {string} file - file path
  * @returns {object} - file stat
  */
-const getStat = file =>
+export const getStat = file =>
   isString(file) && fs.existsSync(file) ? fs.statSync(file) : null;
 
 /**
@@ -65,7 +62,7 @@ const getStat = file =>
  * @param {string} dir - directory path
  * @returns {boolean} - result
  */
-const isDir = dir => {
+export const isDir = dir => {
   const stat = getStat(dir);
   return stat ? stat.isDirectory() : false;
 };
@@ -77,7 +74,7 @@ const isDir = dir => {
  * @param {string} baseDir - base directory path
  * @returns {boolean} - result
  */
-const isSubDir = (dir, baseDir) =>
+export const isSubDir = (dir, baseDir) =>
   isDir(dir) && isDir(baseDir) && dir.startsWith(baseDir);
 
 /**
@@ -86,7 +83,7 @@ const isSubDir = (dir, baseDir) =>
  * @param {string} file - file path
  * @returns {boolean} - result
  */
-const isFile = file => {
+export const isFile = file => {
   const stat = getStat(file);
   return stat ? stat.isFile() : false;
 };
@@ -100,7 +97,7 @@ const isFile = file => {
  * @param {number} [mask] - mask bit
  * @returns {boolean} - result
  */
-const isExecutable = (file, mask = MASK_BIT) => {
+export const isExecutable = (file, mask = MASK_BIT) => {
   let res;
   const stat = getStat(file);
   if (stat) {
@@ -116,7 +113,7 @@ const isExecutable = (file, mask = MASK_BIT) => {
  * @param {string} file - file path
  * @returns {number} - timestamp
  */
-const getFileTimestamp = file => {
+export const getFileTimestamp = file => {
   const stat = getStat(file);
   return stat ? stat.mtime.getTime() : 0;
 };
@@ -128,7 +125,7 @@ const getFileTimestamp = file => {
  * @param {string} [subst] - substitute file name
  * @returns {string} - file name
  */
-const getFileNameFromFilePath = (file, subst = SUBST) => {
+export const getFileNameFromFilePath = (file, subst = SUBST) => {
   let name;
   if (isString(file) && isFile(file)) {
     const base = path.basename(file);
@@ -147,28 +144,12 @@ const getFileNameFromFilePath = (file, subst = SUBST) => {
  * @param {string} baseDir - base directory path
  * @returns {void}
  */
-const removeDir = (dir, baseDir) => {
+export const removeDir = (dir, baseDir) => {
   if (isDir(dir)) {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    // TODO: remove version detection when node 10 reaches EOL
-    const { version: nodeVersion } = process;
-    const result = compareSemVer(nodeVersion, '12.10.0');
-    if (result >= 0) {
-      fs.rmdirSync(dir, { recursive: true });
-    } else {
-      const files = fs.readdirSync(dir);
-      files.length && files.forEach(file => {
-        const cur = path.join(dir, file);
-        if (fs.lstatSync(cur).isDirectory()) {
-          removeDir(cur, baseDir);
-        } else {
-          fs.unlinkSync(cur);
-        }
-      });
-      fs.rmdirSync(dir);
-    }
+    fs.rmdirSync(dir, { recursive: true });
   }
 };
 
@@ -179,7 +160,7 @@ const removeDir = (dir, baseDir) => {
  * @param {string} baseDir - base directory path
  * @returns {void}
  */
-const removeDirectory = async (dir, baseDir) => {
+export const removeDirectory = async (dir, baseDir) => {
   await removeDir(dir, baseDir);
 };
 
@@ -190,7 +171,7 @@ const removeDirectory = async (dir, baseDir) => {
  * @param {number} [mode] - permission
  * @returns {string} - directory path
  */
-const createDirectory = async (dir, mode = PERM_DIR) => {
+export const createDirectory = async (dir, mode = PERM_DIR) => {
   if (!isString(dir)) {
     throw new TypeError(`Expected String but got ${getType(dir)}.`);
   }
@@ -217,7 +198,7 @@ const createDirectory = async (dir, mode = PERM_DIR) => {
  * @param {number|string} [opt.mode] - file permission
  * @returns {string} - file path
  */
-const createFile = async (file, value, opt = {
+export const createFile = async (file, value, opt = {
   encoding: null, flag: 'w', mode: PERM_FILE
 }) => {
   if (!isString(file)) {
@@ -243,27 +224,10 @@ const createFile = async (file, value, opt = {
  * @param {string} [opt.flag] - flag
  * @returns {string|Buffer} - file content
  */
-const readFile = async (file, opt = { encoding: null, flag: 'r' }) => {
+export const readFile = async (file, opt = { encoding: null, flag: 'r' }) => {
   if (!isFile(file)) {
     throw new Error(`${file} is not a file.`);
   }
   const value = await fsPromise.readFile(file, opt);
   return value;
-};
-
-module.exports = {
-  convertUriToFilePath,
-  createDirectory,
-  createFile,
-  getAbsPath,
-  getFileNameFromFilePath,
-  getFileTimestamp,
-  getStat,
-  isDir,
-  isExecutable,
-  isFile,
-  isSubDir,
-  removeDir,
-  removeDirectory,
-  readFile
 };

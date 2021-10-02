@@ -1,35 +1,13 @@
 /**
  * index.js
  */
-'use strict';
+
 /* api */
-const { ChildProcess, CmdArgs } = require('./modules/child-process');
-const { Input, Output } = require('./modules/native-message');
-const { Setup } = require('./modules/setup');
-const {
+export { ChildProcess, CmdArgs } from './modules/child-process.js';
+export { Input, Output } from './modules/native-message.js';
+export { Setup } from './modules/setup.js';
+export {
   convertUriToFilePath, createDirectory, createFile,
   getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat,
   isDir, isExecutable, isFile, isSubDir, readFile, removeDir, removeDirectory
-} = require('./modules/file-util');
-
-module.exports = {
-  ChildProcess,
-  CmdArgs,
-  Input,
-  Output,
-  Setup,
-  convertUriToFilePath,
-  createDirectory,
-  createFile,
-  getAbsPath,
-  getFileNameFromFilePath,
-  getFileTimestamp,
-  getStat,
-  isDir,
-  isExecutable,
-  isFile,
-  isSubDir,
-  readFile,
-  removeDir,
-  removeDirectory
-};
+} from './modules/file-util.js';

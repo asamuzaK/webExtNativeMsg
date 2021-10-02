@@ -1,16 +1,16 @@
 /**
  * native-message.js
  */
-'use strict';
+
 /* api */
-const { isString } = require('./common');
+import { isString } from './common.js';
+import { CHAR, IS_BE } from './constant.js';
 
 /* constants */
-const { CHAR, IS_BE } = require('./constant');
 const BYTE_LEN = 4;
 
 /* Input */
-class Input {
+export class Input {
   /**
    * decode message from buffer
    */
@@ -79,7 +79,7 @@ class Input {
 }
 
 /* Output */
-class Output {
+export class Output {
   /* encode message to buffer */
   constructor() {
     this._output = null;
@@ -118,7 +118,3 @@ class Output {
     return Buffer.isBuffer(buf) ? buf : null;
   }
 }
-
-module.exports = {
-  Input, Output
-};
