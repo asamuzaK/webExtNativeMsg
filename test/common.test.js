@@ -5,8 +5,7 @@ import sinon from 'sinon';
 
 /* test */
 import {
-  escapeChar, getType, isString, logErr, logMsg, logWarn, quoteArg,
-  stringifyPositiveInt, stripHtmlTags, throwErr
+  escapeChar, getType, isString, logErr, logMsg, logWarn, quoteArg, throwErr
 } from '../modules/common.js';
 
 describe('escapeChar', () => {
@@ -126,36 +125,6 @@ describe('quoteArg', () => {
 
   it('should not be quoted if arg does not contain any space', () => {
     assert.strictEqual(quoteArg('abc'), 'abc');
-  });
-});
-
-describe('stringifyPositiveInt', () => {
-  it('should get string', () => {
-    assert.strictEqual(stringifyPositiveInt(1), '1');
-  });
-
-  it('should get null if given argument is not positive integer', () => {
-    assert.isNull(stringifyPositiveInt());
-  });
-
-  it('should get null if 0 is given', () => {
-    assert.isNull(stringifyPositiveInt(0));
-  });
-
-  it('should treat 0 as positive integer if second argument is true', () => {
-    assert.strictEqual(stringifyPositiveInt(0, true), '0');
-  });
-});
-
-describe('stripHtmlTags', () => {
-  it('should strip HTML tags', () => {
-    const p = '<p>test</p>';
-    assert.strictEqual(stripHtmlTags(p), 'test\n');
-  });
-
-  it('should decode HTML entities', () => {
-    const p = '&amp;&lt;&gt;&quot;';
-    assert.strictEqual(stripHtmlTags(p), '&<>"');
   });
 });
 
