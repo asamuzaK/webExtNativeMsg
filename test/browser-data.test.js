@@ -222,28 +222,6 @@ describe('Edge', () => {
   });
 });
 
-describe('Kinza', () => {
-  it('should contain kinza property', () => {
-    assert.property(browserData, 'kinza');
-  });
-
-  it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.kinza, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.kinza, ['aliasWin']);
-  });
-
-  it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.kinza,
-      ['hostLinux', 'hostMac', 'regWin']);
-    assert.isNull(browserData.kinza.hostLinux);
-    assert.isNull(browserData.kinza.hostMac);
-    assert.isArray(browserData.kinza.regWin);
-  });
-});
-
 describe('Opera', () => {
   it('should contain opera property', () => {
     assert.property(browserData, 'opera');

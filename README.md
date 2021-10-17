@@ -22,7 +22,6 @@ Helper modules for WebExtensions native messaging host.
 |Brave           |   ✓ *2|   ✓   |   ✓   |
 |CentBrowser     |   ✓ *2|       |       |
 |Edge            |   ✓   |       |   ✓   |
-|Kinza           |   ✓ *2|       |       |
 |Opera           |   ✓ *2|       |   ✓ *2|
 |Vivaldi         |   ✓ *2|   ✓   |   ✓   |
 

@@ -89,14 +89,6 @@ export const browserData = {
     regWin: [...HKCU_SOFTWARE, 'Microsoft', 'Edge', NM_HOSTS],
     type: EXT_CHROME
   },
-  kinza: {
-    alias: 'kinza',
-    aliasWin: 'chrome',
-    hostLinux: null,
-    hostMac: null,
-    regWin: [...HKCU_SOFTWARE, 'Google', 'Chrome', NM_HOSTS],
-    type: EXT_CHROME
-  },
   opera: {
     alias: 'opera',
     aliasMac: 'chrome',
