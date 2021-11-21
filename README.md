@@ -15,6 +15,7 @@ Helper modules for WebExtensions native messaging host.
 |Firefox         |   ✓   |   ✓   |   ✓   |
 |Thunderbird     |   ✓   |   ✓   |   ✓   |
 |Waterfox Current|   ✓   |   ✓   |   ✓   |
+|LibreWolf       |   ✓ *1|   ✓   |       |
 |Chrome          |   ✓   |   ✓   |   ✓   |
 |Chrome Canary   |   ✓ *2|       |   ✓   |
 |Chrome Beta     |   ✓ *2|   ✓   |   ✓   |

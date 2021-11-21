@@ -21,6 +21,14 @@ export const browserData = {
     regWin: [...HKCU_SOFTWARE, 'Mozilla', NM_HOSTS],
     type: EXT_WEB
   },
+  librewolf: {
+    alias: 'librewolf',
+    aliasWin: 'firefox',
+    hostLinux: [DIR_HOME, '.librewolf', 'native-messaging-hosts'],
+    hostMac: null,
+    regWin: [...HKCU_SOFTWARE, 'Mozilla', NM_HOSTS],
+    type: EXT_WEB
+  },
   thunderbird: {
     alias: 'thunderbird',
     hostLinux: [DIR_HOME, '.thunderbird', 'native-messaging-hosts'],
