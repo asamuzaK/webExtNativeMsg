@@ -242,7 +242,7 @@ describe('Brave', () => {
 
   it('should contain host keys', () => {
     assert.containsAllKeys(browserData.brave, [
-      'hostLinux', 
+      'hostLinux',
       'hostMac',
       'regWin'
     ]);

@@ -21,14 +21,6 @@ export const browserData = {
     regWin: [...HKCU_SOFTWARE, 'Mozilla', NM_HOSTS],
     type: EXT_WEB
   },
-  librewolf: {
-    alias: 'librewolf',
-    aliasWin: 'firefox',
-    hostLinux: [DIR_HOME, '.librewolf', 'native-messaging-hosts'],
-    hostMac: null,
-    regWin: [...HKCU_SOFTWARE, 'Mozilla', NM_HOSTS],
-    type: EXT_WEB
-  },
   thunderbird: {
     alias: 'thunderbird',
     hostLinux: [DIR_HOME, '.thunderbird', 'native-messaging-hosts'],
@@ -41,6 +33,14 @@ export const browserData = {
     hostLinux: [DIR_HOME, '.waterfox', 'native-messaging-hosts'],
     hostMac: [DIR_CONFIG_MAC, 'Waterfox', NM_HOSTS],
     regWin: [...HKCU_SOFTWARE, 'Waterfox', NM_HOSTS],
+    type: EXT_WEB
+  },
+  librewolf: {
+    alias: 'librewolf',
+    aliasWin: 'firefox',
+    hostLinux: [DIR_HOME, '.librewolf', 'native-messaging-hosts'],
+    hostMac: null,
+    regWin: [...HKCU_SOFTWARE, 'Mozilla', NM_HOSTS],
     type: EXT_WEB
   },
   /* blink */
