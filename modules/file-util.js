@@ -149,7 +149,12 @@ export const removeDir = (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    fs.rmdirSync(dir, { recursive: true });
+    // TODO: remove fs.rmdirSync fallback when Node v12 reaches EOL
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dir, { recursive: true });
+    } else {
+      fs.rmdirSync(dir, { recursive: true });
+    }
   }
 };
 

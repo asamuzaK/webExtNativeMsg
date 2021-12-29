@@ -2,6 +2,7 @@
 import { URL } from 'url';
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
+import sinon from 'sinon';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -158,12 +159,20 @@ describe('removeDir', () => {
       fs.existsSync(subDirPath),
       fs.existsSync(filePath)
     ]);
+    const spyRmdirSync = sinon.spy(fs, 'rmdirSync');
     await removeDir(dirPath, TMPDIR);
+    const { called: calledRmdirSync } = spyRmdirSync;
+    spyRmdirSync.restore();
     const res2 = await Promise.all([
       fs.existsSync(dirPath),
       fs.existsSync(subDirPath),
       fs.existsSync(filePath)
     ]);
+    if (typeof rmSync === 'function') {
+      assert.isFalse(calledRmdirSync);
+    } else {
+      assert.isTrue(calledRmdirSync);
+    }
     assert.deepEqual(res1, [true, true, true]);
     assert.deepEqual(res2, [false, false, false]);
   });
