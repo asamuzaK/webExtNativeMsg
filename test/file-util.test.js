@@ -1,7 +1,7 @@
 /* api */
 import { URL } from 'url';
 import { assert } from 'chai';
-import { describe, it } from 'mocha';
+import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import fs from 'fs';
 import os from 'os';
@@ -84,6 +84,32 @@ describe('convertUriToFilePath', () => {
 });
 
 describe('createDirectory', () => {
+  const dirPath = path.join(TMPDIR, 'webextnativemsg');
+  beforeEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+  afterEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+
   it('should get string', async () => {
     const dirString = path.join(TMPDIR, 'webextnativemsg', '1');
     const dir = await createDirectory(dirString);
@@ -110,8 +136,33 @@ describe('createDirectory', () => {
 });
 
 describe('createFile', () => {
+  const dirPath = path.join(TMPDIR, 'webextnativemsg');
+  beforeEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+  afterEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+
   it('should get string', async () => {
-    const dirPath = path.join(TMPDIR, 'webextnativemsg');
     fs.mkdirSync(dirPath);
     const filePath = path.join(dirPath, 'test.txt');
     const value = 'test file.\n';
@@ -119,8 +170,6 @@ describe('createFile', () => {
       encoding: 'utf8', flag: 'w', mode: PERM_FILE
     });
     assert.strictEqual(file, filePath);
-    fs.unlinkSync(file);
-    fs.rmdirSync(dirPath);
   });
 
   it('should throw if first argument is not a string', () => {
@@ -144,8 +193,33 @@ describe('createFile', () => {
 });
 
 describe('removeDir', () => {
+  const dirPath = path.join(TMPDIR, 'webextnativemsg');
+  beforeEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+  afterEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+
   it("should remove dir and it's files", async () => {
-    const dirPath = path.join(TMPDIR, 'webextnativemsg');
     fs.mkdirSync(dirPath);
     const subDirPath = path.join(dirPath, 'foo');
     fs.mkdirSync(subDirPath);
@@ -184,7 +258,6 @@ describe('removeDir', () => {
   });
 
   it('should throw if dir is not subdirectory of base dir', async () => {
-    const dirPath = path.join(TMPDIR, 'webextnativemsg');
     const foo = path.join(TMPDIR, 'foo');
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);
@@ -196,8 +269,33 @@ describe('removeDir', () => {
 });
 
 describe('removeDirectory', () => {
+  const dirPath = path.join(TMPDIR, 'webextnativemsg');
+  beforeEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+  afterEach(() => {
+    if (typeof fs.rmSync === 'function') {
+      fs.rmSync(dirPath, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      fs.rmdirSync(dirPath, {
+        recursive: true
+      });
+    }
+  });
+
   it("should remove dir and it's files", async () => {
-    const dirPath = path.join(TMPDIR, 'webextnativemsg');
     fs.mkdirSync(dirPath);
     const subDirPath = path.join(dirPath, 'foo');
     fs.mkdirSync(subDirPath);
@@ -230,7 +328,6 @@ describe('removeDirectory', () => {
   });
 
   it('should throw if dir is not subdirectory of base dir', async () => {
-    const dirPath = path.join(TMPDIR, 'webextnativemsg');
     const foo = path.join(TMPDIR, 'foo');
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);

@@ -138,7 +138,7 @@ export const getFileNameFromFilePath = (file, subst = SUBST) => {
 };
 
 /**
- * remove the directory and it's files
+ * remove the directory and it's files synchronously
  *
  * @param {string} dir - directory path
  * @param {string} baseDir - base directory path
@@ -149,7 +149,7 @@ export const removeDir = (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    // TODO: remove fs.rmdirSync fallback when Node v12 reaches EOL
+    // TODO: remove fallback when Node v12 reaches EOL
     if (typeof fs.rmSync === 'function') {
       fs.rmSync(dir, { recursive: true });
     } else {
@@ -166,7 +166,20 @@ export const removeDir = (dir, baseDir) => {
  * @returns {void}
  */
 export const removeDirectory = async (dir, baseDir) => {
-  await removeDir(dir, baseDir);
+  if (isDir(dir)) {
+    if (!isSubDir(dir, baseDir)) {
+      throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
+    }
+    // TODO: remove fallback when Node v12 reaches EOL
+    if (typeof fsPromise.rm === 'function') {
+      await fsPromise.rm(dir, {
+        force: true,
+        recursive: true
+      });
+    } else {
+      await removeDir(dir, baseDir);
+    }
+  }
 };
 
 /**
@@ -188,7 +201,7 @@ export const createDirectory = async (dir, mode = PERM_DIR) => {
     mode,
     recursive: true
   };
-  !isDir(dirPath) && await fsPromise.mkdir(dirPath, opt);
+  await fsPromise.mkdir(dirPath, opt);
   return dirPath;
 };
 
