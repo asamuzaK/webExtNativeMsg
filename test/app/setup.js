@@ -2,15 +2,16 @@
  * test app for setup
  * NOTE: regedit.exe is stubbed, so appCallback() will not be called on Windows.
  */
-'use strict';
-const { Setup, isFile, removeDir } = require('../../index');
-const childProcess = require('child_process');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const process = require('process');
-const readline = require('readline-sync');
-const sinon = require('sinon');
+
+import childProcess from 'child_process';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import process from 'process';
+import readline from 'readline-sync';
+import sinon from 'sinon';
+
+import { Setup, isFile, removeDir } from '../../index.js';
 
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();
