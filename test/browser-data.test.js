@@ -9,7 +9,6 @@ describe('browsers', () => {
   it('should contain all keys', () => {
     const keys = [
       'brave',
-      'centbrowser',
       'chrome',
       'chromebeta',
       'chromecanary',
@@ -249,31 +248,6 @@ describe('Brave', () => {
     assert.isArray(browserData.brave.hostLinux);
     assert.isArray(browserData.brave.hostMac);
     assert.isArray(browserData.brave.regWin);
-  });
-});
-
-describe('CentBrowser', () => {
-  it('should contain centbrowser property', () => {
-    assert.property(browserData, 'centbrowser');
-  });
-
-  it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.centbrowser, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.centbrowser, ['aliasWin']);
-  });
-
-  it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.centbrowser, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isNull(browserData.centbrowser.hostLinux);
-    assert.isNull(browserData.centbrowser.hostMac);
-    assert.isArray(browserData.centbrowser.regWin);
   });
 });
 

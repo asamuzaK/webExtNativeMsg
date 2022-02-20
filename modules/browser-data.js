@@ -82,14 +82,6 @@ export const browserData = {
     regWin: [...HKCU_SOFTWARE, 'Google', 'Chrome', NM_HOSTS],
     type: EXT_CHROME
   },
-  centbrowser: {
-    alias: 'centbrowser',
-    aliasWin: 'chrome',
-    hostLinux: null,
-    hostMac: null,
-    regWin: [...HKCU_SOFTWARE, 'Google', 'Chrome', NM_HOSTS],
-    type: EXT_CHROME
-  },
   edge: {
     alias: 'edge',
     hostLinux: null,
