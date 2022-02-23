@@ -270,7 +270,7 @@ describe('Edge', () => {
       'hostMac',
       'regWin'
     ]);
-    assert.isNull(browserData.edge.hostLinux);
+    assert.isArray(browserData.edge.hostLinux);
     assert.isArray(browserData.edge.hostMac);
     assert.isArray(browserData.edge.regWin);
   });

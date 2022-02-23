@@ -23,7 +23,7 @@ Helper modules for WebExtensions native messaging host.
 |Chrome Beta     |   ✓ *2|   ✓   |   ✓   |
 |Chromium        |       |   ✓   |   ✓   |
 |Brave           |   ✓ *2|   ✓   |   ✓   |
-|Edge            |   ✓   |       |   ✓   |
+|Edge            |   ✓   |   ✓   |   ✓   |
 |Opera           |   ✓ *2|       |   ✓ *2|
 |Vivaldi         |   ✓ *2|   ✓   |   ✓   |
 
