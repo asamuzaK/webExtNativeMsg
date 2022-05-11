@@ -127,12 +127,9 @@ export const getFileTimestamp = file => {
  */
 export const getFileNameFromFilePath = (file, subst = SUBST) => {
   let name;
-  if (isString(file) && isFile(file)) {
-    const base = path.basename(file);
-    const extReg = /^([^.]+)(?:\..+)?$/;
-    if (extReg.test(base)) {
-      [, name] = extReg.exec(base);
-    }
+  if (isString(file) && isFile(file) &&
+      /^([^.]+)(?:\..+)?$/.test(path.basename(file))) {
+    [, name] = /^([^.]+)(?:\..+)?$/.exec(path.basename(file));
   }
   return name || subst;
 };
@@ -149,12 +146,10 @@ export const removeDir = (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    // TODO: remove fallback when Node v12 reaches EOL
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dir, { recursive: true });
-    } else {
-      fs.rmdirSync(dir, { recursive: true });
-    }
+    fs.rmSync(dir, {
+      force: true,
+      recursive: true
+    });
   }
 };
 
@@ -170,15 +165,10 @@ export const removeDirectory = async (dir, baseDir) => {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
     }
-    // TODO: remove fallback when Node v12 reaches EOL
-    if (typeof fsPromise.rm === 'function') {
-      await fsPromise.rm(dir, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      await removeDir(dir, baseDir);
-    }
+    await fsPromise.rm(dir, {
+      force: true,
+      recursive: true
+    });
   }
 };
 
@@ -201,7 +191,7 @@ export const createDirectory = async (dir, mode = PERM_DIR) => {
     mode,
     recursive: true
   };
-  await fsPromise.mkdir(dirPath, opt);
+  !isDir(dirPath) && await fsPromise.mkdir(dirPath, opt);
   return dirPath;
 };
 
