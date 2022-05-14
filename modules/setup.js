@@ -145,9 +145,10 @@ export class Setup {
       (Array.isArray(supportedBrowsers) && supportedBrowsers.length)
         ? supportedBrowsers
         : Object.keys(browserData);
-    this._configDir = isString(hostName)
-      ? path.join(DIR_CONFIG, hostName, 'config')
-      : path.join(DIR_CWD, 'config');
+    this._configDir = this._getConfigDir({
+      configPath,
+      hostName
+    });
     this._hostDesc = isString(hostDescription) ? hostDescription : null;
     this._hostName = isString(hostName) ? hostName : null;
     this._mainFile = isString(mainScriptFile) ? mainScriptFile : 'index.js';
@@ -163,9 +164,6 @@ export class Setup {
     this._overwriteConfig = !!overwriteConfig;
     this._readline = readline;
     this._browserConfigDir = null;
-    if (isString(configPath) && configPath.length) {
-      this._setConfigDir(configPath);
-    }
   }
 
   /* getter / setter */
@@ -174,10 +172,8 @@ export class Setup {
     if (this._browser) {
       const { alias } = this._browser;
       browser = alias;
-    } else {
-      browser = this._browser;
     }
-    return browser;
+    return browser || null;
   }
 
   set browser(browser) {
@@ -199,7 +195,9 @@ export class Setup {
   }
 
   set configPath(dir) {
-    this._setConfigDir(dir);
+    this._configDir = this._getConfigDir({
+      configPath: dir
+    });
   }
 
   get hostDescription() {
@@ -259,6 +257,29 @@ export class Setup {
   }
 
   /**
+   * get config directory
+   *
+   * @param {object} opt - options
+   * @returns {string} - config directory
+   */
+  _getConfigDir(opt = {}) {
+    const { configPath, hostName } = opt;
+    let dir;
+    if (configPath && isString(configPath)) {
+      const dirPath = getAbsPath(configPath);
+      if (!dirPath.startsWith(DIR_HOME)) {
+        throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
+      }
+      dir = dirPath;
+    } else if (hostName && isString(hostName)) {
+      dir = path.resolve(DIR_CONFIG, hostName, 'config');
+    } else {
+      dir = path.resolve(DIR_CWD, 'config');
+    }
+    return dir;
+  }
+
+  /**
    * set config directory
    *
    * @param {string} dir - directory path
@@ -269,7 +290,7 @@ export class Setup {
       throw new TypeError(`Expected String but got ${getType(dir)}.`);
     }
     const dirPath = getAbsPath(dir);
-    if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
+    if (!dirPath.startsWith(DIR_HOME)) {
       throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
     }
     this._configDir = dirPath;
@@ -345,6 +366,9 @@ export class Setup {
     if (!isFile(shellPath)) {
       throw new Error(`No such file: ${shellPath}.`);
     }
+    if (IS_WIN && configDir && !isDir(configDir)) {
+      throw new Error(`No such directory: ${configDir}.`);
+    }
     if (!this._browser) {
       throw new TypeError(`Expected Object but got ${getType(this._browser)}.`);
     }
@@ -382,14 +406,10 @@ export class Setup {
     };
     const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
     const fileName = `${this._hostName}.json`;
-    const hostDir = IS_MAC
-      ? path.join(...hostMac)
-      : !IS_WIN && path.join(...hostLinux);
-    if (IS_WIN && !isDir(configDir)) {
-      throw new Error(`No such directory: ${configDir}.`);
-    }
-    const manifestPath = path.resolve(hostDir || configDir, fileName);
-    hostDir && !isDir(hostDir) && await createDirectory(hostDir);
+    const dir = (IS_WIN && configDir) || (IS_MAC && path.join(...hostMac)) ||
+                path.join(...hostLinux);
+    const manifestDir = await createDirectory(dir);
+    const manifestPath = path.resolve(manifestDir, fileName);
     await createFile(manifestPath, content, {
       encoding: CHAR, flag: 'w', mode: PERM_FILE
     });
@@ -414,13 +434,12 @@ export class Setup {
     }
     const appPath = process.execPath;
     const filePath = path.resolve(DIR_CWD, this._mainFile);
-    const cmd = isFile(filePath)
-      ? `${quoteArg(appPath)} ${quoteArg(filePath)}`
-      : quoteArg(appPath);
-    const content = IS_WIN
-      ? `@echo off\n${cmd}\n`
-      : `#!${process.env.SHELL}\n${cmd}\n`;
-    const shellExt = IS_WIN ? 'cmd' : 'sh';
+    const cmd =
+      (isFile(filePath) && `${quoteArg(appPath)} ${quoteArg(filePath)}`) ||
+      quoteArg(appPath);
+    const content =
+      (IS_WIN && `@echo off\n${cmd}\n`) || `#!${process.env.SHELL}\n${cmd}\n`;
+    const shellExt = (IS_WIN && 'cmd') || 'sh';
     const shellPath = path.join(configDir, `${this._hostName}.${shellExt}`);
     await createFile(shellPath, content, {
       encoding: CHAR, flag: 'w', mode: PERM_EXEC
@@ -460,9 +479,7 @@ export class Setup {
       values.set('shellPath', shellPath);
       values.set('manifestPath', manifestPath);
       values.set('callback', this._callback);
-      func = IS_WIN
-        ? this._createReg(manifestPath)
-        : handleSetupCallback();
+      func = IS_WIN ? this._createReg(manifestPath) : handleSetupCallback();
     } else {
       func = abortSetup('Failed to create files.');
     }

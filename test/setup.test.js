@@ -482,6 +482,15 @@ describe('Setup', () => {
       assert.deepEqual(setup.supportedBrowsers, ['firefox', 'chrome']);
     });
 
+    it('should throw', () => {
+      const myPath = '/foo/bar';
+      const setup = new Setup();
+      assert.throws(
+        () => { setup.configPath = myPath; },
+        `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
+      );
+    });
+
     it('should set string', () => {
       const myPath = path.resolve(DIR_CWD, 'foo');
       const setup = new Setup();
@@ -596,6 +605,58 @@ describe('Setup', () => {
       setup.overwriteConfig = false;
       assert.isFalse(setup.overwriteConfig);
     });
+  });
+});
+
+describe('_getConfigDir', () => {
+  it("should throw if dir is not subdirectory of user's home dir", () => {
+    const setup = new Setup();
+    assert.throws(
+      () => setup._getConfigDir({
+        configPath: '/foo/bar'
+      }),
+      `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
+    );
+  });
+
+  it("should throw if dir is not subdirectory of user's home dir", () => {
+    const setup = new Setup();
+    assert.throws(
+      () => setup._getConfigDir({
+        configPath: path.join(DIR_HOME, '../foo')
+      }),
+      `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`);
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join('foo', 'bar');
+    const setup = new Setup();
+    const res = setup._getConfigDir({ configPath });
+    assert.strictEqual(res, path.resolve(configPath));
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join('foo', '../bar/baz');
+    const setup = new Setup();
+    const res = setup._getConfigDir({ configPath });
+    assert.strictEqual(configPath, path.join('bar', 'baz'));
+    assert.strictEqual(res, path.resolve(configPath));
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join(DIR_CONFIG, 'foo', 'config');
+    const setup = new Setup();
+    const res = setup._getConfigDir({
+      hostName: 'foo'
+    });
+    assert.strictEqual(res, path.resolve(configPath));
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join(DIR_CWD, 'config');
+    const setup = new Setup();
+    const res = setup._getConfigDir();
+    assert.strictEqual(res, path.resolve(configPath));
   });
 });
 
@@ -737,6 +798,21 @@ describe('_createManifest', () => {
   it('should throw', async () => {
     const file =
       path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const dir = path.resolve(DIR_HOME, 'foo');
+    const setup = new Setup();
+    await setup._createManifest(file, dir).catch(e => {
+      if (IS_WIN) {
+        assert.instanceOf(e, Error);
+        assert.strictEqual(e.message, `No such directory: ${dir}.`);
+      } else {
+        assert.isUndefined(e);
+      }
+    });
+  });
+
+  it('should throw', async () => {
+    const file =
+      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
     const setup = new Setup();
     await setup._createManifest(file).catch(e => {
       assert.instanceOf(e, TypeError);
@@ -822,6 +898,7 @@ describe('_createManifest', () => {
     const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
       info = msg;
     });
+    const spyMkdir = sinon.spy(fsPromise, 'mkdir');
     const spyWrite = sinon.spy(fsPromise, 'writeFile');
     const dir = path.join(TMPDIR, 'webextnativemsg');
     const configDir =
@@ -836,9 +913,11 @@ describe('_createManifest', () => {
     });
     const res = await setup._createManifest(shellPath, configDir);
     const { calledOnce: infoCalled } = stubInfo;
+    const { callCount: mkdirCallCount } = spyMkdir;
     const { calledOnce: writeCalled } = spyWrite;
     stubInfo.restore();
     spyWrite.restore();
+    spyMkdir.restore();
     let manifestPath;
     if (IS_WIN) {
       manifestPath = path.join(configDir, 'foo.json');
@@ -855,6 +934,7 @@ describe('_createManifest', () => {
     });
     const parsedFile = JSON.parse(file);
     assert.isTrue(infoCalled);
+    assert.strictEqual(mkdirCallCount, 1);
     assert.isTrue(writeCalled);
     assert.strictEqual(info, `Created: ${manifestPath}`);
     assert.strictEqual(res, manifestPath);
