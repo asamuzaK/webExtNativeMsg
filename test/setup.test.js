@@ -904,8 +904,9 @@ describe('_createManifest', () => {
     const spyMkdir = sinon.spy(fsPromise, 'mkdir');
     const spyWrite = sinon.spy(fsPromise, 'writeFile');
     const dir = path.join(TMPDIR, 'webextnativemsg');
-    const configDir =
-      await createDirectory(path.join(dir, 'config', 'firefox'));
+    const configDir = fs.mkdirSync(path.join(dir, 'config', 'firefox'), {
+      recursive: true
+    });
     const shellPath =
       path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
     const setup = new Setup({
@@ -937,7 +938,11 @@ describe('_createManifest', () => {
     });
     const parsedFile = JSON.parse(file);
     assert.isTrue(infoCalled);
-    assert.strictEqual(mkdirCallCount, 1);
+    if (IS_WIN) {
+      assert.strictEqual(mkdirCallCount, 0);
+    } else {
+      assert.strictEqual(mkdirCallCount, 1);
+    }
     assert.isTrue(writeCalled);
     assert.strictEqual(info, `Created: ${manifestPath}`);
     assert.strictEqual(res, manifestPath);
