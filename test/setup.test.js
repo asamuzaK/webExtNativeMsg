@@ -798,21 +798,6 @@ describe('_createManifest', () => {
   it('should throw', async () => {
     const file =
       path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
-    const dir = path.resolve(DIR_HOME, 'foo');
-    const setup = new Setup();
-    await setup._createManifest(file, dir).catch(e => {
-      if (IS_WIN) {
-        assert.instanceOf(e, Error);
-        assert.strictEqual(e.message, `No such directory: ${dir}.`);
-      } else {
-        assert.isUndefined(e);
-      }
-    });
-  });
-
-  it('should throw', async () => {
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
     const setup = new Setup();
     await setup._createManifest(file).catch(e => {
       assert.instanceOf(e, TypeError);
@@ -889,6 +874,24 @@ describe('_createManifest', () => {
       await setup._createManifest(file).catch(e => {
         assert.instanceOf(e, Error);
         assert.strictEqual(e.message, 'No such directory: undefined.');
+      });
+    }
+  });
+
+  it('should throw', async () => {
+    const file =
+      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const dir = path.resolve(DIR_HOME, 'foo');
+    const setup = new Setup({
+      browser: 'firefox',
+      hostDescription: 'foo bar',
+      hostName: 'foo',
+      webExtensionIds: ['foo@bar']
+    });
+    if (IS_WIN) {
+      await setup._createManifest(file, dir).catch(e => {
+        assert.instanceOf(e, Error);
+        assert.strictEqual(e.message, `No such directory: ${dir}.`);
       });
     }
   });
