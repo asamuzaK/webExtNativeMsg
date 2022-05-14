@@ -267,7 +267,7 @@ export class Setup {
     let dir;
     if (configPath && isString(configPath)) {
       const dirPath = getAbsPath(configPath);
-      if (!dirPath.startsWith(DIR_HOME)) {
+      if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
         throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
       }
       dir = dirPath;
