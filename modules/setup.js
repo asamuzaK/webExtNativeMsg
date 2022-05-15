@@ -307,9 +307,9 @@ export class Setup {
       const {
         alias, aliasLinux, aliasMac, aliasWin, hostLinux, hostMac, regWin
       } = this._browser;
-      const label = (IS_WIN && regWin && (aliasWin || alias)) ||
-                    (IS_MAC && hostMac && (aliasMac || alias)) ||
-                    (!IS_WIN && !IS_MAC && hostLinux && (aliasLinux || alias));
+      const label = (IS_WIN && regWin && (aliasWin ?? alias)) ||
+                    (IS_MAC && hostMac && (aliasMac ?? alias)) ||
+                    (!IS_WIN && !IS_MAC && hostLinux && (aliasLinux ?? alias));
       if (this._configDir && isString(label)) {
         dir = path.join(this._configDir, label);
       }
