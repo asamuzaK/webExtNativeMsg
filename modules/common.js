@@ -74,7 +74,7 @@ export const isString = o => typeof o === 'string' || o instanceof String;
  * @returns {?string} - string
  */
 export const escapeChar = (str, re) =>
-  isString(str) && re && re.global ? str.replace(re, (m, c) => `\\${c}`) : null;
+  isString(str) && re?.global ? str.replace(re, (m, c) => `\\${c}`) : null;
 
 /**
  * quote arg
