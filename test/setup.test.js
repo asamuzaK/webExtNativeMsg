@@ -1,9 +1,7 @@
 /* api */
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import {
-  createDirectory, isDir, isFile, removeDir
-} from '../modules/file-util.js';
+import { createDirectory, isDir, isFile } from '../modules/file-util.js';
 import { quoteArg } from '../modules/common.js';
 import childProcess from 'child_process';
 import fs, { promises as fsPromise } from 'fs';
@@ -27,14 +25,21 @@ import {
 const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
-const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
-               os.tmpdir();
+const TMPDIR = path.join(DIR_CWD, 'tmp');
 
-beforeEach(() => {
+beforeEach(async () => {
   values.clear();
+  await fsPromise.rm(TMPDIR, {
+    force: true,
+    recursive: true
+  });
 });
-afterEach(() => {
+afterEach(async () => {
   values.clear();
+  await fsPromise.rm(TMPDIR, {
+    force: true,
+    recursive: true
+  });
 });
 
 describe('abortSetup', () => {
@@ -660,44 +665,6 @@ describe('_getConfigDir', () => {
   });
 });
 
-describe('_setConfigDir', () => {
-  it('should throw if dir is not given', () => {
-    const setup = new Setup();
-    assert.throws(() => setup._setConfigDir(),
-      'Expected String but got Undefined');
-  });
-
-  it("should throw if dir is not subdirectory of user's home dir", () => {
-    const setup = new Setup();
-    assert.throws(
-      () => setup._setConfigDir('/foo/bar'),
-      `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
-    );
-  });
-
-  it("should throw if dir is not subdirectory of user's home dir", () => {
-    const setup = new Setup();
-    assert.throws(
-      () => setup._setConfigDir(path.join(DIR_HOME, '../foo')),
-      `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`);
-  });
-
-  it('should set dir', () => {
-    const configPath = path.join('foo', 'bar');
-    const setup = new Setup();
-    setup._setConfigDir(configPath);
-    assert.strictEqual(setup.configPath, path.resolve(configPath));
-  });
-
-  it('should set dir', () => {
-    const configPath = path.join('foo', '../bar/baz');
-    const setup = new Setup();
-    setup._setConfigDir(configPath);
-    assert.strictEqual(configPath, path.join('bar', 'baz'));
-    assert.strictEqual(setup.configPath, path.resolve(configPath));
-  });
-});
-
 describe('_getBrowserConfigDir', () => {
   it('should get null', () => {
     const browser = IS_WIN ? 'Chromium' : 'CentBrowser';
@@ -955,7 +922,6 @@ describe('_createManifest', () => {
       path: shellPath,
       type: 'stdio'
     });
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create manifest', async () => {
@@ -1008,7 +974,6 @@ describe('_createManifest', () => {
       path: shellPath,
       type: 'stdio'
     });
-    await removeDir(dir, TMPDIR);
   });
 });
 
@@ -1037,7 +1002,6 @@ describe('_createShellScript', () => {
       assert.instanceOf(e, TypeError);
       assert.strictEqual(e.message, 'Expected String but got Null.');
     });
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1077,7 +1041,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1117,7 +1080,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1157,7 +1119,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1197,7 +1158,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1237,7 +1197,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1276,7 +1235,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1315,7 +1273,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 });
 
@@ -1336,7 +1293,8 @@ describe('_createConfigDir', () => {
     const dir = path.join(TMPDIR, 'webextnativemsg');
     const browserConfigDir = path.join(dir, 'config', 'firefox');
     const setup = new Setup();
-    setup._browserConfigDir = browserConfigDir;
+    setup.browser = 'firefox';
+    setup.configPath = path.join(dir, 'config');
     const res = await setup._createConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     stubInfo.restore();
@@ -1344,7 +1302,6 @@ describe('_createConfigDir', () => {
     assert.strictEqual(info, `Created: ${browserConfigDir}`);
     assert.strictEqual(res, browserConfigDir);
     assert.isTrue(isDir(res));
-    await removeDir(dir, TMPDIR);
   });
 });
 
@@ -1454,7 +1411,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
     const configPath = path.resolve('test', 'file', 'config', 'firefox');
-    setup._browserConfigDir = configPath;
+    setup.browser = 'firefox';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
@@ -1481,7 +1439,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubReadline = sinon.stub(readline, 'keyInYNStrict').returns(true);
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
-    setup._browserConfigDir = path.resolve('test', 'file', 'config', 'firefox');
+    setup.browser = 'firefox';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
@@ -1508,7 +1467,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubReadline = sinon.stub(readline, 'keyInYNStrict').returns(true);
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
-    setup._browserConfigDir = path.resolve('test', 'file', 'config', 'firefox');
+    setup.browser = 'firefox';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
@@ -1535,7 +1495,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubReadline = sinon.stub(readline, 'keyInYNStrict').returns(true);
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
-    setup._browserConfigDir = path.resolve('test', 'file', 'config', 'chrome');
+    setup.browser = 'chrome';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;

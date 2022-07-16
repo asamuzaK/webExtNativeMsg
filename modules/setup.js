@@ -120,6 +120,20 @@ export const getBrowserData = key => {
 
 /* Setup */
 export class Setup {
+  /* private fields */
+  #browser;
+  #browserConfigDir;
+  #callback;
+  #chromeExtIds;
+  #configDir;
+  #hostDesc;
+  #hostName;
+  #mainFile;
+  #overwriteConfig;
+  #readline;
+  #supportedBrowsers;
+  #webExtIds;
+
   /**
    * setup options
    *
@@ -140,120 +154,119 @@ export class Setup {
       hostName, mainScriptFile, overwriteConfig, supportedBrowsers,
       webExtensionIds
     } = opt;
-    this._browser = isString(browser) ? getBrowserData(browser) : null;
-    this._supportedBrowsers =
+    this.#browser = isString(browser) ? getBrowserData(browser) : null;
+    this.#supportedBrowsers =
       (Array.isArray(supportedBrowsers) && supportedBrowsers.length)
         ? supportedBrowsers
         : Object.keys(browserData);
-    this._configDir = this._getConfigDir({
+    this.#configDir = this._getConfigDir({
       configPath,
       hostName
     });
-    this._hostDesc = isString(hostDescription) ? hostDescription : null;
-    this._hostName = isString(hostName) ? hostName : null;
-    this._mainFile = isString(mainScriptFile) ? mainScriptFile : 'index.js';
-    this._chromeExtIds =
+    this.#hostDesc = isString(hostDescription) ? hostDescription : null;
+    this.#hostName = isString(hostName) ? hostName : null;
+    this.#mainFile = isString(mainScriptFile) ? mainScriptFile : 'index.js';
+    this.#chromeExtIds =
       (Array.isArray(chromeExtensionIds) && chromeExtensionIds.length)
         ? chromeExtensionIds
         : null;
-    this._webExtIds =
+    this.#webExtIds =
       (Array.isArray(webExtensionIds) && webExtensionIds.length)
         ? webExtensionIds
         : null;
-    this._callback = typeof callback === 'function' ? callback : null;
-    this._overwriteConfig = !!overwriteConfig;
-    this._readline = readline;
-    this._browserConfigDir = null;
+    this.#callback = typeof callback === 'function' ? callback : null;
+    this.#overwriteConfig = !!overwriteConfig;
+    this.#browserConfigDir = null;
   }
 
   /* getter / setter */
   get browser() {
     let browser;
-    if (this._browser) {
-      const { alias } = this._browser;
+    if (this.#browser) {
+      const { alias } = this.#browser;
       browser = alias;
     }
     return browser || null;
   }
 
   set browser(browser) {
-    this._browser = isString(browser) ? getBrowserData(browser) : null;
+    this.#browser = isString(browser) ? getBrowserData(browser) : null;
   }
 
   get supportedBrowsers() {
-    return this._supportedBrowsers;
+    return this.#supportedBrowsers;
   }
 
   set supportedBrowsers(arr) {
     if (Array.isArray(arr) && arr.length) {
-      this._supportedBrowsers = arr;
+      this.#supportedBrowsers = arr;
     }
   }
 
   get configPath() {
-    return this._configDir;
+    return this.#configDir;
   }
 
   set configPath(dir) {
-    this._configDir = this._getConfigDir({
+    this.#configDir = this._getConfigDir({
       configPath: dir
     });
   }
 
   get hostDescription() {
-    return this._hostDesc;
+    return this.#hostDesc;
   }
 
   set hostDescription(desc) {
-    this._hostDesc = isString(desc) ? desc : null;
+    this.#hostDesc = isString(desc) ? desc : null;
   }
 
   get hostName() {
-    return this._hostName;
+    return this.#hostName;
   }
 
   set hostName(name) {
-    this._hostName = isString(name) ? name : null;
+    this.#hostName = isString(name) ? name : null;
   }
 
   get mainScriptFile() {
-    return this._mainFile;
+    return this.#mainFile;
   }
 
   set mainScriptFile(name) {
-    this._mainFile = isString(name) ? name : 'index.js';
+    this.#mainFile = isString(name) ? name : 'index.js';
   }
 
   get chromeExtensionIds() {
-    return this._chromeExtIds;
+    return this.#chromeExtIds;
   }
 
   set chromeExtensionIds(arr) {
-    this._chromeExtIds = (Array.isArray(arr) && arr.length) ? arr : null;
+    this.#chromeExtIds = (Array.isArray(arr) && arr.length) ? arr : null;
   }
 
   get webExtensionIds() {
-    return this._webExtIds;
+    return this.#webExtIds;
   }
 
   set webExtensionIds(arr) {
-    this._webExtIds = (Array.isArray(arr) && arr.length) ? arr : null;
+    this.#webExtIds = (Array.isArray(arr) && arr.length) ? arr : null;
   }
 
   get callback() {
-    return this._callback;
+    return this.#callback;
   }
 
   set callback(func) {
-    this._callback = typeof func === 'function' ? func : null;
+    this.#callback = typeof func === 'function' ? func : null;
   }
 
   get overwriteConfig() {
-    return this._overwriteConfig;
+    return this.#overwriteConfig;
   }
 
   set overwriteConfig(overwrite) {
-    this._overwriteConfig = !!overwrite;
+    this.#overwriteConfig = !!overwrite;
   }
 
   /**
@@ -280,38 +293,21 @@ export class Setup {
   }
 
   /**
-   * set config directory
-   *
-   * @param {string} dir - directory path
-   * @returns {void}
-   */
-  _setConfigDir(dir) {
-    if (!isString(dir)) {
-      throw new TypeError(`Expected String but got ${getType(dir)}.`);
-    }
-    const dirPath = getAbsPath(dir);
-    if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
-      throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
-    }
-    this._configDir = dirPath;
-  }
-
-  /**
    * get browser specific config directory
    *
    * @returns {?string} - config directory
    */
   _getBrowserConfigDir() {
     let dir;
-    if (this._browser) {
+    if (this.#browser) {
       const {
         alias, aliasLinux, aliasMac, aliasWin, hostLinux, hostMac, regWin
-      } = this._browser;
+      } = this.#browser;
       const label = (IS_WIN && regWin && (aliasWin ?? alias)) ||
                     (IS_MAC && hostMac && (aliasMac ?? alias)) ||
                     (!IS_WIN && !IS_MAC && hostLinux && (aliasLinux ?? alias));
-      if (this._configDir && isString(label)) {
-        dir = path.join(this._configDir, label);
+      if (this.#configDir && isString(label)) {
+        dir = path.join(this.#configDir, label);
       }
     }
     return dir || null;
@@ -327,16 +323,16 @@ export class Setup {
     if (!isFile(manifestPath)) {
       throw new Error(`No such file: ${manifestPath}.`);
     }
-    if (!this._browser) {
-      throw new TypeError(`Expected Object but got ${getType(this._browser)}.`);
+    if (!this.#browser) {
+      throw new TypeError(`Expected Object but got ${getType(this.#browser)}.`);
     }
-    if (!isString(this._hostName)) {
-      throw new TypeError(`Expected String but got ${getType(this._hostName)}.`);
+    if (!isString(this.#hostName)) {
+      throw new TypeError(`Expected String but got ${getType(this.#hostName)}.`);
     }
     let proc;
     if (IS_WIN) {
-      const { regWin } = this._browser;
-      const regKey = path.join(...regWin, this._hostName);
+      const { regWin } = this.#browser;
+      const regKey = path.join(...regWin, this.#hostName);
       const reg = path.join(process.env.WINDIR, 'system32', 'reg.exe');
       const args = ['add', regKey, '/ve', '/d', manifestPath, '/f'];
       const opt = {
@@ -367,24 +363,24 @@ export class Setup {
     if (IS_WIN && configDir && !isDir(configDir)) {
       throw new Error(`No such directory: ${configDir}.`);
     }
-    if (!this._browser) {
-      throw new TypeError(`Expected Object but got ${getType(this._browser)}.`);
+    if (!this.#browser) {
+      throw new TypeError(`Expected Object but got ${getType(this.#browser)}.`);
     }
-    if (!isString(this._hostDesc)) {
-      throw new TypeError(`Expected String but got ${getType(this._hostDesc)}.`);
+    if (!isString(this.#hostDesc)) {
+      throw new TypeError(`Expected String but got ${getType(this.#hostDesc)}.`);
     }
-    if (!isString(this._hostName)) {
-      throw new TypeError(`Expected String but got ${getType(this._hostName)}.`);
+    if (!isString(this.#hostName)) {
+      throw new TypeError(`Expected String but got ${getType(this.#hostName)}.`);
     }
-    const { hostLinux, hostMac, type } = this._browser;
+    const { hostLinux, hostMac, type } = this.#browser;
     const allowedField = {
       [EXT_CHROME]: {
         key: 'allowed_origins',
-        value: this._chromeExtIds
+        value: this.#chromeExtIds
       },
       [EXT_WEB]: {
         key: 'allowed_extensions',
-        value: this._webExtIds
+        value: this.#webExtIds
       }
     };
     const { key, value } = allowedField[type];
@@ -393,13 +389,13 @@ export class Setup {
     }
     const manifest = {
       [key]: [...value],
-      description: this._hostDesc,
-      name: this._hostName,
+      description: this.#hostDesc,
+      name: this.#hostName,
       path: shellPath,
       type: 'stdio'
     };
     const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
-    const fileName = `${this._hostName}.json`;
+    const fileName = `${this.#hostName}.json`;
     const dir = (IS_WIN && configDir) || (IS_MAC && path.join(...hostMac)) ||
                 path.join(...hostLinux);
     const manifestDir = await createDirectory(dir);
@@ -421,18 +417,18 @@ export class Setup {
     if (!isDir(configDir)) {
       throw new Error(`No such directory: ${configDir}.`);
     }
-    if (!isString(this._hostName)) {
-      throw new TypeError(`Expected String but got ${getType(this._hostName)}.`);
+    if (!isString(this.#hostName)) {
+      throw new TypeError(`Expected String but got ${getType(this.#hostName)}.`);
     }
     const appPath = process.execPath;
-    const filePath = path.resolve(DIR_CWD, this._mainFile);
+    const filePath = path.resolve(DIR_CWD, this.#mainFile);
     const cmd =
       (isFile(filePath) && `${quoteArg(appPath)} ${quoteArg(filePath)}`) ||
       quoteArg(appPath);
     const content =
       (IS_WIN && `@echo off\n${cmd}\n`) || `#!${process.env.SHELL}\n${cmd}\n`;
     const shellExt = (IS_WIN && 'cmd') || 'sh';
-    const shellPath = path.join(configDir, `${this._hostName}.${shellExt}`);
+    const shellPath = path.join(configDir, `${this.#hostName}.${shellExt}`);
     await createFile(shellPath, content, {
       encoding: CHAR, flag: 'w', mode: PERM_EXEC
     });
@@ -446,10 +442,14 @@ export class Setup {
    * @returns {string} - config directory path
    */
   async _createConfigDir() {
-    if (!isString(this._browserConfigDir)) {
-      throw new TypeError(`Expected String but got ${getType(this._browserConfigDir)}.`);
+    // TODO: use ??= when Node 14 reaches EOL
+    if (!this.#browserConfigDir) {
+      this.#browserConfigDir = this._getBrowserConfigDir();
     }
-    const configDir = await createDirectory(this._browserConfigDir, PERM_DIR);
+    if (!isString(this.#browserConfigDir)) {
+      throw new TypeError(`Expected String but got ${getType(this.#browserConfigDir)}.`);
+    }
+    const configDir = await createDirectory(this.#browserConfigDir, PERM_DIR);
     console.info(`Created: ${configDir}`);
     return configDir;
   }
@@ -468,7 +468,7 @@ export class Setup {
       values.set('configDir', configDir);
       values.set('shellPath', shellPath);
       values.set('manifestPath', manifestPath);
-      values.set('callback', this._callback);
+      values.set('callback', this.#callback);
       func = IS_WIN ? this._createReg(manifestPath) : handleSetupCallback();
     } else {
       func = abortSetup('Failed to create files.');
@@ -482,14 +482,14 @@ export class Setup {
    * @returns {Function} - createFiles(), abortSetup()
    */
   async _handleBrowserConfigDir() {
-    if (!isString(this._browserConfigDir)) {
-      throw new TypeError(`Expected String but got ${getType(this._browserConfigDir)}.`);
-    }
     let func;
-    if (isDir(this._browserConfigDir) && !this._overwriteConfig) {
-      const dir = this._browserConfigDir;
-      const ans =
-        this._readline.keyInYNStrict(`${dir} already exists.\nOverwrite?`);
+    // TODO: use ??= when Node 14 reaches EOL
+    if (!this.#browserConfigDir) {
+      this.#browserConfigDir = this._getBrowserConfigDir();
+    }
+    if (isDir(this.#browserConfigDir) && !this.#overwriteConfig) {
+      const dir = this.#browserConfigDir;
+      const ans = readline.keyInYNStrict(`${dir} already exists.\nOverwrite?`);
       if (ans) {
         func = this._createFiles();
       } else {
@@ -512,12 +512,12 @@ export class Setup {
       throw new TypeError(`Expected Array but got ${getType(arr)}.`);
     }
     let func;
-    const i = this._readline.keyInSelect(arr, 'Select a browser.');
+    const i = readline.keyInSelect(arr, 'Select a browser.');
     if (Number.isInteger(i) && i >= 0) {
-      this._browser = getBrowserData(arr[i]);
+      this.#browser = getBrowserData(arr[i]);
     }
-    if (this._browser) {
-      this._browserConfigDir = this._getBrowserConfigDir();
+    if (this.#browser) {
+      this.#browserConfigDir = this._getBrowserConfigDir();
       func = this._handleBrowserConfigDir();
     } else {
       func = abortSetup('Browser is not specified.');
@@ -532,18 +532,18 @@ export class Setup {
    */
   run() {
     let func;
-    this._browserConfigDir = this._getBrowserConfigDir();
-    if (this._browserConfigDir) {
+    this.#browserConfigDir = this._getBrowserConfigDir();
+    if (this.#browserConfigDir) {
       func = this._handleBrowserConfigDir().catch(throwErr);
     } else {
       const arr = [];
       const items = Object.entries(browserData);
       for (const [item, obj] of items) {
-        if (this._supportedBrowsers.includes(item) &&
+        if (this.#supportedBrowsers.includes(item) &&
             ((IS_WIN && obj.regWin) || (IS_MAC && obj.hostMac) ||
              (!IS_WIN && !IS_MAC && obj.hostLinux)) &&
-            ((obj.type === EXT_CHROME && this._chromeExtIds) ||
-             (obj.type === EXT_WEB && this._webExtIds))) {
+            ((obj.type === EXT_CHROME && this.#chromeExtIds) ||
+             (obj.type === EXT_WEB && this.#webExtIds))) {
           arr.push(item);
         }
       }

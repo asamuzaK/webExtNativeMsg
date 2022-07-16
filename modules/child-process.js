@@ -93,13 +93,16 @@ export const stringifyArg = arg => {
 
 /* CmdArgs */
 export class CmdArgs {
+  /* private fields */
+  #input;
+
   /**
    * argument input
    *
    * @param {string|Array} input - input
    */
   constructor(input) {
-    this._input = input;
+    this.#input = input;
   }
 
   /**
@@ -109,10 +112,10 @@ export class CmdArgs {
    */
   toArray() {
     let arr;
-    if (Array.isArray(this._input)) {
-      arr = this._input;
-    } else if (isString(this._input)) {
-      const args = [this._input].map(extractArg);
+    if (Array.isArray(this.#input)) {
+      arr = this.#input;
+    } else if (isString(this.#input)) {
+      const args = [this.#input].map(extractArg);
       arr = args.reduce(concatArray);
     }
     return arr || [];
@@ -131,6 +134,11 @@ export class CmdArgs {
 
 /* Child process */
 export class ChildProcess {
+  /* private fields */
+  #cmd;
+  #args;
+  #opt;
+
   /**
    * command, arguments and option
    *
@@ -139,11 +147,20 @@ export class ChildProcess {
    * @param {object} [opt] - options
    */
   constructor(cmd, args, opt) {
-    this._cmd = isString(cmd) ? cmd : null;
-    this._args = new CmdArgs(args).toArray();
-    this._opt =
+    this.#cmd = isString(cmd) ? cmd : null;
+    this.#args = new CmdArgs(args).toArray();
+    this.#opt =
       getType(opt) === 'Object' ? opt : { cwd: null, env: process.env };
   }
+
+  /**
+   * get spawn arguments (for test)
+   *
+   * @returns {Array} - arguments in array
+   */
+  _getSpawnArgs() {
+    return [this.#cmd, this.#args, this.#opt];
+  };
 
   /**
    * spawn child process
@@ -152,13 +169,13 @@ export class ChildProcess {
    * @returns {object} - child process
    */
   async spawn(file) {
-    if (!isExecutable(this._cmd)) {
-      throw new Error(`${this._cmd} is not executable.`);
+    if (!isExecutable(this.#cmd)) {
+      throw new Error(`${this.#cmd} is not executable.`);
     }
     if (isString(file)) {
       const [filePath] = new CmdArgs(quoteArg(file)).toArray();
-      this._args.push(filePath);
+      this.#args.push(filePath);
     }
-    return childProcess.spawn(this._cmd, this._args, this._opt);
+    return childProcess.spawn(this.#cmd, this.#args, this.#opt);
   }
 }
