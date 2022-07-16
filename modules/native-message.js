@@ -11,12 +11,16 @@ const BYTE_LEN = 4;
 
 /* Input */
 export class Input {
+  /* private fields */
+  #input;
+  #length;
+
   /**
    * decode message from buffer
    */
   constructor() {
-    this._input = null;
-    this._length = null;
+    this.#input = null;
+    this.#length = null;
   }
 
   /**
@@ -24,24 +28,24 @@ export class Input {
    *
    * @returns {Array} - message array
    */
-  _decoder() {
+  #decoder() {
     let arr = [];
-    if (Buffer.isBuffer(this._input)) {
-      if (!this._length && this._input.length >= BYTE_LEN) {
-        this._length = IS_BE
-          ? this._input.readUIntBE(0, BYTE_LEN)
-          : this._input.readUIntLE(0, BYTE_LEN);
-        this._input = this._input.slice(BYTE_LEN);
+    if (Buffer.isBuffer(this.#input)) {
+      if (!this.#length && this.#input.length >= BYTE_LEN) {
+        this.#length = IS_BE
+          ? this.#input.readUIntBE(0, BYTE_LEN)
+          : this.#input.readUIntLE(0, BYTE_LEN);
+        this.#input = this.#input.slice(BYTE_LEN);
       }
-      if (this._length && this._input.length >= this._length) {
-        const buf = this._input.slice(0, this._length);
+      if (this.#length && this.#input.length >= this.#length) {
+        const buf = this.#input.slice(0, this.#length);
         arr.push(JSON.parse(buf.toString(CHAR)));
-        this._input = this._input.length > this._length
-          ? this._input.slice(this._length)
+        this.#input = this.#input.length > this.#length
+          ? this.#input.slice(this.#length)
           : null;
-        this._length = null;
-        if (this._input) {
-          const cur = this._decoder();
+        this.#length = null;
+        if (this.#input) {
+          const cur = this.#decoder();
           if (cur.length) {
             arr = arr.concat(cur);
           }
@@ -62,14 +66,14 @@ export class Input {
     const buf =
       (isString(chunk) || Buffer.isBuffer(chunk)) && Buffer.from(chunk);
     if (buf) {
-      if (Buffer.isBuffer(this._input)) {
-        this._input = Buffer.concat([this._input, buf]);
+      if (Buffer.isBuffer(this.#input)) {
+        this.#input = Buffer.concat([this.#input, buf]);
       } else {
-        this._input = buf;
+        this.#input = buf;
       }
     }
-    if (Buffer.isBuffer(this._input) && this._input.length >= BYTE_LEN) {
-      const arr = this._decoder();
+    if (Buffer.isBuffer(this.#input) && this.#input.length >= BYTE_LEN) {
+      const arr = this.#decoder();
       if (Array.isArray(arr) && arr.length) {
         msg = arr;
       }
@@ -80,9 +84,12 @@ export class Input {
 
 /* Output */
 export class Output {
+  /* private fields */
+  #output;
+
   /* encode message to buffer */
   constructor() {
-    this._output = null;
+    this.#output = null;
   }
 
   /**
@@ -90,8 +97,8 @@ export class Output {
    *
    * @returns {?Buffer} - buffered message
    */
-  _encoder() {
-    let msg = JSON.stringify(this._output);
+  #encoder() {
+    let msg = JSON.stringify(this.#output);
     if (isString(msg)) {
       const buf = Buffer.from(msg);
       const len = Buffer.alloc(BYTE_LEN);
@@ -99,7 +106,7 @@ export class Output {
       len.writeUIntLE(buf.length, 0, BYTE_LEN);
       msg = Buffer.concat([len, buf]);
     }
-    this._output = null;
+    this.#output = null;
     return Buffer.isBuffer(msg) ? msg : null;
   }
 
@@ -112,8 +119,8 @@ export class Output {
   encode(msg) {
     let buf;
     if (msg) {
-      this._output = msg;
-      buf = this._encoder();
+      this.#output = msg;
+      buf = this.#encoder();
     }
     return Buffer.isBuffer(buf) ? buf : null;
   }

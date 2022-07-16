@@ -660,44 +660,6 @@ describe('_getConfigDir', () => {
   });
 });
 
-describe('_setConfigDir', () => {
-  it('should throw if dir is not given', () => {
-    const setup = new Setup();
-    assert.throws(() => setup._setConfigDir(),
-      'Expected String but got Undefined');
-  });
-
-  it("should throw if dir is not subdirectory of user's home dir", () => {
-    const setup = new Setup();
-    assert.throws(
-      () => setup._setConfigDir('/foo/bar'),
-      `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
-    );
-  });
-
-  it("should throw if dir is not subdirectory of user's home dir", () => {
-    const setup = new Setup();
-    assert.throws(
-      () => setup._setConfigDir(path.join(DIR_HOME, '../foo')),
-      `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`);
-  });
-
-  it('should set dir', () => {
-    const configPath = path.join('foo', 'bar');
-    const setup = new Setup();
-    setup._setConfigDir(configPath);
-    assert.strictEqual(setup.configPath, path.resolve(configPath));
-  });
-
-  it('should set dir', () => {
-    const configPath = path.join('foo', '../bar/baz');
-    const setup = new Setup();
-    setup._setConfigDir(configPath);
-    assert.strictEqual(configPath, path.join('bar', 'baz'));
-    assert.strictEqual(setup.configPath, path.resolve(configPath));
-  });
-});
-
 describe('_getBrowserConfigDir', () => {
   it('should get null', () => {
     const browser = IS_WIN ? 'Chromium' : 'CentBrowser';
@@ -1336,7 +1298,8 @@ describe('_createConfigDir', () => {
     const dir = path.join(TMPDIR, 'webextnativemsg');
     const browserConfigDir = path.join(dir, 'config', 'firefox');
     const setup = new Setup();
-    setup._browserConfigDir = browserConfigDir;
+    setup.browser = 'firefox';
+    setup.configPath = path.join(dir, 'config');
     const res = await setup._createConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     stubInfo.restore();
@@ -1454,7 +1417,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
     const configPath = path.resolve('test', 'file', 'config', 'firefox');
-    setup._browserConfigDir = configPath;
+    setup.browser = 'firefox';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
@@ -1481,7 +1445,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubReadline = sinon.stub(readline, 'keyInYNStrict').returns(true);
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
-    setup._browserConfigDir = path.resolve('test', 'file', 'config', 'firefox');
+    setup.browser = 'firefox';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
@@ -1508,7 +1473,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubReadline = sinon.stub(readline, 'keyInYNStrict').returns(true);
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
-    setup._browserConfigDir = path.resolve('test', 'file', 'config', 'firefox');
+    setup.browser = 'firefox';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
@@ -1535,7 +1501,8 @@ describe('_handleBrowserConfigDir', () => {
     const stubReadline = sinon.stub(readline, 'keyInYNStrict').returns(true);
     const stubExit = sinon.stub(process, 'exit');
     const i = stubReadline.callCount;
-    setup._browserConfigDir = path.resolve('test', 'file', 'config', 'chrome');
+    setup.browser = 'chrome';
+    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;

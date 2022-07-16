@@ -316,35 +316,40 @@ describe('CmdArgs', () => {
 
 /* ChildProcess */
 describe('ChildProcess', () => {
+  /* constructor */
   it('should create an instance', () => {
     const proc = new ChildProcess();
     assert.instanceOf(proc, ChildProcess);
   });
 
-  /* constructor */
+  /* get spawn args */
   it('should set cmd', () => {
     const app = IS_WIN ? 'test.cmd' : 'test.sh';
     const cmd = path.resolve(path.join('test', 'file', app));
     const proc = new ChildProcess(cmd);
-    assert.deepEqual(proc._cmd, cmd);
+    const [res] = proc._getSpawnArgs();
+    assert.strictEqual(res, cmd);
   });
 
   it('should set args', () => {
     const args = ['foo', 'bar'];
     const proc = new ChildProcess(null, args);
-    assert.deepEqual(proc._args, args);
+    const [, res] = proc._getSpawnArgs();
+    assert.deepEqual(res, args);
   });
 
   it('should set args', () => {
     const args = 'foo bar';
     const proc = new ChildProcess(null, args);
-    assert.deepEqual(proc._args, args.split(' '));
+    const [, res] = proc._getSpawnArgs();
+    assert.deepEqual(res, args.split(' '));
   });
 
   it('should set option', () => {
     const opt = { cwd: null, env: process.env, encoding: 'utf8' };
     const proc = new ChildProcess(null, null, opt);
-    assert.deepEqual(proc._opt, opt);
+    const [,, res] = proc._getSpawnArgs();
+    assert.deepEqual(res, opt);
   });
 
   /* method */
