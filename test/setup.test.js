@@ -1,9 +1,7 @@
 /* api */
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import {
-  createDirectory, isDir, isFile, removeDir
-} from '../modules/file-util.js';
+import { createDirectory, isDir, isFile } from '../modules/file-util.js';
 import { quoteArg } from '../modules/common.js';
 import childProcess from 'child_process';
 import fs, { promises as fsPromise } from 'fs';
