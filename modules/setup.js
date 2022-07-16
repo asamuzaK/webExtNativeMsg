@@ -25,8 +25,6 @@ const DIR_CWD = process.cwd();
 const PERM_DIR = 0o755;
 const PERM_EXEC = 0o755;
 const PERM_FILE = 0o644;
-const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
-               os.tmpdir();
 
 /* created path values */
 export const values = new Map();
@@ -283,9 +281,7 @@ export class Setup {
     let dir;
     if (configPath && isString(configPath)) {
       const dirPath = getAbsPath(configPath);
-      if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD) &&
-          // for test
-          !dirPath.startsWith(TMPDIR)) {
+      if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
         throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
       }
       dir = dirPath;
@@ -447,7 +443,10 @@ export class Setup {
    * @returns {string} - config directory path
    */
   async _createConfigDir() {
-    this.#browserConfigDir ??= this._getBrowserConfigDir();
+    // TODO: use ??= when Node 14 reaches EOL
+    if (!this.#browserConfigDir) {
+      this.#browserConfigDir = this._getBrowserConfigDir();
+    }
     if (!isString(this.#browserConfigDir)) {
       throw new TypeError(`Expected String but got ${getType(this.#browserConfigDir)}.`);
     }
@@ -485,7 +484,10 @@ export class Setup {
    */
   async _handleBrowserConfigDir() {
     let func;
-    this.#browserConfigDir ??= this._getBrowserConfigDir();
+    // TODO: use ??= when Node 14 reaches EOL
+    if (!this.#browserConfigDir) {
+      this.#browserConfigDir = this._getBrowserConfigDir();
+    }
     if (isDir(this.#browserConfigDir) && !this.#overwriteConfig) {
       const dir = this.#browserConfigDir;
       const ans = readline.keyInYNStrict(`${dir} already exists.\nOverwrite?`);

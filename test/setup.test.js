@@ -27,14 +27,21 @@ import {
 const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
-const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
-               os.tmpdir();
+const TMPDIR = path.join(DIR_CWD, 'tmp');
 
-beforeEach(() => {
+beforeEach(async () => {
   values.clear();
+  await fsPromise.rm(TMPDIR, {
+    force: true,
+    recursive: true
+  });
 });
-afterEach(() => {
+afterEach(async () => {
   values.clear();
+  await fsPromise.rm(TMPDIR, {
+    force: true,
+    recursive: true
+  });
 });
 
 describe('abortSetup', () => {
@@ -917,7 +924,6 @@ describe('_createManifest', () => {
       path: shellPath,
       type: 'stdio'
     });
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create manifest', async () => {
@@ -970,7 +976,6 @@ describe('_createManifest', () => {
       path: shellPath,
       type: 'stdio'
     });
-    await removeDir(dir, TMPDIR);
   });
 });
 
@@ -999,7 +1004,6 @@ describe('_createShellScript', () => {
       assert.instanceOf(e, TypeError);
       assert.strictEqual(e.message, 'Expected String but got Null.');
     });
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1039,7 +1043,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1079,7 +1082,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1119,7 +1121,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1159,7 +1160,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1199,7 +1199,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1238,7 +1237,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 
   it('should create file', async () => {
@@ -1277,7 +1275,6 @@ describe('_createShellScript', () => {
         `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`
       );
     }
-    await removeDir(dir, TMPDIR);
   });
 });
 
@@ -1307,7 +1304,6 @@ describe('_createConfigDir', () => {
     assert.strictEqual(info, `Created: ${browserConfigDir}`);
     assert.strictEqual(res, browserConfigDir);
     assert.isTrue(isDir(res));
-    await removeDir(dir, TMPDIR);
   });
 });
 
