@@ -24,6 +24,8 @@ const DIR_CWD = process.cwd();
 const PERM_DIR = 0o755;
 const PERM_EXEC = 0o755;
 const PERM_FILE = 0o644;
+const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
+               os.tmpdir();
 
 /* created path values */
 export const values = new Map();
@@ -280,7 +282,9 @@ export class Setup {
     let dir;
     if (configPath && isString(configPath)) {
       const dirPath = getAbsPath(configPath);
-      if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
+      if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD) &&
+          // for test
+          !dirPath.startsWith(TMPDIR)) {
         throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
       }
       dir = dirPath;
