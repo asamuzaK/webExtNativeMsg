@@ -27,7 +27,8 @@ import {
 const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
-const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
+const TMPDIR = (isDir('/home/user/tmp') && '/home/user/tmp') ||
+               process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();
 
 beforeEach(() => {
