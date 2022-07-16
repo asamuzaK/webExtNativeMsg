@@ -331,9 +331,7 @@ export class Setup {
       throw new TypeError(`Expected Object but got ${getType(this._browser)}.`);
     }
     if (!isString(this._hostName)) {
-      throw new TypeError(
-        `Expected String but got ${getType(this._hostName)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(this._hostName)}.`);
     }
     let proc;
     if (IS_WIN) {
@@ -373,14 +371,10 @@ export class Setup {
       throw new TypeError(`Expected Object but got ${getType(this._browser)}.`);
     }
     if (!isString(this._hostDesc)) {
-      throw new TypeError(
-        `Expected String but got ${getType(this._hostDesc)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(this._hostDesc)}.`);
     }
     if (!isString(this._hostName)) {
-      throw new TypeError(
-        `Expected String but got ${getType(this._hostName)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(this._hostName)}.`);
     }
     const { hostLinux, hostMac, type } = this._browser;
     const allowedField = {
@@ -428,9 +422,7 @@ export class Setup {
       throw new Error(`No such directory: ${configDir}.`);
     }
     if (!isString(this._hostName)) {
-      throw new TypeError(
-        `Expected String but got ${getType(this._hostName)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(this._hostName)}.`);
     }
     const appPath = process.execPath;
     const filePath = path.resolve(DIR_CWD, this._mainFile);
@@ -455,9 +447,7 @@ export class Setup {
    */
   async _createConfigDir() {
     if (!isString(this._browserConfigDir)) {
-      throw new TypeError(
-        `Expected String but got ${getType(this._browserConfigDir)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(this._browserConfigDir)}.`);
     }
     const configDir = await createDirectory(this._browserConfigDir, PERM_DIR);
     console.info(`Created: ${configDir}`);
@@ -493,9 +483,7 @@ export class Setup {
    */
   async _handleBrowserConfigDir() {
     if (!isString(this._browserConfigDir)) {
-      throw new TypeError(
-        `Expected String but got ${getType(this._browserConfigDir)}.`
-      );
+      throw new TypeError(`Expected String but got ${getType(this._browserConfigDir)}.`);
     }
     let func;
     if (isDir(this._browserConfigDir) && !this._overwriteConfig) {
