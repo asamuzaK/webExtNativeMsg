@@ -153,7 +153,6 @@ export class Setup {
   #hostName;
   #mainFile;
   #overwriteConfig;
-  #readline;
   #supportedBrowsers;
   #webExtIds;
 
