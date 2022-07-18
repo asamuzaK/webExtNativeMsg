@@ -118,6 +118,29 @@ export const getBrowserData = key => {
   return browser || null;
 };
 
+/**
+ * get config directory
+ *
+ * @param {object} opt - options
+ * @returns {string} - config directory
+ */
+export const getConfigDir = (opt = {}) => {
+  const { configPath, hostName } = opt;
+  let dir;
+  if (configPath && isString(configPath)) {
+    const dirPath = getAbsPath(configPath);
+    if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
+      throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
+    }
+    dir = dirPath;
+  } else if (hostName && isString(hostName)) {
+    dir = path.resolve(DIR_CONFIG, hostName, 'config');
+  } else {
+    dir = path.resolve(DIR_CWD, 'config');
+  }
+  return dir;
+};
+
 /* Setup */
 export class Setup {
   /* private fields */
@@ -159,7 +182,7 @@ export class Setup {
       (Array.isArray(supportedBrowsers) && supportedBrowsers.length)
         ? supportedBrowsers
         : Object.keys(browserData);
-    this.#configDir = this._getConfigDir({
+    this.#configDir = getConfigDir({
       configPath,
       hostName
     });
@@ -208,8 +231,9 @@ export class Setup {
   }
 
   set configPath(dir) {
-    this.#configDir = this._getConfigDir({
-      configPath: dir
+    this.#configDir = getConfigDir({
+      configPath: dir,
+      hostName: this.#hostName
     });
   }
 
@@ -267,29 +291,6 @@ export class Setup {
 
   set overwriteConfig(overwrite) {
     this.#overwriteConfig = !!overwrite;
-  }
-
-  /**
-   * get config directory
-   *
-   * @param {object} opt - options
-   * @returns {string} - config directory
-   */
-  _getConfigDir(opt = {}) {
-    const { configPath, hostName } = opt;
-    let dir;
-    if (configPath && isString(configPath)) {
-      const dirPath = getAbsPath(configPath);
-      if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
-        throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
-      }
-      dir = dirPath;
-    } else if (hostName && isString(hostName)) {
-      dir = path.resolve(DIR_CONFIG, hostName, 'config');
-    } else {
-      dir = path.resolve(DIR_CWD, 'config');
-    }
-    return dir;
   }
 
   /**

@@ -17,7 +17,7 @@ import {
 /* test */
 import {
   Setup,
-  abortSetup, getBrowserData, handleRegClose, handleRegStderr,
+  abortSetup, getBrowserData, getConfigDir, handleRegClose, handleRegStderr,
   handleSetupCallback, values
 } from '../modules/setup.js';
 
@@ -203,6 +203,52 @@ describe('getBrowserData', () => {
   });
 });
 
+describe('getConfigDir', () => {
+  it("should throw if dir is not subdirectory of user's home dir", () => {
+    assert.throws(
+      () => getConfigDir({
+        configPath: '/foo/bar'
+      }),
+      `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
+    );
+  });
+
+  it("should throw if dir is not subdirectory of user's home dir", () => {
+    assert.throws(
+      () => getConfigDir({
+        configPath: path.join(DIR_HOME, '../foo')
+      }),
+      `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`);
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join('foo', 'bar');
+    const res = getConfigDir({ configPath });
+    assert.strictEqual(res, path.resolve(configPath));
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join('foo', '../bar/baz');
+    const res = getConfigDir({ configPath });
+    assert.strictEqual(configPath, path.join('bar', 'baz'));
+    assert.strictEqual(res, path.resolve(configPath));
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join(DIR_CONFIG, 'foo', 'config');
+    const res = getConfigDir({
+      hostName: 'foo'
+    });
+    assert.strictEqual(res, path.resolve(configPath));
+  });
+
+  it('should get dir', () => {
+    const configPath = path.join(DIR_CWD, 'config');
+    const res = getConfigDir();
+    assert.strictEqual(res, path.resolve(configPath));
+  });
+});
+
 describe('Setup', () => {
   it('should create an instance', () => {
     const setup = new Setup();
@@ -327,17 +373,24 @@ describe('Setup', () => {
     });
 
     it('should get string', () => {
+      const setup = new Setup();
+      assert.strictEqual(setup.configPath, path.resolve(DIR_CWD, 'config'));
+    });
+
+    it('should get string', () => {
+      const configPath = path.join(DIR_HOME, 'foo', 'bar');
+      const setup = new Setup({
+        configPath
+      });
+      assert.strictEqual(setup.configPath, path.resolve(configPath));
+    });
+
+    it('should get string', () => {
       const setup = new Setup({
         hostName: 'myhost'
       });
       assert.strictEqual(setup.configPath,
         path.resolve(DIR_CONFIG, 'myhost', 'config'));
-    });
-
-    it('should get string', () => {
-      const setup = new Setup();
-      assert.strictEqual(setup.configPath,
-        path.resolve(DIR_CWD, 'config'));
     });
 
     it('should get null', () => {
@@ -510,6 +563,15 @@ describe('Setup', () => {
       assert.strictEqual(setup.configPath, myPath);
     });
 
+    it('should set string', () => {
+      const setup = new Setup({
+        hostName: 'myhost'
+      });
+      setup.configPath = null;
+      assert.strictEqual(setup.configPath,
+        path.resolve(DIR_CONFIG, 'myhost', 'config'));
+    });
+
     it('should set null', () => {
       const setup = new Setup({
         hostDescription: 'My host description'
@@ -610,58 +672,6 @@ describe('Setup', () => {
       setup.overwriteConfig = false;
       assert.isFalse(setup.overwriteConfig);
     });
-  });
-});
-
-describe('_getConfigDir', () => {
-  it("should throw if dir is not subdirectory of user's home dir", () => {
-    const setup = new Setup();
-    assert.throws(
-      () => setup._getConfigDir({
-        configPath: '/foo/bar'
-      }),
-      `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
-    );
-  });
-
-  it("should throw if dir is not subdirectory of user's home dir", () => {
-    const setup = new Setup();
-    assert.throws(
-      () => setup._getConfigDir({
-        configPath: path.join(DIR_HOME, '../foo')
-      }),
-      `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`);
-  });
-
-  it('should get dir', () => {
-    const configPath = path.join('foo', 'bar');
-    const setup = new Setup();
-    const res = setup._getConfigDir({ configPath });
-    assert.strictEqual(res, path.resolve(configPath));
-  });
-
-  it('should get dir', () => {
-    const configPath = path.join('foo', '../bar/baz');
-    const setup = new Setup();
-    const res = setup._getConfigDir({ configPath });
-    assert.strictEqual(configPath, path.join('bar', 'baz'));
-    assert.strictEqual(res, path.resolve(configPath));
-  });
-
-  it('should get dir', () => {
-    const configPath = path.join(DIR_CONFIG, 'foo', 'config');
-    const setup = new Setup();
-    const res = setup._getConfigDir({
-      hostName: 'foo'
-    });
-    assert.strictEqual(res, path.resolve(configPath));
-  });
-
-  it('should get dir', () => {
-    const configPath = path.join(DIR_CWD, 'config');
-    const setup = new Setup();
-    const res = setup._getConfigDir();
-    assert.strictEqual(res, path.resolve(configPath));
   });
 });
 
