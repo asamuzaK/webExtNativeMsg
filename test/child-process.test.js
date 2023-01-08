@@ -2,10 +2,10 @@
 /* api */
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
-import childProcess from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
+import childProcess from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
 import sinon from 'sinon';
 import { IS_WIN } from '../modules/constant.js';
 

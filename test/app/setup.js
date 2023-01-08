@@ -3,11 +3,11 @@
  * NOTE: regedit.exe is stubbed, so appCallback() will not be called on Windows.
  */
 
-import childProcess from 'child_process';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import process from 'process';
+import childProcess from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import process from 'node:process';
 import readline from 'readline-sync';
 import sinon from 'sinon';
 

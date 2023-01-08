@@ -9,8 +9,8 @@ import { getType, isString, quoteArg, throwErr } from './common.js';
 import {
   createDirectory, createFile, getAbsPath, isDir, isFile
 } from './file-util.js';
-import path from 'path';
-import process from 'process';
+import path from 'node:path';
+import process from 'node:process';
 import readline from 'readline-sync';
 import {
   CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,

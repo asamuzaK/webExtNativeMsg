@@ -5,8 +5,8 @@
 /* api */
 import { escapeChar, getType, isString, quoteArg } from './common.js';
 import { isExecutable } from './file-util.js';
-import childProcess from 'child_process';
-import process from 'process';
+import childProcess from 'node:child_process';
+import process from 'node:process';
 
 /**
  * concat array

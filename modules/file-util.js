@@ -3,10 +3,10 @@
  */
 
 /* api */
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { getType, isString } from './common.js';
-import fs, { promises as fsPromise } from 'fs';
-import path from 'path';
+import fs, { promises as fsPromise } from 'node:fs';
+import path from 'node:path';
 import { IS_WIN } from './constant.js';
 
 /* constants */
