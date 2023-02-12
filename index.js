@@ -1,8 +1,11 @@
-/**
- * index.js
+/*!
+ * WebExtensions native messaging
+ *
+ * @license MIT
+ * @copyright asamuzaK (Kazz)
+ * @see {@link https://github.com/asamuzaK/webExtNativeMsg/blob/master/LICENSE}
  */
 
-/* api */
 export { ChildProcess, CmdArgs } from './modules/child-process.js';
 export { Input, Output } from './modules/native-message.js';
 export { Setup } from './modules/setup.js';
