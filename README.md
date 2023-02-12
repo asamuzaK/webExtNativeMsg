@@ -1,10 +1,6 @@
 [![build](https://github.com/asamuzaK/webExtNativeMsg/workflows/build/badge.svg)](https://github.com/asamuzaK/webExtNativeMsg/actions?query=workflow%3Abuild)
 [![CodeQL](https://github.com/asamuzaK/webExtNativeMsg/workflows/CodeQL/badge.svg)](https://github.com/asamuzaK/webExtNativeMsg/actions?query=workflow%3ACodeQL)
-<!--
-[![dependencies Status](https://david-dm.org/asamuzaK/webExtNativeMsg/status.svg)](https://david-dm.org/asamuzaK/webExtNativeMsg)
-[![devDependency Status](https://david-dm.org/asamuzaK/webExtNativeMsg/dev-status.svg)](https://david-dm.org/asamuzaK/webExtNativeMsg?type=dev)
--->
-[![npm version](https://badge.fury.io/js/web-ext-native-msg.svg)](https://badge.fury.io/js/web-ext-native-msg)
+[![npm](https://img.shields.io/npm/v/web-ext-native-msg)](https://www.npmjs.com/package/web-ext-native-msg)
 
 # WebExtensions native messaging
 
@@ -33,7 +29,7 @@ Helper modules for WebExtensions native messaging host.
 ## Install
 
 ```
-npm install web-ext-native-msg
+npm i web-ext-native-msg
 ```
 
 ## Usage
