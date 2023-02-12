@@ -33,5 +33,5 @@
     "test": "c8 --reporter=text mocha --exit test/*.test.js",
     "test-setup": "cd test/app && node setup"
   },
-  "version": "6.1.2"
+  "version": "6.1.3"
 }
