@@ -2,20 +2,15 @@
   "name": "web-ext-native-msg",
   "description": "Helper modules for WebExtensions native messaging host",
   "author": "asamuzaK",
+  "license": "MIT",
   "homepage": "https://github.com/asamuzaK/webExtNativeMsg",
   "bugs": "https://github.com/asamuzaK/webExtNativeMsg/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/asamuzaK/webExtNativeMsg.git"
   },
-  "license": "MIT",
-  "main": "./index.js",
   "type": "module",
-  "scripts": {
-    "lint": "eslint --fix .",
-    "test": "c8 --reporter=text mocha --exit test/*.test.js",
-    "test-setup": "cd test/app && node setup"
-  },
+  "main": "./index.js",
   "dependencies": {
     "readline-sync": "^1.4.10"
   },
@@ -33,5 +28,10 @@
     "mocha": "^10.2.0",
     "sinon": "^15.0.1"
   },
-  "version": "6.1.1"
+  "scripts": {
+    "lint": "eslint --fix .",
+    "test": "c8 --reporter=text mocha --exit test/*.test.js",
+    "test-setup": "cd test/app && node setup"
+  },
+  "version": "6.1.2"
 }
