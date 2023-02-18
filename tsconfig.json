@@ -1,0 +1,12 @@
+{
+  "include": ["index.js"],
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationDir": "types",
+    "emitDeclarationOnly": true,
+    "newLine": "LF",
+    "removeComments": true
+  }
+}

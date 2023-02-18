@@ -12,6 +12,7 @@
   "type": "module",
   "main": "./index.js",
   "dependencies": {
+    "@types/readline-sync": "^1.4.4",
     "readline-sync": "^1.4.10"
   },
   "devDependencies": {
@@ -26,12 +27,15 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-unicorn": "^45.0.2",
     "mocha": "^10.2.0",
-    "sinon": "^15.0.1"
+    "sinon": "^15.0.1",
+    "typescript": "^4.9.5"
   },
   "scripts": {
+    "build": "npm run tsc && npm run lint && npm run test",
     "lint": "eslint --fix .",
     "test": "c8 --reporter=text mocha --exit test/*.test.js",
-    "test-setup": "cd test/app && node setup"
+    "test-setup": "cd test/app && node setup",
+    "tsc": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && npx tsc"
   },
   "version": "6.1.3"
 }
