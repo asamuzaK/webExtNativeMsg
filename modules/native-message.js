@@ -26,7 +26,7 @@ export class Input {
   /**
    * buffer to message
    *
-   * @returns {Array} - message array
+   * @returns {Array.<string>} - message array
    */
   #decoder() {
     let arr = [];
@@ -59,7 +59,7 @@ export class Input {
    * decode message
    *
    * @param {string|Buffer} chunk - chunk
-   * @returns {?Array} - message array
+   * @returns {?Array.<string>} - message array
    */
   decode(chunk) {
     let msg;

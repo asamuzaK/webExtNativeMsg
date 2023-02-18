@@ -56,7 +56,7 @@ export const correctArg = arg => {
  * extract argument
  *
  * @param {string} arg - argument
- * @returns {Array} - arguments array
+ * @returns {Array.<string|undefined>} - arguments array
  */
 export const extractArg = arg => {
   if (!isString(arg)) {

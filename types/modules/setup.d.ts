@@ -1,4 +1,4 @@
-export const values: any;
+export const values: Map<any, any>;
 export function abortSetup(msg: string): void;
 export function handleSetupCallback(): Function | null;
 export function handleRegClose(code: number): Function | null;
