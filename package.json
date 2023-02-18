@@ -10,7 +10,8 @@
     "url": "https://github.com/asamuzaK/webExtNativeMsg.git"
   },
   "type": "module",
-  "main": "./index.js",
+  "main": "index.js",
+  "types": "types/index.d.ts",
   "dependencies": {
     "@types/node": "^18.14.0",
     "@types/readline-sync": "^1.4.4",
