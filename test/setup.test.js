@@ -1,8 +1,4 @@
 /* api */
-import { assert } from 'chai';
-import { afterEach, beforeEach, describe, it } from 'mocha';
-import { createDirectory, isDir, isFile } from '../modules/file-util.js';
-import { quoteArg } from '../modules/common.js';
 import childProcess from 'node:child_process';
 import fs, { promises as fsPromise } from 'node:fs';
 import os from 'node:os';
@@ -10,6 +6,10 @@ import path from 'node:path';
 import process from 'node:process';
 import readline from 'readline-sync';
 import sinon from 'sinon';
+import { assert } from 'chai';
+import { afterEach, beforeEach, describe, it } from 'mocha';
+import { quoteArg } from '../modules/common.js';
+import { createDirectory, isDir, isFile } from '../modules/file-util.js';
 import {
   DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME, IS_MAC, IS_WIN
 } from '../modules/constant.js';

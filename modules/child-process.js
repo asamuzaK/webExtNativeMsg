@@ -3,10 +3,10 @@
  */
 
 /* api */
-import { escapeChar, getType, isString, quoteArg } from './common.js';
-import { isExecutable } from './file-util.js';
 import childProcess from 'node:child_process';
 import process from 'node:process';
+import { escapeChar, getType, isString, quoteArg } from './common.js';
+import { isExecutable } from './file-util.js';
 
 /**
  * concat array

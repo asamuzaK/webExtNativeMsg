@@ -3,15 +3,15 @@
  */
 
 /* api */
-import { ChildProcess } from './child-process.js';
+import path from 'node:path';
+import process from 'node:process';
+import readline from 'readline-sync';
 import { browserData } from './browser-data.js';
+import { ChildProcess } from './child-process.js';
 import { getType, isString, quoteArg, throwErr } from './common.js';
 import {
   createDirectory, createFile, getAbsPath, isDir, isFile
 } from './file-util.js';
-import path from 'node:path';
-import process from 'node:process';
-import readline from 'readline-sync';
 import {
   CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
   EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN
