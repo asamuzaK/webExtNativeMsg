@@ -166,7 +166,7 @@ export class ChildProcess {
    * spawn child process
    *
    * @param {string} [file] - file
-   * @returns {object} - child process
+   * @returns {Promise.<object>} - child process
    */
   async spawn(file) {
     if (!isExecutable(this.#cmd)) {

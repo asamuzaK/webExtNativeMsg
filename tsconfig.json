@@ -6,7 +6,11 @@
     "declaration": true,
     "declarationDir": "types",
     "emitDeclarationOnly": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "newLine": "LF",
-    "removeComments": true
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "target": "esnext"
   }
 }

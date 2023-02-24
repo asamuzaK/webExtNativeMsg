@@ -83,15 +83,13 @@ export const handleRegClose = code => {
  * handle registry stderr
  *
  * @param {*} data - data
- * @returns {Function} - abortSetup()
+ * @returns {void}
  */
 export const handleRegStderr = data => {
-  let func;
   if (IS_WIN) {
     data && console.error(`stderr: ${data.toString()}`);
-    func = abortSetup('Failed to create registry key.');
+    abortSetup('Failed to create registry key.');
   }
-  return func || null;
 };
 
 /**
@@ -165,8 +163,9 @@ export class Setup {
    * @param {string} [opt.hostDescription] - host description
    * @param {string} [opt.hostName] - host name
    * @param {string} [opt.mainScriptFile] - file name of the main script
-   * @param {Array} [opt.chromeExtensionIds] - array of chrome extension IDs
-   * @param {Array} [opt.webExtensionIds] - array of web extension IDs
+   * @param {Array.<string>} [opt.chromeExtensionIds] - chrome extension IDs
+   * @param {Array.<string>} [opt.webExtensionIds] - web extension IDs
+   * @param {Array.<string>} [opt.supportedBrowsers] - supported browsers
    * @param {Function} [opt.callback] - callback after setup
    * @param {boolean} [opt.overwriteConfig] - overwrite config if exists
    */
@@ -317,7 +316,7 @@ export class Setup {
    * create registry
    *
    * @param {string} manifestPath - manifest path
-   * @returns {object} - child process
+   * @returns {Promise.<object>} - child process
    */
   async _createReg(manifestPath) {
     if (!isFile(manifestPath)) {
@@ -354,7 +353,7 @@ export class Setup {
    *
    * @param {string} shellPath - shell script path
    * @param {string} configDir - config directory path
-   * @returns {string} - manifest path
+   * @returns {Promise.<string>} - manifest path
    */
   async _createManifest(shellPath, configDir) {
     if (!isFile(shellPath)) {
@@ -411,7 +410,7 @@ export class Setup {
    * create shell script
    *
    * @param {string} configDir - config directory path
-   * @returns {string} - shell script path
+   * @returns {Promise.<string>} - shell script path
    */
   async _createShellScript(configDir) {
     if (!isDir(configDir)) {
@@ -439,7 +438,7 @@ export class Setup {
   /**
    * create config directory
    *
-   * @returns {string} - config directory path
+   * @returns {Promise.<string>} - config directory path
    */
   async _createConfigDir() {
     // TODO: use ??= when Node 14 reaches EOL
@@ -457,7 +456,7 @@ export class Setup {
   /**
    * create files
    *
-   * @returns {Function} - createReg(), handleSetupCallback(), abortSetup()
+   * @returns {Promise.<any>} - createReg(), handleSetupCallback(), abortSetup()
    */
   async _createFiles() {
     let func;
@@ -479,7 +478,7 @@ export class Setup {
   /**
    * handle browser config directory input
    *
-   * @returns {Function} - createFiles(), abortSetup()
+   * @returns {Promise.<any>} - createFiles(), abortSetup()
    */
   async _handleBrowserConfigDir() {
     let func;
@@ -505,7 +504,7 @@ export class Setup {
    * handle browser input
    *
    * @param {string} arr - browser array
-   * @returns {Function} - handleBrowserConfigDir(), abortSetup()
+   * @returns {Promise.<any>} - handleBrowserConfigDir(), abortSetup()
    */
   async _handleBrowserInput(arr) {
     if (!Array.isArray(arr)) {
@@ -528,7 +527,7 @@ export class Setup {
   /**
    * run setup
    *
-   * @returns {Function} - handleBrowserInput(), handleBrowserConfigDir()
+   * @returns {Promise.<any>} - handleBrowserInput(), handleBrowserConfigDir()
    */
   run() {
     let func;

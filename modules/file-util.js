@@ -158,7 +158,7 @@ export const removeDir = (dir, baseDir) => {
  *
  * @param {string} dir - directory path
  * @param {string} baseDir - base directory path
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const removeDirectory = async (dir, baseDir) => {
   if (isDir(dir)) {
@@ -177,7 +177,7 @@ export const removeDirectory = async (dir, baseDir) => {
  *
  * @param {string} dir - directory path to create
  * @param {number} [mode] - permission
- * @returns {string} - directory path
+ * @returns {Promise.<string>} - directory path
  */
 export const createDirectory = async (dir, mode = PERM_DIR) => {
   if (!isString(dir)) {
@@ -204,7 +204,7 @@ export const createDirectory = async (dir, mode = PERM_DIR) => {
  * @param {string} [opt.encoding] - encoding
  * @param {string} [opt.flag] - flag
  * @param {number|string} [opt.mode] - file permission
- * @returns {string} - file path
+ * @returns {Promise.<string>} - file path
  */
 export const createFile = async (file, value, opt = {
   encoding: null, flag: 'w', mode: PERM_FILE
@@ -228,7 +228,7 @@ export const createFile = async (file, value, opt = {
  * @param {object} [opt] - options
  * @param {string} [opt.encoding] - encoding
  * @param {string} [opt.flag] - flag
- * @returns {string|Buffer} - file content
+ * @returns {Promise.<string|Buffer>} - file content
  */
 export const readFile = async (file, opt = { encoding: null, flag: 'r' }) => {
   if (!isFile(file)) {

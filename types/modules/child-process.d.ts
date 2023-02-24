@@ -11,6 +11,6 @@ export class CmdArgs {
 export class ChildProcess {
     constructor(cmd: string, args?: string | any[], opt?: object);
     _getSpawnArgs(): any[];
-    spawn(file?: string): object;
+    spawn(file?: string): Promise<object>;
     #private;
 }

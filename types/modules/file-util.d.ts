@@ -8,14 +8,14 @@ export function isExecutable(file: string, mask?: number): boolean;
 export function getFileTimestamp(file: string): number;
 export function getFileNameFromFilePath(file: string, subst?: string): string;
 export function removeDir(dir: string, baseDir: string): void;
-export function removeDirectory(dir: string, baseDir: string): void;
-export function createDirectory(dir: string, mode?: number): string;
+export function removeDirectory(dir: string, baseDir: string): Promise<void>;
+export function createDirectory(dir: string, mode?: number): Promise<string>;
 export function createFile(file: string, value: string | Buffer | Uint8Array, opt?: {
     encoding?: string;
     flag?: string;
     mode?: number | string;
-}): string;
+}): Promise<string>;
 export function readFile(file: string, opt?: {
     encoding?: string;
     flag?: string;
-}): string | Buffer;
+}): Promise<string | Buffer>;
