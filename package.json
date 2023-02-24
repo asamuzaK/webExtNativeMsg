@@ -13,7 +13,7 @@
   "main": "index.js",
   "types": "types/index.d.ts",
   "dependencies": {
-    "@types/node": "^18.14.0",
+    "@types/node": "^18.14.1",
     "@types/readline-sync": "^1.4.4",
     "readline-sync": "^1.4.10"
   },
