@@ -5,6 +5,7 @@
   },
   "extends": [
     "plugin:jsdoc/recommended",
+    "plugin:regexp/recommended",
     "standard"
   ],
   "parserOptions": {
@@ -13,6 +14,7 @@
   },
   "plugins": [
     "eslint-plugin-import",
+    "eslint-plugin-regexp",
     "unicorn"
   ],
   "reportUnusedDisableDirectives": true,
