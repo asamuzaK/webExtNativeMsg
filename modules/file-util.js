@@ -128,7 +128,7 @@ export const getFileTimestamp = file => {
 export const getFileNameFromFilePath = (file, subst = SUBST) => {
   let name;
   if (isString(file) && isFile(file) &&
-      /^([^.]+)(?:\..+)?$/.test(path.basename(file))) {
+      /^[^.]+(?:\..+)?$/.test(path.basename(file))) {
     [, name] = /^([^.]+)(?:\..+)?$/.exec(path.basename(file));
   }
   return name || subst;

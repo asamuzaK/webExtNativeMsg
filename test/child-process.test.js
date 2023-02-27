@@ -100,6 +100,11 @@ describe('correctArg', () => {
     const res = correctArg("test='a b'");
     assert.strictEqual(res, 'test=a b');
   });
+
+  it('should strip quotes', () => {
+    const res = correctArg('"--b="c d\\e""');
+    assert.strictEqual(res, '--b="c d\\e"');
+  });
 });
 
 describe('extractArg', () => {
