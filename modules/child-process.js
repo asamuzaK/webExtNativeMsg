@@ -37,7 +37,7 @@ export const correctArg = arg => {
   }
   if (/^\s*(?:".*"|'.*')\s*$/.test(arg)) {
     arg = arg.trim().replace(/^['"]/, '').replace(/["']$/, '');
-    if (/\\["|\\]/.test(arg)) {
+    if (/\\["\\]/.test(arg)) {
       arg = arg.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
     }
   } else {
