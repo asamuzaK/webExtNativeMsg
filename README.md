@@ -28,7 +28,7 @@ Helper modules for WebExtensions native messaging host.
 
 ## Install
 
-```
+```console
 npm i web-ext-native-msg
 ```
 
@@ -39,7 +39,7 @@ npm i web-ext-native-msg
 Creates shell script, application manifest for specified browser.
 
 Sample:
-```
+```javascript
 import { Setup } from 'web-ext-native-msg';
 
 const handlerAfterSetup = info => {
@@ -95,7 +95,7 @@ Methods:
 Decode / encode native messages exchanged between browser and host.
 
 Sample:
-```
+```javascript
 import { Input, Output } from 'web-ext-native-msg';
 import process from 'process';
 
@@ -147,7 +147,7 @@ Output method:
 Spawns child process.
 
 Sample:
-```
+```javascript
 import { ChildProcess, CmdArgs } from 'web-ext-native-msg';
 import path from 'path';
 import process from 'process';
