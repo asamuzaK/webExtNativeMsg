@@ -140,5 +140,5 @@ export namespace browserData {
         export { EXT_CHROME as type };
     }
 }
-import { EXT_WEB } from "./constant.js";
-import { EXT_CHROME } from "./constant.js";
+import { EXT_WEB } from './constant.js';
+import { EXT_CHROME } from './constant.js';
