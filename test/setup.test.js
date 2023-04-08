@@ -756,72 +756,30 @@ describe('_createReg', () => {
 
 describe('_createManifest', () => {
   it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const setup = new Setup();
     await setup._createManifest().catch(e => {
       assert.instanceOf(e, Error);
       assert.strictEqual(e.message, 'No such file: undefined.');
     });
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
   });
 
   it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const file = path.resolve(DIR_CWD, IS_WIN ? 'foo.cmd' : 'foo.sh');
     const setup = new Setup();
     await setup._createManifest(file).catch(e => {
       assert.instanceOf(e, Error);
       assert.strictEqual(e.message, `No such file: ${file}.`);
     });
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
   });
 
   it('should throw', async () => {
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
-    const setup = new Setup();
-    await setup._createManifest(file).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected Object but got Null.');
-    });
-  });
-
-  it('should throw', async () => {
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
-    const setup = new Setup({
-      browser: 'firefox'
-    });
-    await setup._createManifest(file).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
-    });
-  });
-
-  it('should throw', async () => {
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
-    const setup = new Setup({
-      browser: 'firefox',
-      hostDescription: 'foo bar'
-    });
-    await setup._createManifest(file).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
-    });
-  });
-
-  it('should throw', async () => {
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
-    const setup = new Setup({
-      browser: 'firefox',
-      hostDescription: 'foo bar',
-      hostName: 'foo'
-    });
-    await setup._createManifest(file).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected Array but got Null.');
-    });
-  });
-
-  it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const file =
       path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
     const setup = new Setup({
@@ -836,9 +794,12 @@ describe('_createManifest', () => {
         assert.strictEqual(e.message, 'No such directory: undefined.');
       });
     }
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
   });
 
   it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const file =
       path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
     const setup = new Setup({
@@ -853,9 +814,12 @@ describe('_createManifest', () => {
         assert.strictEqual(e.message, 'No such directory: undefined.');
       });
     }
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
   });
 
   it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const file =
       path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
     const dir = path.resolve(DIR_HOME, 'foo');
@@ -871,6 +835,69 @@ describe('_createManifest', () => {
         assert.strictEqual(e.message, `No such directory: ${dir}.`);
       });
     }
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
+  });
+
+  it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
+    const file =
+      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const setup = new Setup();
+    await setup._createManifest(file, DIR_HOME).catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, 'Expected Object but got Null.');
+    });
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
+  });
+
+  it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
+    const file =
+      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const setup = new Setup({
+      browser: 'firefox'
+    });
+    await setup._createManifest(file, DIR_HOME).catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, 'Expected String but got Null.');
+    });
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
+  });
+
+  it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
+    const file =
+      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const setup = new Setup({
+      browser: 'firefox',
+      hostDescription: 'foo bar'
+    });
+    await setup._createManifest(file, DIR_HOME).catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, 'Expected String but got Null.');
+    });
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
+  });
+
+  it('should throw', async () => {
+    const stubWrite = sinon.stub(fsPromise, 'writeFile');
+    const file =
+      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const setup = new Setup({
+      browser: 'firefox',
+      hostDescription: 'foo bar',
+      hostName: 'foo'
+    });
+    await setup._createManifest(file, DIR_HOME).catch(e => {
+      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e.message, 'Expected Array but got Null.');
+    });
+    assert.isFalse(stubWrite.called, 'called');
+    stubWrite.restore();
   });
 
   it('should create manifest', async () => {

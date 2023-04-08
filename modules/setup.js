@@ -359,7 +359,7 @@ export class Setup {
     if (!isFile(shellPath)) {
       throw new Error(`No such file: ${shellPath}.`);
     }
-    if (IS_WIN && configDir && !isDir(configDir)) {
+    if (IS_WIN && !isDir(configDir)) {
       throw new Error(`No such directory: ${configDir}.`);
     }
     if (!this.#browser) {
