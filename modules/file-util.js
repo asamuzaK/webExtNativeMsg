@@ -25,6 +25,7 @@ export const convertUriToFilePath = uri => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
+  // TODO: sanitize with url-sanitizer when Node 16 reaches EOL
   const { protocol } = new URL(uri);
   let file;
   if (protocol === 'file:') {
