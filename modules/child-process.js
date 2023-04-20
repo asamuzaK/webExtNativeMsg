@@ -10,7 +10,6 @@ import { isExecutable } from './file-util.js';
 
 /**
  * concat array
- *
  * @param {Array} arrA - array
  * @param {Array} arrB - array
  * @returns {Array} - array
@@ -27,7 +26,6 @@ export const concatArray = (arrA, arrB) => {
 
 /**
  * correct argument string
- *
  * @param {string} arg - argument
  * @returns {string} - argument
  */
@@ -53,7 +51,6 @@ export const correctArg = arg => {
 
 /**
  * extract argument
- *
  * @param {string} arg - argument
  * @returns {Array.<string|undefined>} - arguments array
  */
@@ -72,7 +69,6 @@ export const extractArg = arg => {
 
 /**
  * stringify argument string
- *
  * @param {string} arg - argument
  * @returns {string} - argument
  */
@@ -97,7 +93,6 @@ export class CmdArgs {
 
   /**
    * argument input
-   *
    * @param {string|Array} input - input
    */
   constructor(input) {
@@ -106,7 +101,6 @@ export class CmdArgs {
 
   /**
    * arguments to array
-   *
    * @returns {Array} - arguments array
    */
   toArray() {
@@ -122,7 +116,6 @@ export class CmdArgs {
 
   /**
    * arguments array to string
-   *
    * @returns {string} - arguments string
    */
   toString() {
@@ -140,7 +133,6 @@ export class ChildProcess {
 
   /**
    * command, arguments and option
-   *
    * @param {string} cmd - command
    * @param {string|Array} [args] - command arguments
    * @param {object} [opt] - options
@@ -154,7 +146,6 @@ export class ChildProcess {
 
   /**
    * get spawn arguments (for test)
-   *
    * @returns {Array} - arguments in array
    */
   _getSpawnArgs() {
@@ -163,7 +154,6 @@ export class ChildProcess {
 
   /**
    * spawn child process
-   *
    * @param {string} [file] - file
    * @returns {Promise.<object>} - child process
    */

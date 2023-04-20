@@ -25,7 +25,6 @@ export class Input {
 
   /**
    * buffer to message
-   *
    * @returns {Array.<string>} - message array
    */
   #decoder() {
@@ -57,7 +56,6 @@ export class Input {
 
   /**
    * decode message
-   *
    * @param {string|Buffer} chunk - chunk
    * @returns {?Array.<string>} - message array
    */
@@ -94,7 +92,6 @@ export class Output {
 
   /**
    * message to buffer
-   *
    * @returns {?Buffer} - buffered message
    */
   #encoder() {
@@ -112,7 +109,6 @@ export class Output {
 
   /**
    * encode message
-   *
    * @param {object} msg - message
    * @returns {?Buffer} - buffered message
    */

@@ -30,7 +30,6 @@ export const values = new Map();
 
 /**
  * abort setup
- *
  * @param {string} msg - message
  * @returns {void}
  */
@@ -42,7 +41,6 @@ export const abortSetup = msg => {
 
 /**
  * handle setup callback
- *
  * @returns {?Function} - callback
  */
 export const handleSetupCallback = () => {
@@ -60,7 +58,6 @@ export const handleSetupCallback = () => {
 
 /**
  * handle create registry close
- *
  * @param {number} code - exit code
  * @returns {?Function} - handleSetupCallback()
  */
@@ -81,7 +78,6 @@ export const handleRegClose = code => {
 
 /**
  * handle registry stderr
- *
  * @param {*} data - data
  * @returns {void}
  */
@@ -94,7 +90,6 @@ export const handleRegStderr = data => {
 
 /**
  * get browser data
- *
  * @param {string} key - key
  * @returns {object} - browser data
  */
@@ -118,7 +113,6 @@ export const getBrowserData = key => {
 
 /**
  * get config directory
- *
  * @param {object} opt - options
  * @returns {string} - config directory
  */
@@ -156,7 +150,6 @@ export class Setup {
 
   /**
    * setup options
-   *
    * @param {object} [opt] - options
    * @param {string} [opt.browser] - specify the browser
    * @param {string} [opt.configPath] - config path
@@ -293,7 +286,6 @@ export class Setup {
 
   /**
    * get browser specific config directory
-   *
    * @returns {?string} - config directory
    */
   _getBrowserConfigDir() {
@@ -314,7 +306,6 @@ export class Setup {
 
   /**
    * create registry
-   *
    * @param {string} manifestPath - manifest path
    * @returns {Promise.<object>} - child process
    */
@@ -350,7 +341,6 @@ export class Setup {
 
   /**
    * create manifest
-   *
    * @param {string} shellPath - shell script path
    * @param {string} configDir - config directory path
    * @returns {Promise.<string>} - manifest path
@@ -408,7 +398,6 @@ export class Setup {
 
   /**
    * create shell script
-   *
    * @param {string} configDir - config directory path
    * @returns {Promise.<string>} - shell script path
    */
@@ -437,7 +426,6 @@ export class Setup {
 
   /**
    * create config directory
-   *
    * @returns {Promise.<string>} - config directory path
    */
   async _createConfigDir() {
@@ -455,7 +443,6 @@ export class Setup {
 
   /**
    * create files
-   *
    * @returns {Promise.<any>} - createReg(), handleSetupCallback(), abortSetup()
    */
   async _createFiles() {
@@ -477,7 +464,6 @@ export class Setup {
 
   /**
    * handle browser config directory input
-   *
    * @returns {Promise.<any>} - createFiles(), abortSetup()
    */
   async _handleBrowserConfigDir() {
@@ -502,7 +488,6 @@ export class Setup {
 
   /**
    * handle browser input
-   *
    * @param {string} arr - browser array
    * @returns {Promise.<any>} - handleBrowserConfigDir(), abortSetup()
    */
@@ -526,7 +511,6 @@ export class Setup {
 
   /**
    * run setup
-   *
    * @returns {Promise.<any>} - handleBrowserInput(), handleBrowserConfigDir()
    */
   run() {
