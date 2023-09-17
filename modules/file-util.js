@@ -7,9 +7,9 @@ import fs, { promises as fsPromise } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getType, isString } from './common.js';
-import { IS_WIN } from './constant.js';
 
 /* constants */
+import { IS_WIN } from './constant.js';
 const MASK_BIT = 0o111;
 const PERM_DIR = 0o777;
 const PERM_FILE = 0o666;

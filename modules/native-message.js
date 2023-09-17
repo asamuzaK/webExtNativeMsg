@@ -4,9 +4,9 @@
 
 /* api */
 import { isString } from './common.js';
-import { CHAR, IS_BE } from './constant.js';
 
 /* constants */
+import { CHAR, IS_BE } from './constant.js';
 const BYTE_LEN = 4;
 
 /* Input */

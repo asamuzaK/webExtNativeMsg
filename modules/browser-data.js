@@ -2,12 +2,10 @@
  * browser-data.js
  */
 
-/* api */
+/* constants */
 import {
   DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_HOME, EXT_CHROME, EXT_WEB
 } from './constant.js';
-
-/* constants */
 const HKCU_SOFTWARE = ['HKEY_CURRENT_USER', 'SOFTWARE'];
 const HOST = 'native-messaging-hosts';
 const HOST_CAMEL = 'NativeMessagingHosts';

@@ -12,12 +12,12 @@ import { getType, isString, quoteArg, throwErr } from './common.js';
 import {
   createDirectory, createFile, getAbsPath, isDir, isFile
 } from './file-util.js';
+
+/* constants */
 import {
   CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
   EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN
 } from './constant.js';
-
-/* constants */
 const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
                    DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
