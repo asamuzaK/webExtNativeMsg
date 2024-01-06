@@ -41,54 +41,54 @@ describe('Classes', () => {
 /* Functions */
 describe('Functions', () => {
   it('should be type of function', () => {
-    assert.typeOf(convertUriToFilePath, 'function');
+    assert.strictEqual(typeof convertUriToFilePath, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(createDirectory, 'function');
+    assert.strictEqual(typeof createDirectory, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(createFile, 'function');
+    assert.strictEqual(typeof createFile, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(getAbsPath, 'function');
+    assert.strictEqual(typeof getAbsPath, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(getFileNameFromFilePath, 'function');
+    assert.strictEqual(typeof getFileNameFromFilePath, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(getFileTimestamp, 'function');
+    assert.strictEqual(typeof getFileTimestamp, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(getStat, 'function');
+    assert.strictEqual(typeof getStat, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(isDir, 'function');
+    assert.strictEqual(typeof isDir, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(isExecutable, 'function');
+    assert.strictEqual(typeof isExecutable, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(isFile, 'function');
+    assert.strictEqual(typeof isFile, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(isSubDir, 'function');
+    assert.strictEqual(typeof isSubDir, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(readFile, 'function');
+    assert.strictEqual(typeof readFile, 'function');
   });
 
   it('should be type of function', () => {
-    assert.typeOf(removeDir, 'function');
+    assert.strictEqual(typeof removeDir, 'function');
   });
 });
