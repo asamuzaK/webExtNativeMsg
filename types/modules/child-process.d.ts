@@ -10,7 +10,7 @@ export class CmdArgs {
 }
 export class ChildProcess {
     constructor(cmd: string, args?: string | any[], opt?: object);
-    _getSpawnArgs(): any[];
+    private _getSpawnArgs;
     spawn(file?: string): Promise<object>;
     #private;
 }
