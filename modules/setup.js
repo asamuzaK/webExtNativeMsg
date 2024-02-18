@@ -286,6 +286,7 @@ export class Setup {
 
   /**
    * get browser specific config directory
+   * @private
    * @returns {?string} - config directory
    */
   _getBrowserConfigDir() {
@@ -306,6 +307,7 @@ export class Setup {
 
   /**
    * create registry
+   * @private
    * @param {string} manifestPath - manifest path
    * @returns {Promise.<object>} - child process
    */
@@ -341,6 +343,7 @@ export class Setup {
 
   /**
    * create manifest
+   * @private
    * @param {string} shellPath - shell script path
    * @param {string} configDir - config directory path
    * @returns {Promise.<string>} - manifest path
@@ -398,6 +401,7 @@ export class Setup {
 
   /**
    * create shell script
+   * @private
    * @param {string} configDir - config directory path
    * @returns {Promise.<string>} - shell script path
    */
@@ -426,13 +430,11 @@ export class Setup {
 
   /**
    * create config directory
+   * @private
    * @returns {Promise.<string>} - config directory path
    */
   async _createConfigDir() {
-    // TODO: use ??= when Node 14 reaches EOL
-    if (!this.#browserConfigDir) {
-      this.#browserConfigDir = this._getBrowserConfigDir();
-    }
+    this.#browserConfigDir ??= this._getBrowserConfigDir();
     if (!isString(this.#browserConfigDir)) {
       throw new TypeError(`Expected String but got ${getType(this.#browserConfigDir)}.`);
     }
@@ -443,6 +445,7 @@ export class Setup {
 
   /**
    * create files
+   * @private
    * @returns {Promise.<any>} - createReg(), handleSetupCallback(), abortSetup()
    */
   async _createFiles() {
@@ -464,14 +467,12 @@ export class Setup {
 
   /**
    * handle browser config directory input
+   * @private
    * @returns {Promise.<any>} - createFiles(), abortSetup()
    */
   async _handleBrowserConfigDir() {
     let func;
-    // TODO: use ??= when Node 14 reaches EOL
-    if (!this.#browserConfigDir) {
-      this.#browserConfigDir = this._getBrowserConfigDir();
-    }
+    this.#browserConfigDir ??= this._getBrowserConfigDir();
     if (isDir(this.#browserConfigDir) && !this.#overwriteConfig) {
       const dir = this.#browserConfigDir;
       const ans = readline.keyInYNStrict(`${dir} already exists.\nOverwrite?`);
@@ -488,6 +489,7 @@ export class Setup {
 
   /**
    * handle browser input
+   * @private
    * @param {string} arr - browser array
    * @returns {Promise.<any>} - handleBrowserConfigDir(), abortSetup()
    */
