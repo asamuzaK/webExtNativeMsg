@@ -25,6 +25,7 @@ export class Input {
 
   /**
    * buffer to message
+   * @private
    * @returns {Array.<string>} - message array
    */
   #decoder() {
@@ -92,6 +93,7 @@ export class Output {
 
   /**
    * message to buffer
+   * @private
    * @returns {?Buffer} - buffered message
    */
   #encoder() {
