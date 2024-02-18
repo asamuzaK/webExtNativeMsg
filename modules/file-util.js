@@ -6,6 +6,7 @@
 import fs, { promises as fsPromise } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseURLSync } from 'url-sanitizer';
 import { getType, isString } from './common.js';
 
 /* constants */
@@ -24,11 +25,10 @@ export const convertUriToFilePath = uri => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  // TODO: sanitize with url-sanitizer when Node 16 reaches EOL
-  const { protocol } = new URL(uri);
+  const { href, protocol } = parseURLSync(uri);
   let file;
   if (protocol === 'file:') {
-    file = fileURLToPath(uri);
+    file = fileURLToPath(href);
   }
   return file || null;
 };

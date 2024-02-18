@@ -13,20 +13,21 @@
   "main": "index.js",
   "types": "types/index.d.ts",
   "dependencies": {
-    "readline-sync": "^1.4.10"
+    "readline-sync": "^1.4.10",
+    "url-sanitizer": "^0.10.17"
   },
   "devDependencies": {
-    "@types/node": "^20.11.9",
+    "@types/node": "^20.11.19",
     "@types/readline-sync": "^1.4.8",
     "c8": "^9.1.0",
-    "chai": "^5.0.3",
+    "chai": "^5.1.0",
     "eslint": "^8.56.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsdoc": "^48.0.4",
+    "eslint-plugin-jsdoc": "^48.1.0",
     "eslint-plugin-regexp": "^2.2.0",
-    "eslint-plugin-unicorn": "^50.0.1",
-    "mocha": "^10.2.0",
+    "eslint-plugin-unicorn": "^51.0.1",
+    "mocha": "^10.3.0",
     "sinon": "^17.0.1",
     "typescript": "^5.3.3"
   },
