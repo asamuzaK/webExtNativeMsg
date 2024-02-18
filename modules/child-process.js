@@ -146,6 +146,7 @@ export class ChildProcess {
 
   /**
    * get spawn arguments (for test)
+   * @private
    * @returns {Array} - arguments in array
    */
   _getSpawnArgs() {
