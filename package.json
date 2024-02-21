@@ -14,7 +14,7 @@
   "types": "types/index.d.ts",
   "dependencies": {
     "readline-sync": "^1.4.10",
-    "url-sanitizer": "^0.10.17"
+    "url-sanitizer": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",
@@ -38,5 +38,5 @@
     "test-setup": "cd test/app && node setup",
     "tsc": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && npx tsc"
   },
-  "version": "6.2.0"
+  "version": "6.2.1"
 }
