@@ -14,17 +14,17 @@
   "types": "types/index.d.ts",
   "dependencies": {
     "readline-sync": "^1.4.10",
-    "url-sanitizer": "^1.0.0"
+    "url-sanitizer": "^1.0.2"
   },
   "devDependencies": {
-    "@types/node": "^20.11.19",
+    "@types/node": "^20.11.20",
     "@types/readline-sync": "^1.4.8",
     "c8": "^9.1.0",
     "chai": "^5.1.0",
     "eslint": "^8.56.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsdoc": "^48.1.0",
+    "eslint-plugin-jsdoc": "^48.2.0",
     "eslint-plugin-regexp": "^2.2.0",
     "eslint-plugin-unicorn": "^51.0.1",
     "mocha": "^10.3.0",
@@ -38,5 +38,5 @@
     "test-setup": "cd test/app && node setup",
     "tsc": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && npx tsc"
   },
-  "version": "6.2.1"
+  "version": "6.2.2"
 }
