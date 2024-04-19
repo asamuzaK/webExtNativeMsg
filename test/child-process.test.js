@@ -381,7 +381,11 @@ describe('ChildProcess', () => {
         ? path.join('test', 'file', 'test 2.cmd')
         : path.join('test', 'file', 'test 2.sh'));
       await fs.chmodSync(app, PERM_EXEC);
-      const proc = await new ChildProcess(app).spawn();
+      const proc = await new ChildProcess(app, [], {
+        cwd: null,
+        env: process.env,
+        shell: true
+      }).spawn();
       proc.on('close', code => {
         assert.strictEqual(code, 0);
       });
