@@ -142,7 +142,7 @@ export class ChildProcess {
     this.#args = new CmdArgs(args).toArray();
     this.#opt = getType(opt) === 'Object'
       ? opt
-      : { cwd: null, env: process.env, shell: true };
+      : { cwd: null, env: process.env };
   }
 
   /**
