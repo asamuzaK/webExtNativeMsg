@@ -140,8 +140,9 @@ export class ChildProcess {
   constructor(cmd, args, opt) {
     this.#cmd = isString(cmd) ? cmd : null;
     this.#args = new CmdArgs(args).toArray();
-    this.#opt =
-      getType(opt) === 'Object' ? opt : { cwd: null, env: process.env };
+    this.#opt = getType(opt) === 'Object'
+      ? opt
+      : { cwd: null, env: process.env, shell: true };
   }
 
   /**
