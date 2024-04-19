@@ -4,6 +4,8 @@
 
 /* api */
 import childProcess from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
 import process from 'node:process';
 import { escapeChar, getType, isString, quoteArg } from './common.js';
 import { isExecutable } from './file-util.js';
@@ -140,9 +142,21 @@ export class ChildProcess {
   constructor(cmd, args, opt) {
     this.#cmd = isString(cmd) ? cmd : null;
     this.#args = new CmdArgs(args).toArray();
-    this.#opt = getType(opt) === 'Object'
-      ? opt
-      : { cwd: null, env: process.env };
+    if (getType(opt) === 'Object') {
+      this.#opt = opt;
+    } else if (os.platform() === 'win32' && isString(cmd) &&
+               /.(?:bat|cmd)/.test(path.extname(cmd))) {
+      this.#opt = {
+        cwd: null,
+        env: process.env,
+        shell: true
+      };
+    } else {
+      this.#opt = {
+        cwd: null,
+        env: process.env
+      };
+    }
   }
 
   /**
