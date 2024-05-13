@@ -6,6 +6,7 @@
 import path from 'node:path';
 import process from 'node:process';
 import readline from 'readline-sync';
+import { parse } from 'shell-quote';
 import { browserData } from './browser-data.js';
 import { ChildProcess } from './child-process.js';
 import { getType, isString, quoteArg, throwErr } from './common.js';
@@ -326,7 +327,7 @@ export class Setup {
       const { regWin } = this.#browser;
       const regKey = path.join(...regWin, this.#hostName);
       const reg = path.join(process.env.WINDIR, 'system32', 'reg.exe');
-      const args = ['add', regKey, '/ve', '/d', manifestPath, '/f'];
+      const args = parse(`add ${regKey} /ve /d ${manifestPath} /f`);
       const opt = {
         cwd: null,
         encoding: CHAR,
