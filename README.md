@@ -96,8 +96,8 @@ Decode / encode native messages exchanged between browser and host.
 
 Sample:
 ```javascript
+import process from 'node:process';
 import { Input, Output } from 'web-ext-native-msg';
-import process from 'process';
 
 const handleReject = e => {
   e = (new Output()).encode(e);
@@ -142,45 +142,29 @@ Output method:
   * @param {Object} msg - message
   * @returns {?Buffer} - buffered message, nullable
 
-### Class ChildProcess / CmdArgs
+### Class ChildProcess
 
 Spawns child process.
 
 Sample:
 ```javascript
-import { ChildProcess, CmdArgs } from 'web-ext-native-msg';
-import path from 'path';
-import process from 'process';
-
-const arg = '-a -b -c';
-const cmdArgs = (new CmdArgs(arg)).toArray();
+import path from 'node:path';
+import process from 'node:process';
+import { ChildProcess } from 'web-ext-native-msg';
 
 const app = path.resolve(path.join('path', 'to', 'myApp.exe'));
-const file = path.resolve(path.join('path', 'to', 'myFile.txt'));
+const arg = ['-a, '-b', -c'];
 const opt = {
   cwd: null,
   encoding: 'utf8',
   env: process.env
 };
+const file = path.resolve(path.join('path', 'to', 'myFile.txt'));
 
-const proc = (new ChildProcess(app, cmdArgs, opt)).spawn(file).catch(e => {
+const proc = (new ChildProcess(app, arg, opt)).spawn(file).catch(e => {
   throw e;
 });
 ```
-
-Construct:
-* new CmdArgs(arg)
-  * @param {string|Array} arg - argument input
-* new ChildProcess(app, args, opt)
-  * @param {string} app - application path
-  * @param {string|Array} [args] - command arguments
-  * @param {Object} [opt] - options. Defaults to `{cwd: null, env: process.env}`.
-
-CmdArgs methods:
-* toArray(): Arguments to array.
-  * @returns {Array} - arguments array or empty array
-* toString(): Arguments array to string.
-  * @returns {string} - arguments string or empty string
 
 ChildProcess method:
 * spawn(file): Spawn child process. Async.
