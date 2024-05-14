@@ -7,7 +7,7 @@ import childProcess from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import { parse, quote } from 'shell-quote';
+import { parse as parseCmd } from 'shell-quote';
 import { escapeChar, getType, isString } from './common.js';
 import { isExecutable, isFile } from './file-util.js';
 
@@ -143,9 +143,10 @@ export class ChildProcess {
   constructor(cmd, args, opt) {
     this.#cmd = isString(cmd) ? cmd : null;
     if (Array.isArray(args)) {
-      this.#args = parse(quote(args));
+      args = new CmdArgs(args).toString();
+      this.#args = parseCmd(args);
     } else if (args && isString(args)) {
-      this.#args = parse(args);
+      this.#args = parseCmd(args);
     } else {
       this.#args = [];
     }
