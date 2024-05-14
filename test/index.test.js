@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 
 /* test */
 import {
-  ChildProcess, Input, Output, Setup,
+  ChildProcess, CmdArgs, Input, Output, Setup,
   convertUriToFilePath, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
   isFile, isSubDir, readFile, removeDir
@@ -15,6 +15,11 @@ describe('Classes', () => {
   it('should be instance of ChildProcess', () => {
     const childProcess = new ChildProcess();
     assert.instanceOf(childProcess, ChildProcess);
+  });
+
+  it('should be instance of CmdArgs', () => {
+    const cmdArgs = new CmdArgs();
+    assert.instanceOf(cmdArgs, CmdArgs);
   });
 
   it('should be instance of Input', () => {
