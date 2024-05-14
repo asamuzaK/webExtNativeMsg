@@ -446,5 +446,49 @@ describe('ChildProcess', () => {
       stub.restore();
       assert.isTrue(calledOnce);
     });
+
+    it('should spawn with file path as last argument', async () => {
+      const app = path.resolve(IS_WIN
+        ? path.join('test', 'file', 'test.cmd')
+        : path.join('test', 'file', 'test.sh'));
+      const arg = ['-a', '--b="c d\\e"'];
+      const file = path.resolve(path.join('test', 'file', 'test.txt'));
+      await fs.chmodSync(app, PERM_EXEC);
+      await fs.chmodSync(file, PERM_FILE);
+      const stub = sinon.stub(childProcess, 'spawn').callsFake((...args) => {
+        const [, cmdArgs] = args;
+        const [arg1, arg2, arg3] = cmdArgs;
+        assert.strictEqual(cmdArgs.length, 3);
+        assert.strictEqual(arg1, '-a');
+        assert.strictEqual(arg2, '--b="c d\\e"');
+        assert.strictEqual(arg3, file);
+      });
+      await new ChildProcess(app, arg).spawn(file);
+      const { calledOnce } = stub;
+      stub.restore();
+      assert.isTrue(calledOnce);
+    });
+
+    it('should spawn with file path as last argument', async () => {
+      const app = path.resolve(IS_WIN
+        ? path.join('test', 'file', 'test.cmd')
+        : path.join('test', 'file', 'test.sh'));
+      const arg = '-a --b="c d\\e"';
+      const file = path.resolve(path.join('test', 'file', 'test.txt'));
+      await fs.chmodSync(app, PERM_EXEC);
+      await fs.chmodSync(file, PERM_FILE);
+      const stub = sinon.stub(childProcess, 'spawn').callsFake((...args) => {
+        const [, cmdArgs] = args;
+        const [arg1, arg2, arg3] = cmdArgs;
+        assert.strictEqual(cmdArgs.length, 3);
+        assert.strictEqual(arg1, '-a');
+        assert.strictEqual(arg2, '--b=c d\\e');
+        assert.strictEqual(arg3, file);
+      });
+      await new ChildProcess(app, arg).spawn(file);
+      const { calledOnce } = stub;
+      stub.restore();
+      assert.isTrue(calledOnce);
+    });
   });
 });
