@@ -6,7 +6,7 @@
  * @see {@link https://github.com/asamuzaK/webExtNativeMsg/blob/master/LICENSE}
  */
 
-export { ChildProcess } from './modules/child-process.js';
+export { ChildProcess, CmdArgs } from './modules/child-process.js';
 export { Input, Output } from './modules/native-message.js';
 export { Setup } from './modules/setup.js';
 export {
