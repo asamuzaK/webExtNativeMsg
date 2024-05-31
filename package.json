@@ -17,18 +17,18 @@
     "shell-quote": "^1.8.1"
   },
   "devDependencies": {
-    "@types/node": "^20.12.11",
+    "@types/node": "^20.12.13",
     "@types/readline-sync": "^1.4.8",
     "c8": "^9.1.0",
     "chai": "^5.1.1",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsdoc": "^48.2.4",
-    "eslint-plugin-regexp": "^2.5.0",
+    "eslint-plugin-jsdoc": "^48.2.7",
+    "eslint-plugin-regexp": "^2.6.0",
     "eslint-plugin-unicorn": "^53.0.0",
     "mocha": "^10.4.0",
-    "sinon": "^17.0.1",
+    "sinon": "^18.0.0",
     "typescript": "^5.4.5"
   },
   "scripts": {
