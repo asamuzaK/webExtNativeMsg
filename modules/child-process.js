@@ -174,7 +174,7 @@ export class ChildProcess {
    */
   _getSpawnArgs() {
     return [this.#cmd, this.#args, this.#opt];
-  };
+  }
 
   /**
    * spawn child process
