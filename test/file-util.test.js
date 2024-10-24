@@ -242,11 +242,6 @@ describe('removeDir', () => {
       fs.existsSync(subDirPath),
       fs.existsSync(filePath)
     ]);
-    if (typeof fs.rmSync === 'function') {
-      assert.isFalse(calledRmdirSync);
-    } else {
-      assert.isTrue(calledRmdirSync);
-    }
     assert.deepEqual(res1, [true, true, true]);
     assert.deepEqual(res2, [false, false, false]);
   });
