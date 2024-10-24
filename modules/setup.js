@@ -5,7 +5,7 @@
 /* api */
 import path from 'node:path';
 import process from 'node:process';
-import readline from 'readline-sync';
+import { Separator, confirm, select } from '@inquirer/prompts';
 import { browserData } from './browser-data.js';
 import { ChildProcess } from './child-process.js';
 import { getType, isString, quoteArg, throwErr } from './common.js';
@@ -24,6 +24,12 @@ const DIR_CWD = process.cwd();
 const PERM_DIR = 0o755;
 const PERM_EXEC = 0o755;
 const PERM_FILE = 0o644;
+
+/* wrap inquirer (for test) */
+export const inquirer = {
+  confirm,
+  select
+};
 
 /* created path values */
 export const values = new Map();
@@ -475,7 +481,10 @@ export class Setup {
     this.#browserConfigDir ??= this._getBrowserConfigDir();
     if (isDir(this.#browserConfigDir) && !this.#overwriteConfig) {
       const dir = this.#browserConfigDir;
-      const ans = readline.keyInYNStrict(`${dir} already exists.\nOverwrite?`);
+      const ans = await inquirer.confirm({
+        message: `${dir} already exists.\nOverwrite?`,
+        default: false
+      });
       if (ans) {
         func = this._createFiles();
       } else {
@@ -498,9 +507,28 @@ export class Setup {
       throw new TypeError(`Expected Array but got ${getType(arr)}.`);
     }
     let func;
-    const i = readline.keyInSelect(arr, 'Select a browser.');
-    if (Number.isInteger(i) && i >= 0) {
-      this.#browser = getBrowserData(arr[i]);
+    const choices = [];
+    for (const item of arr) {
+      const choice = {
+        name: item,
+        value: item
+      };
+      choices.push(choice);
+    }
+    choices.push(new Separator(), {
+      name: 'CANCEL',
+      value: null
+    });
+    const opt = {
+      choices,
+      message: 'Select a browser.'
+    };
+    if (arr.length > 5) {
+      opt.pageSize = arr.length + 2;
+    }
+    const ans = await inquirer.select(opt);
+    if (ans) {
+      this.#browser = getBrowserData(ans);
     }
     if (this.#browser) {
       this.#browserConfigDir = this._getBrowserConfigDir();
