@@ -1,10 +1,9 @@
 /* api */
-import fs from 'node:fs';
+import fs, { promises as fsPromise } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { URL } from 'node:url';
-import sinon from 'sinon';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { IS_WIN } from '../modules/constant.js';
@@ -86,36 +85,26 @@ describe('convertUriToFilePath', () => {
 describe('createDirectory', () => {
   const dirPath = path.join(TMPDIR, 'webextnativemsg');
   beforeEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
   afterEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
 
   it('should get string', async () => {
     const dirString = path.join(TMPDIR, 'webextnativemsg', '1');
     const dir = await createDirectory(dirString);
     assert.strictEqual(dir, dirString);
-    fs.rmdirSync(dirString);
-    fs.rmdirSync(path.join(TMPDIR, 'webextnativemsg'));
+    await fsPromise.rm(path.join(TMPDIR, 'webextnativemsg'), {
+      force: true,
+      recursive: true
+    });
   });
 
   it('should throw if given argument is not a string', async () => {
@@ -138,28 +127,16 @@ describe('createDirectory', () => {
 describe('createFile', () => {
   const dirPath = path.join(TMPDIR, 'webextnativemsg');
   beforeEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
   afterEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
 
   it('should get string', async () => {
@@ -195,28 +172,16 @@ describe('createFile', () => {
 describe('removeDir', () => {
   const dirPath = path.join(TMPDIR, 'webextnativemsg');
   beforeEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
   afterEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
 
   it("should remove dir and it's files", async () => {
@@ -233,10 +198,7 @@ describe('removeDir', () => {
       fs.existsSync(subDirPath),
       fs.existsSync(filePath)
     ]);
-    const spyRmdirSync = sinon.spy(fs, 'rmdirSync');
     await removeDir(dirPath, TMPDIR);
-    const { called: calledRmdirSync } = spyRmdirSync;
-    spyRmdirSync.restore();
     const res2 = await Promise.all([
       fs.existsSync(dirPath),
       fs.existsSync(subDirPath),
@@ -258,36 +220,30 @@ describe('removeDir', () => {
     await fs.mkdirSync(foo);
     assert.throws(() => removeDir(foo, dirPath),
                   `${foo} is not a subdirectory of ${dirPath}.`);
-    await fs.rmdirSync(dirPath);
-    await fs.rmdirSync(foo);
+    await fsPromise.rm(dirPath, {
+      force: true,
+      recursive: true
+    });
+    await fsPromise.rm(foo, {
+      force: true,
+      recursive: true
+    });
   });
 });
 
 describe('removeDirectory', () => {
   const dirPath = path.join(TMPDIR, 'webextnativemsg');
   beforeEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
   afterEach(() => {
-    if (typeof fs.rmSync === 'function') {
-      fs.rmSync(dirPath, {
-        force: true,
-        recursive: true
-      });
-    } else {
-      fs.rmdirSync(dirPath, {
-        recursive: true
-      });
-    }
+    fs.rmSync(dirPath, {
+      force: true,
+      recursive: true
+    });
   });
 
   it("should remove dir and it's files", async () => {
@@ -331,8 +287,14 @@ describe('removeDirectory', () => {
       assert.strictEqual(e.message,
                          `${foo} is not a subdirectory of ${dirPath}.`);
     });
-    await fs.rmdirSync(dirPath);
-    await fs.rmdirSync(foo);
+    await fsPromise.rm(dirPath, {
+      force: true,
+      recursive: true
+    });
+    await fsPromise.rm(foo, {
+      force: true,
+      recursive: true
+    });
   });
 });
 

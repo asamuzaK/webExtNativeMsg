@@ -11,7 +11,7 @@ import process from 'node:process';
 import readline from 'readline-sync';
 import sinon from 'sinon';
 
-import { Setup, isFile, removeDir } from '../../index.js';
+import { Setup, isFile } from '../../index.js';
 
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
                os.tmpdir();
@@ -43,7 +43,10 @@ const clean = () => {
     fs.unlinkSync(file);
   }
   stubSpawn.restore();
-  removeDir(path.join(TMPDIR, 'test-app'), TMPDIR);
+  fs.rmSync(path.join(TMPDIR, 'test-app'), {
+    force: true,
+    recursive: true
+  });
   map.clear();
 };
 
