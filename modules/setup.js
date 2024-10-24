@@ -482,7 +482,7 @@ export class Setup {
     if (isDir(this.#browserConfigDir) && !this.#overwriteConfig) {
       const dir = this.#browserConfigDir;
       const ans = await inquirer.confirm({
-        message: `${dir} already exists.\nOverwrite?`,
+        message: `${dir} already exists. Overwrite?`,
         default: false
       });
       if (ans) {
