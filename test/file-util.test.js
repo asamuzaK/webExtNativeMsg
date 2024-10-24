@@ -242,7 +242,7 @@ describe('removeDir', () => {
       fs.existsSync(subDirPath),
       fs.existsSync(filePath)
     ]);
-    if (typeof rmSync === 'function') {
+    if (typeof fs.rmSync === 'function') {
       assert.isFalse(calledRmdirSync);
     } else {
       assert.isTrue(calledRmdirSync);
