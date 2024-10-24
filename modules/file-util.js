@@ -131,7 +131,7 @@ export const getFileNameFromFilePath = (file, subst = SUBST) => {
  * @param {string} baseDir - base directory path
  * @returns {void}
  */
-export const removeDir = (dir, baseDir) => {
+export const removeDirSync = (dir, baseDir) => {
   if (isDir(dir)) {
     if (!isSubDir(dir, baseDir)) {
       throw new Error(`${dir} is not a subdirectory of ${baseDir}.`);
