@@ -8,9 +8,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import readline from 'readline-sync';
+import { confirm } from '@inquirer/prompts';
 import sinon from 'sinon';
-
 import { Setup, isFile } from '../../index.js';
 
 const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
@@ -60,8 +59,10 @@ const clean = () => {
     callback: appCallback
   });
   return setup.run();
-})().then(() => {
-  const ans = readline.keyInYNStrict('Remove created files?');
+})().then(async () => {
+  const ans = await confirm({
+    message: 'Remove created files?'
+  });
   if (ans) {
     console.info('Removing created files.');
     clean();
