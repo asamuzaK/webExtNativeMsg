@@ -10,9 +10,9 @@ import { IS_WIN } from '../modules/constant.js';
 
 /* test */
 import {
-  convertUriToFilePath, createDirectory, createFile,
-  getAbsPath, getFileNameFromFilePath, getFileTimestamp, getStat,
-  isDir, isExecutable, isFile, isSubDir, removeDir, removeDirectory, readFile
+  convertUriToFilePath, createDirectory, createFile, getAbsPath,
+  getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
+  isFile, isSubDir, removeDirSync, removeDirectory, readFile
 } from '../modules/file-util.js';
 
 /* constants */
@@ -169,7 +169,7 @@ describe('createFile', () => {
   );
 });
 
-describe('removeDir', () => {
+describe('removeDirSync', () => {
   const dirPath = path.join(TMPDIR, 'webextnativemsg');
   beforeEach(() => {
     fs.rmSync(dirPath, {
@@ -198,7 +198,7 @@ describe('removeDir', () => {
       fs.existsSync(subDirPath),
       fs.existsSync(filePath)
     ]);
-    await removeDir(dirPath, TMPDIR);
+    await removeDirSync(dirPath, TMPDIR);
     const res2 = await Promise.all([
       fs.existsSync(dirPath),
       fs.existsSync(subDirPath),
@@ -211,14 +211,14 @@ describe('removeDir', () => {
   it('should ignore if dir is not a directory', () => {
     const foo = path.resolve('foo');
     assert.isFalse(isDir(foo));
-    assert.doesNotThrow(() => removeDir(foo, TMPDIR));
+    assert.doesNotThrow(() => removeDirSync(foo, TMPDIR));
   });
 
   it('should throw if dir is not subdirectory of base dir', async () => {
     const foo = path.join(TMPDIR, 'foo');
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);
-    assert.throws(() => removeDir(foo, dirPath),
+    assert.throws(() => removeDirSync(foo, dirPath),
                   `${foo} is not a subdirectory of ${dirPath}.`);
     await fsPromise.rm(dirPath, {
       force: true,

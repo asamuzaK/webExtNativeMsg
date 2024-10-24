@@ -7,7 +7,7 @@ import {
   ChildProcess, CmdArgs, Input, Output, Setup,
   convertUriToFilePath, createDirectory, createFile, getAbsPath,
   getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
-  isFile, isSubDir, readFile, removeDir, removeDirectory
+  isFile, isSubDir, readFile, removeDirSync, removeDirectory
 } from '../index.js';
 
 /* Classes */
@@ -89,7 +89,7 @@ describe('Functions', () => {
   });
 
   it('should be type of function', () => {
-    assert.strictEqual(typeof removeDir, 'function');
+    assert.strictEqual(typeof removeDirSync, 'function');
   });
 
   it('should be type of function', () => {
