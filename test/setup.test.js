@@ -1442,9 +1442,9 @@ describe('_handleBrowserConfigDir', () => {
       overwriteConfig: false
     });
     const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
-    const stubReadline = sinon.stub(inquirer, 'confirm').resolves(false);
+    const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(false);
     const stubExit = sinon.stub(process, 'exit');
-    const i = stubReadline.callCount;
+    const i = stubConfirm.callCount;
     const configPath = path.resolve('test', 'file', 'config', 'firefox');
     setup.browser = 'firefox';
     setup.configPath = path.resolve('test', 'file', 'config');
@@ -1454,12 +1454,12 @@ describe('_handleBrowserConfigDir', () => {
     stubInfo.restore();
     stubExit.restore();
     assert.isFalse(stubCreateFiles.calledOnce);
-    assert.strictEqual(stubReadline.callCount, i + 1);
+    assert.strictEqual(stubConfirm.callCount, i + 1);
     assert.isTrue(infoCalled);
     assert.isTrue(exitCalled);
     assert.strictEqual(info, `Setup aborted: ${configPath} already exists.`);
     assert.isUndefined(res);
-    stubReadline.restore();
+    stubConfirm.restore();
   });
 
   it('should call function', async () => {
@@ -1471,9 +1471,9 @@ describe('_handleBrowserConfigDir', () => {
       overwriteConfig: false
     });
     const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
-    const stubReadline = sinon.stub(inquirer, 'confirm').resolves(true);
+    const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(true);
     const stubExit = sinon.stub(process, 'exit');
-    const i = stubReadline.callCount;
+    const i = stubConfirm.callCount;
     setup.browser = 'firefox';
     setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
@@ -1482,12 +1482,12 @@ describe('_handleBrowserConfigDir', () => {
     stubInfo.restore();
     stubExit.restore();
     assert.isTrue(stubCreateFiles.calledOnce);
-    assert.strictEqual(stubReadline.callCount, i + 1);
+    assert.strictEqual(stubConfirm.callCount, i + 1);
     assert.isFalse(infoCalled);
     assert.isFalse(exitCalled);
     assert.isUndefined(info);
     assert.isTrue(res);
-    stubReadline.restore();
+    stubConfirm.restore();
   });
 
   it('should call function', async () => {
@@ -1499,9 +1499,9 @@ describe('_handleBrowserConfigDir', () => {
       overwriteConfig: true
     });
     const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
-    const stubReadline = sinon.stub(inquirer, 'confirm').resolves(true);
+    const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(true);
     const stubExit = sinon.stub(process, 'exit');
-    const i = stubReadline.callCount;
+    const i = stubConfirm.callCount;
     setup.browser = 'firefox';
     setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
@@ -1510,12 +1510,12 @@ describe('_handleBrowserConfigDir', () => {
     stubInfo.restore();
     stubExit.restore();
     assert.isTrue(stubCreateFiles.calledOnce);
-    assert.strictEqual(stubReadline.callCount, i);
+    assert.strictEqual(stubConfirm.callCount, i);
     assert.isFalse(infoCalled);
     assert.isFalse(exitCalled);
     assert.isUndefined(info);
     assert.isTrue(res);
-    stubReadline.restore();
+    stubConfirm.restore();
   });
 
   it('should call function', async () => {
@@ -1527,9 +1527,9 @@ describe('_handleBrowserConfigDir', () => {
       overwriteConfig: false
     });
     const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
-    const stubReadline = sinon.stub(inquirer, 'confirm').resolves(true);
+    const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(true);
     const stubExit = sinon.stub(process, 'exit');
-    const i = stubReadline.callCount;
+    const i = stubConfirm.callCount;
     setup.browser = 'chrome';
     setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
@@ -1538,12 +1538,12 @@ describe('_handleBrowserConfigDir', () => {
     stubInfo.restore();
     stubExit.restore();
     assert.isTrue(stubCreateFiles.calledOnce);
-    assert.strictEqual(stubReadline.callCount, i);
+    assert.strictEqual(stubConfirm.callCount, i);
     assert.isFalse(infoCalled);
     assert.isFalse(exitCalled);
     assert.isUndefined(info);
     assert.isTrue(res);
-    stubReadline.restore();
+    stubConfirm.restore();
   });
 });
 
@@ -1564,12 +1564,13 @@ describe('_handleBrowserInput', () => {
     const setup = new Setup();
     const stubConfigDir =
       sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubReadline = sinon.stub(inquirer, 'select').callsFake(() => null);
+    const stubSelect =
+      sinon.stub(inquirer, 'select').callsFake(async () => null);
     const stubExit = sinon.stub(process, 'exit');
     const res = await setup._handleBrowserInput([]);
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
-    stubReadline.restore();
+    stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
     assert.isFalse(stubConfigDir.called);
@@ -1587,13 +1588,13 @@ describe('_handleBrowserInput', () => {
     const setup = new Setup();
     const stubConfigDir =
       sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubReadline =
-      sinon.stub(inquirer, 'select').callsFake(() => 'firefox');
+    const stubSelect =
+      sinon.stub(inquirer, 'select').callsFake(async () => 'firefox');
     const stubExit = sinon.stub(process, 'exit');
     const res = await setup._handleBrowserInput(['firefox', 'chrome']);
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
-    stubReadline.restore();
+    stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
     assert.isTrue(stubConfigDir.calledOnce);
@@ -1612,13 +1613,13 @@ describe('_handleBrowserInput', () => {
     const setup = new Setup();
     const stubConfigDir =
       sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubReadline =
-      sinon.stub(inquirer, 'select').callsFake(() => 'chrome');
+    const stubSelect =
+      sinon.stub(inquirer, 'select').callsFake(async () => 'chrome');
     const stubExit = sinon.stub(process, 'exit');
     const res = await setup._handleBrowserInput(['firefox', 'chrome']);
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
-    stubReadline.restore();
+    stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
     assert.isTrue(stubConfigDir.calledOnce);
@@ -1637,8 +1638,8 @@ describe('_handleBrowserInput', () => {
     const setup = new Setup();
     const stubConfigDir =
       sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubReadline =
-      sinon.stub(inquirer, 'select').callsFake(() => 'vivaldi');
+    const stubSelect =
+      sinon.stub(inquirer, 'select').callsFake(async () => 'vivaldi');
     const stubExit = sinon.stub(process, 'exit');
     const res = await setup._handleBrowserInput([
       'firefox',
@@ -1650,7 +1651,7 @@ describe('_handleBrowserInput', () => {
     ]);
     const { calledOnce: infoCalled } = stubInfo;
     const { calledOnce: exitCalled } = stubExit;
-    stubReadline.restore();
+    stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
     assert.isTrue(stubConfigDir.calledOnce);
