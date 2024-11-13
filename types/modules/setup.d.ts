@@ -1,3 +1,7 @@
+export namespace inquirer {
+    export { confirm };
+    export { select };
+}
 export const values: Map<any, any>;
 export function abortSetup(msg: string): void;
 export function handleSetupCallback(): Function | null;
@@ -49,3 +53,5 @@ export class Setup {
     run(): Promise<any>;
     #private;
 }
+import { confirm } from '@inquirer/prompts';
+import { select } from '@inquirer/prompts';

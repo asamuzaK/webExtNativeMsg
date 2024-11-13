@@ -7,7 +7,7 @@ export function isFile(file: string): boolean;
 export function isExecutable(file: string, mask?: number): boolean;
 export function getFileTimestamp(file: string): number;
 export function getFileNameFromFilePath(file: string, subst?: string): string;
-export function removeDir(dir: string, baseDir: string): void;
+export function removeDirSync(dir: string, baseDir: string): void;
 export function removeDirectory(dir: string, baseDir: string): Promise<void>;
 export function createDirectory(dir: string, mode?: number): Promise<string>;
 export function createFile(file: string, value: string | Buffer | Uint8Array, opt?: {
