@@ -13,21 +13,21 @@
   "main": "index.js",
   "types": "types/index.d.ts",
   "dependencies": {
-    "@inquirer/prompts": "^7.0.1",
+    "@inquirer/prompts": "^7.1.0",
     "shell-quote": "^1.8.1"
   },
   "devDependencies": {
-    "@types/node": "^22.8.4",
+    "@types/node": "^22.9.0",
     "c8": "^10.1.2",
     "chai": "^5.1.2",
-    "eslint": "^9.13.0",
-    "eslint-plugin-import-x": "^4.4.0",
-    "eslint-plugin-jsdoc": "^50.4.3",
+    "eslint": "^9.14.0",
+    "eslint-plugin-import-x": "^4.4.2",
+    "eslint-plugin-jsdoc": "^50.5.0",
     "eslint-plugin-regexp": "^2.6.0",
     "eslint-plugin-unicorn": "^56.0.0",
-    "globals": "^15.11.0",
-    "mocha": "^10.8.1",
-    "neostandard": "^0.11.7",
+    "globals": "^15.12.0",
+    "mocha": "^10.8.2",
+    "neostandard": "^0.11.8",
     "sinon": "^19.0.2",
     "typescript": "^5.6.3"
   },
@@ -38,5 +38,5 @@
     "test-setup": "cd test/app && node setup",
     "tsc": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && npx tsc"
   },
-  "version": "8.0.4"
+  "version": "8.0.5"
 }
