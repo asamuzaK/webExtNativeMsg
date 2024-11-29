@@ -1,5 +1,5 @@
 /* api */
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { describe, it } from 'mocha';
 
 /* test */
@@ -22,306 +22,312 @@ describe('browsers', () => {
       'waterfoxcurrent'
     ];
     assert.strictEqual(Object.keys(browserData).length, keys.length);
-    assert.containsAllKeys(browserData, keys);
+    for (const key of Object.keys(browserData)) {
+      assert.strictEqual(keys.includes(key), true);
+    }
   });
 });
 
 describe('Firefox', () => {
-  it('should contain firefox property', () => {
-    assert.property(browserData, 'firefox');
+  const browser = 'firefox';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.firefox, ['alias', 'type']);
+    const keys = ['alias', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should not contain alter alias key', () => {
-    assert.doesNotHaveAnyKeys(browserData.firefox, ['aliasWin']);
+    assert.strictEqual(browserData[browser].aliasWin, undefined);
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.firefox, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.firefox.hostLinux);
-    assert.isArray(browserData.firefox.hostMac);
-    assert.isArray(browserData.firefox.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });
 
 describe('LibreWolf', () => {
-  it('should contain librewolf property', () => {
-    assert.property(browserData, 'librewolf');
+  const browser = 'librewolf';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.firefox, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.doesNotHaveAnyKeys(browserData.firefox, ['aliasWin']);
+    const keys = ['alias', 'aliasWin', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.librewolf, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.librewolf.hostLinux);
-    assert.isNull(browserData.librewolf.hostMac);
-    assert.isArray(browserData.librewolf.regWin);
+    const keys = ['hostLinux', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
+  });
+
+  it('should get null value', () => {
+    assert.deepEqual(browserData[browser].hostMac, null);
   });
 });
 
 describe('Thunderbird', () => {
-  it('should contain thunderbird property', () => {
-    assert.property(browserData, 'thunderbird');
+  const browser = 'thunderbird';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.thunderbird, ['alias', 'type']);
+    const keys = ['alias', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should not contain alter alias key', () => {
-    assert.doesNotHaveAnyKeys(browserData.thunderbird, ['aliasWin']);
+    assert.strictEqual(browserData[browser].aliasWin, undefined);
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.thunderbird, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.thunderbird.hostLinux);
-    assert.isArray(browserData.thunderbird.hostMac);
-    assert.isArray(browserData.thunderbird.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });
 
 describe('Waterfox Current', () => {
-  it('should contain waterfoxcurrent property', () => {
-    assert.property(browserData, 'waterfoxcurrent');
+  const browser = 'waterfoxcurrent';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.waterfoxcurrent, ['alias', 'type']);
+    const keys = ['alias', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should not contain alter alias key', () => {
-    assert.doesNotHaveAnyKeys(browserData.waterfoxcurrent, ['aliasWin']);
+    assert.strictEqual(browserData[browser].aliasWin, undefined);
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.waterfoxcurrent, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.waterfoxcurrent.hostLinux);
-    assert.isArray(browserData.waterfoxcurrent.hostMac);
-    assert.isArray(browserData.waterfoxcurrent.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });
 
 describe('Chrome', () => {
-  it('should contain chrome property', () => {
-    assert.property(browserData, 'chrome');
+  const browser = 'chrome';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.chrome, ['alias', 'type']);
+    const keys = ['alias', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should not contain alter alias key', () => {
-    assert.doesNotHaveAnyKeys(browserData.chrome, ['aliasWin']);
+    assert.strictEqual(browserData[browser].aliasWin, undefined);
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.chrome, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.chrome.hostLinux);
-    assert.isArray(browserData.chrome.hostMac);
-    assert.isArray(browserData.chrome.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });
 
 describe('Chrome Beta', () => {
-  it('should contain chrome property', () => {
-    assert.property(browserData, 'chromebeta');
+  const browser = 'chromebeta';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.chromebeta, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.chromebeta, ['aliasWin']);
+    const keys = ['alias', 'aliasWin', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.chromebeta, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.chromebeta.hostLinux);
-    assert.isArray(browserData.chromebeta.hostMac);
-    assert.isArray(browserData.chromebeta.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });
 
 describe('Chrome Canary', () => {
-  it('should contain chromecanary property', () => {
-    assert.property(browserData, 'chromecanary');
+  const browser = 'chromecanary';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.chromecanary, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.chromecanary, ['aliasWin']);
+    const keys = ['alias', 'aliasWin', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.chromecanary, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isNull(browserData.chromecanary.hostLinux);
-    assert.isArray(browserData.chromecanary.hostMac);
-    assert.isArray(browserData.chromecanary.regWin);
+    const keys = ['hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
+  });
+
+  it('should get null value', () => {
+    assert.deepEqual(browserData[browser].hostLinux, null);
   });
 });
 
 describe('Chromium', () => {
-  it('should contain chromium property', () => {
-    assert.property(browserData, 'chromium');
+  const browser = 'chromium';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.chromium, ['alias', 'type']);
+    const keys = ['alias', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should not contain alter alias key', () => {
-    assert.doesNotHaveAnyKeys(browserData.chromium, ['aliasWin']);
+    assert.strictEqual(browserData[browser].aliasWin, undefined);
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.chromium, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.chromium.hostLinux);
-    assert.isArray(browserData.chromium.hostMac);
-    assert.isNull(browserData.chromium.regWin);
+    const keys = ['hostLinux', 'hostMac'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
+  });
+
+  it('should get null value', () => {
+    assert.deepEqual(browserData[browser].regWin, null);
   });
 });
 
 describe('Brave', () => {
-  it('should contain brave property', () => {
-    assert.property(browserData, 'brave');
+  const browser = 'brave';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.brave, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.brave, ['aliasWin']);
+    const keys = ['alias', 'aliasWin', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.brave, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.brave.hostLinux);
-    assert.isArray(browserData.brave.hostMac);
-    assert.isArray(browserData.brave.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });
 
 describe('Edge', () => {
-  it('should contain edge property', () => {
-    assert.property(browserData, 'edge');
+  const browser = 'edge';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.edge, ['alias', 'type']);
+    const keys = ['alias', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should not contain alter alias key', () => {
-    assert.doesNotHaveAnyKeys(browserData.edge, ['aliasWin']);
+    assert.strictEqual(browserData[browser].aliasWin, undefined);
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.edge, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.edge.hostLinux);
-    assert.isArray(browserData.edge.hostMac);
-    assert.isArray(browserData.edge.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });
 
 describe('Opera', () => {
-  it('should contain opera property', () => {
-    assert.property(browserData, 'opera');
+  const browser = 'opera';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.opera, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.opera, ['aliasMac', 'aliasWin']);
+    const keys = ['alias', 'aliasMac', 'aliasWin', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.opera, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isNull(browserData.opera.hostLinux);
-    assert.isArray(browserData.opera.hostMac);
-    assert.isArray(browserData.opera.regWin);
+    const keys = ['hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
+  });
+
+  it('should get null value', () => {
+    assert.deepEqual(browserData[browser].hostLinux, null);
   });
 });
 
 describe('Vivaldi', () => {
-  it('should contain vivaldi property', () => {
-    assert.property(browserData, 'vivaldi');
+  const browser = 'vivaldi';
+
+  it('should contain browser', () => {
+    assert.strictEqual(typeof browserData[browser], 'object');
   });
 
   it('should contain alias and type keys', () => {
-    assert.containsAllKeys(browserData.vivaldi, ['alias', 'type']);
-  });
-
-  it('should contain alter alias key', () => {
-    assert.containsAllKeys(browserData.vivaldi, ['aliasWin']);
+    const keys = ['alias', 'aliasWin', 'type'];
+    for (const key of keys) {
+      assert.strictEqual(typeof browserData[browser][key], 'string');
+    }
   });
 
   it('should contain host keys', () => {
-    assert.containsAllKeys(browserData.vivaldi, [
-      'hostLinux',
-      'hostMac',
-      'regWin'
-    ]);
-    assert.isArray(browserData.vivaldi.hostLinux);
-    assert.isArray(browserData.vivaldi.hostMac);
-    assert.isArray(browserData.vivaldi.regWin);
+    const keys = ['hostLinux', 'hostMac', 'regWin'];
+    for (const key of keys) {
+      assert.strictEqual(Array.isArray(browserData[browser][key]), true);
+    }
   });
 });

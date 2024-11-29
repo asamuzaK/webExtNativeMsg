@@ -1,5 +1,5 @@
 /* api */
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { describe, it } from 'mocha';
 import { isString } from '../modules/common.js';
 
@@ -21,7 +21,7 @@ describe('string constants', () => {
       EXT_WEB
     ];
     arr.forEach(i => {
-      assert.isTrue(isString(i));
+      assert.strictEqual(isString(i), true);
     });
   });
 });
@@ -30,7 +30,7 @@ describe('number constants', () => {
   it('should get number', () => {
     const arr = [INDENT];
     arr.forEach(i => {
-      assert.isTrue(typeof i === 'number');
+      assert.strictEqual(typeof i, 'number');
     });
   });
 });
@@ -44,7 +44,7 @@ describe('boolean constants', () => {
       IS_WIN
     ];
     arr.forEach(i => {
-      assert.isTrue(typeof i === 'boolean');
+      assert.strictEqual(typeof i, 'boolean');
     });
   });
 });

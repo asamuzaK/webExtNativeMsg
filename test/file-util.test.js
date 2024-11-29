@@ -1,10 +1,10 @@
 /* api */
+import { strict as assert } from 'node:assert';
 import fs, { promises as fsPromise } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { URL } from 'node:url';
-import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { IS_WIN } from '../modules/constant.js';
 
@@ -72,13 +72,13 @@ describe('convertUriToFilePath', () => {
   });
 
   it('should throw if string is not given', () => {
-    assert.throws(() => convertUriToFilePath(),
+    assert.throws(() => convertUriToFilePath(), TypeError,
       'Expected String but got Undefined');
   });
 
   it('should get null if protocol does not match', () => {
     const uri = 'http://example.com';
-    assert.isNull(convertUriToFilePath(uri));
+    assert.deepEqual(convertUriToFilePath(uri), null);
   });
 });
 
@@ -109,17 +109,15 @@ describe('createDirectory', () => {
 
   it('should throw if given argument is not a string', async () => {
     await createDirectory().catch(e => {
-      assert.instanceOf(e, TypeError, 'error');
-      assert.strictEqual(e.message, 'Expected String but got Undefined.',
-        'message');
+      assert.deepStrictEqual(e,
+        new TypeError('Expected String but got Undefined.'));
     });
   });
 
   it('should throw if given second argument is not a number', async () => {
     await createDirectory('/foo/bar', 'baz').catch(e => {
-      assert.instanceOf(e, TypeError, 'error');
-      assert.strictEqual(e.message, 'Expected Number but got String.',
-        'message');
+      assert.deepStrictEqual(e,
+        new TypeError('Expected Number but got String.'));
     });
   });
 });
@@ -151,7 +149,8 @@ describe('createFile', () => {
 
   it('should throw if first argument is not a string', () => {
     createFile().catch(e => {
-      assert.strictEqual(e.message, 'Expected String but got Undefined.');
+      assert.deepStrictEqual(e,
+        new TypeError('Expected String but got Undefined.'));
     });
   });
 
@@ -160,10 +159,8 @@ describe('createFile', () => {
     () => {
       const file = path.join(TMPDIR, 'webextnativemsg', 'test.txt');
       createFile(file).catch(e => {
-        assert.strictEqual(
-          e.message,
-          'Expected String, Buffer, Uint8Array but got Undefined.'
-        );
+        assert.deepStrictEqual(e,
+          new TypeError('Expected String, Buffer, Uint8Array but got Undefined.'));
       });
     }
   );
@@ -210,7 +207,7 @@ describe('removeDirSync', () => {
 
   it('should ignore if dir is not a directory', () => {
     const foo = path.resolve('foo');
-    assert.isFalse(isDir(foo));
+    assert.strictEqual(isDir(foo), false);
     assert.doesNotThrow(() => removeDirSync(foo, TMPDIR));
   });
 
@@ -218,7 +215,7 @@ describe('removeDirSync', () => {
     const foo = path.join(TMPDIR, 'foo');
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);
-    assert.throws(() => removeDirSync(foo, dirPath),
+    assert.throws(() => removeDirSync(foo, dirPath), Error,
                   `${foo} is not a subdirectory of ${dirPath}.`);
     await fsPromise.rm(dirPath, {
       force: true,
@@ -272,9 +269,9 @@ describe('removeDirectory', () => {
 
   it('should ignore if dir is not a directory', async () => {
     const foo = path.resolve('foo');
-    assert.isFalse(isDir(foo));
+    assert.strictEqual(isDir(foo), false);
     await removeDirectory(foo, TMPDIR).catch(e => {
-      assert.isUndefined(e);
+      assert.strictEqual(e, undefined);
     });
   });
 
@@ -283,9 +280,8 @@ describe('removeDirectory', () => {
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);
     await removeDirectory(foo, dirPath).catch(e => {
-      assert.instanceOf(e, Error);
-      assert.strictEqual(e.message,
-                         `${foo} is not a subdirectory of ${dirPath}.`);
+      assert.deepStrictEqual(e,
+        new Error(`${foo} is not a subdirectory of ${dirPath}.`));
     });
     await fsPromise.rm(dirPath, {
       force: true,
@@ -318,7 +314,7 @@ describe('getAbsPath', () => {
   });
 
   it('should throw', () => {
-    assert.throws(() => getAbsPath(),
+    assert.throws(() => getAbsPath(), TypeError,
       'Expected String but got Undefined');
   });
 });
@@ -348,7 +344,7 @@ describe('getFileNameFromFilePath', () => {
 describe('getFileTimestamp', () => {
   it('should get positive integer', () => {
     const p = path.resolve(path.join('test', 'file', 'test.sh'));
-    assert.isAbove(getFileTimestamp(p), 0);
+    assert.strictEqual(getFileTimestamp(p) > 0, true);
   });
 
   it('should get 0 if file does not exist', () => {
@@ -360,16 +356,16 @@ describe('getFileTimestamp', () => {
 describe('getStat', () => {
   it('should be an object', () => {
     const p = path.resolve(path.join('test', 'file', 'test.sh'));
-    assert.property(getStat(p), 'mode');
+    assert.strictEqual(typeof getStat(p), 'object');
   });
 
   it('should get null if given argument is not string', () => {
-    assert.isNull(getStat());
+    assert.deepEqual(getStat(), null);
   });
 
   it('should get null if file does not exist', () => {
     const p = path.resolve(path.join('test', 'file', 'foo.txt'));
-    assert.isNull(getStat(p));
+    assert.deepEqual(getStat(p), null);
   });
 });
 
@@ -434,7 +430,7 @@ describe('isSubDir', () => {
 describe('readFile', () => {
   it('should throw', async () => {
     await readFile('foo/bar').catch(e => {
-      assert.strictEqual(e.message, 'foo/bar is not a file.');
+      assert.deepStrictEqual(e, new Error('foo/bar is not a file.'));
     });
   });
 

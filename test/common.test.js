@@ -1,6 +1,6 @@
 /* api */
+import { strict as assert } from 'node:assert';
 import sinon from 'sinon';
-import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
 /* test */
@@ -17,12 +17,12 @@ describe('escapeChar', () => {
 
   it('should get null if string is not given', () => {
     const re = /(b)/gi;
-    assert.isNull(escapeChar(1, re));
+    assert.deepEqual(escapeChar(1, re), null);
   });
 
   it('should get null if regexp is not given', () => {
     const c = 'abc';
-    assert.isNull(escapeChar(c));
+    assert.deepEqual(escapeChar(c), null);
   });
 });
 
@@ -76,9 +76,9 @@ describe('logErr', () => {
     const res = logErr(new Error(msg));
     const { calledOnce } = consoleError;
     consoleError.restore();
-    assert.isTrue(calledOnce);
+    assert.strictEqual(calledOnce, true);
     assert.strictEqual(errMsg, msg);
-    assert.isFalse(res);
+    assert.strictEqual(res, false);
   });
 });
 
@@ -92,7 +92,7 @@ describe('logMsg', () => {
     const res = logMsg(msg);
     const { calledOnce } = consoleLog;
     consoleLog.restore();
-    assert.isTrue(calledOnce);
+    assert.strictEqual(calledOnce, true);
     assert.strictEqual(logMessage, msg);
     assert.strictEqual(res, msg);
   });
@@ -108,9 +108,9 @@ describe('logWarn', () => {
     const res = logWarn(msg);
     const { calledOnce } = consoleWarn;
     consoleWarn.restore();
-    assert.isTrue(calledOnce);
+    assert.strictEqual(calledOnce, true);
     assert.strictEqual(warnMsg, msg);
-    assert.isFalse(res);
+    assert.strictEqual(res, false);
   });
 });
 

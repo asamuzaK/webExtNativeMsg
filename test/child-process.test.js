@@ -1,11 +1,11 @@
 /* eslint-disable no-template-curly-in-string */
 /* api */
+import { strict as assert } from 'node:assert';
 import childProcess from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import sinon from 'sinon';
-import { assert } from 'chai';
 import { describe, it } from 'mocha';
 import { IS_WIN } from '../modules/constant.js';
 
@@ -190,43 +190,43 @@ describe('CmdArgs', () => {
   const cmdPlaceholderArr = new CmdArgs(['-a', '${foo}', '-b']);
 
   it('should create an instance', () => {
-    assert.instanceOf(cmd, CmdArgs);
+    assert.strictEqual(cmd instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdEmptyStr, CmdArgs);
+    assert.strictEqual(cmdEmptyStr instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdEmptyArr, CmdArgs);
+    assert.strictEqual(cmdEmptyArr instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdSpace, CmdArgs);
+    assert.strictEqual(cmdSpace instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdStr, CmdArgs);
+    assert.strictEqual(cmdStr instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdArr, CmdArgs);
+    assert.strictEqual(cmdArr instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdQuoteStr, CmdArgs);
+    assert.strictEqual(cmdQuoteStr instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdQuoteArr, CmdArgs);
+    assert.strictEqual(cmdQuoteArr instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdPlaceholderStr, CmdArgs);
+    assert.strictEqual(cmdPlaceholderStr instanceof CmdArgs, true);
   });
 
   it('should create an instance', () => {
-    assert.instanceOf(cmdPlaceholderArr, CmdArgs);
+    assert.strictEqual(cmdPlaceholderArr instanceof CmdArgs, true);
   });
 
   /* methods */
@@ -324,7 +324,7 @@ describe('ChildProcess', () => {
   /* constructor */
   it('should create an instance', () => {
     const proc = new ChildProcess();
-    assert.instanceOf(proc, ChildProcess);
+    assert.strictEqual(proc instanceof ChildProcess, true);
   });
 
   /* get spawn args */
@@ -361,7 +361,7 @@ describe('ChildProcess', () => {
   describe('spawn', () => {
     it('should throw if given command is not executable', async () => {
       await new ChildProcess().spawn().catch(e => {
-        assert.strictEqual(e.message, 'null is not executable.');
+        assert.deepStrictEqual(e, new Error('null is not executable.'));
       });
     });
 
@@ -403,7 +403,7 @@ describe('ChildProcess', () => {
       await new ChildProcess(app).spawn(file);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce);
+      assert.strictEqual(calledOnce, true);
     });
 
     it('should spawn with file path as first argument', async () => {
@@ -422,7 +422,7 @@ describe('ChildProcess', () => {
       await new ChildProcess(app).spawn(file, true);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce);
+      assert.strictEqual(calledOnce, true);
     });
 
     it('should spawn with file path as last argument', async () => {
@@ -444,7 +444,7 @@ describe('ChildProcess', () => {
       await new ChildProcess(app, arg).spawn(file);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce);
+      assert.strictEqual(calledOnce, true);
     });
 
     it('should spawn with file path as last argument', async () => {
@@ -466,7 +466,7 @@ describe('ChildProcess', () => {
       await new ChildProcess(app, arg).spawn(file);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce);
+      assert.strictEqual(calledOnce, true);
     });
 
     it('should spawn with file path as last argument', async () => {
@@ -488,7 +488,7 @@ describe('ChildProcess', () => {
       await new ChildProcess(app, arg).spawn(file);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce);
+      assert.strictEqual(calledOnce, true);
     });
   });
 });

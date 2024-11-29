@@ -1,5 +1,5 @@
 /* api */
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { describe, it } from 'mocha';
 import { IS_BE } from '../modules/constant.js';
 
@@ -11,24 +11,24 @@ describe('Input', () => {
   /* constructor */
   it('should create an instance', () => {
     const input = new Input();
-    assert.instanceOf(input, Input);
+    assert.strictEqual(input instanceof Input, true);
   });
 
   /* method */
   describe('decode', () => {
     it('should get null', () => {
       const input = new Input();
-      assert.isNull(input.decode());
+      assert.deepEqual(input.decode(), null);
     });
 
     it('should get null', () => {
       const input = new Input();
-      assert.isNull(input.decode(Buffer.alloc(0)));
+      assert.deepEqual(input.decode(Buffer.alloc(0)), null);
     });
 
     it('should get null', () => {
       const input = new Input();
-      assert.isNull(input.decode(Buffer.alloc(4)));
+      assert.deepEqual(input.decode(Buffer.alloc(4)), null);
     });
 
     it('should decode buffer to array of message', () => {
@@ -51,12 +51,12 @@ describe('Input', () => {
       if (IS_BE) {
         const msg1 = input.decode(Buffer.from([0, 0, 0, 6]));
         const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
-        assert.isNull(msg1);
+        assert.deepEqual(msg1, null);
         assert.deepEqual(msg2, ['test']);
       } else {
         const msg1 = input.decode(Buffer.from([6, 0, 0, 0]));
         const msg2 = input.decode(Buffer.from([34, 116, 101, 115, 116, 34]));
-        assert.isNull(msg1);
+        assert.deepEqual(msg1, null);
         assert.deepEqual(msg2, ['test']);
       }
     });
@@ -104,24 +104,24 @@ describe('Output', () => {
   /* constructor */
   it('should create an instance', () => {
     const output = new Output();
-    assert.instanceOf(output, Output);
+    assert.strictEqual(output instanceof Output, true);
   });
 
   /* method */
   describe('encode', () => {
     it('should get null', () => {
       const output = new Output();
-      assert.isNull(output.encode());
+      assert.deepEqual(output.encode(), null);
     });
 
     it('should get null', () => {
       const output = new Output();
-      assert.isNull(output.encode(''));
+      assert.deepEqual(output.encode(''), null);
     });
 
     it('should get null', () => {
       const output = new Output();
-      assert.isNull(output.encode(a => a));
+      assert.deepEqual(output.encode(a => a), null);
     });
 
     it('should encode message to buffer', () => {

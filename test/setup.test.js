@@ -1,11 +1,11 @@
 /* api */
+import { strict as assert } from 'node:assert';
 import childProcess from 'node:child_process';
 import fs, { promises as fsPromise } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import sinon from 'sinon';
-import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { quoteArg } from '../modules/common.js';
 import { createDirectory, isDir, isFile } from '../modules/file-util.js';
@@ -52,8 +52,8 @@ describe('abortSetup', () => {
     const { calledOnce: exitCalled } = stubExit;
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(infoCalled);
-    assert.isTrue(exitCalled);
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(exitCalled, true);
     assert.strictEqual(info, 'Setup aborted: foo');
   });
 });
@@ -61,7 +61,7 @@ describe('abortSetup', () => {
 describe('handleSetupCallback', () => {
   it('should get null', () => {
     const res = handleSetupCallback();
-    assert.isNull(res);
+    assert.deepEqual(res, null);
   });
 
   it('should get null', () => {
@@ -70,7 +70,7 @@ describe('handleSetupCallback', () => {
     values.set('manifestPath', 'baz');
     values.set('callback', {});
     const res = handleSetupCallback();
-    assert.isNull(res);
+    assert.deepEqual(res, null);
   });
 
   it('should call function', () => {
@@ -80,7 +80,7 @@ describe('handleSetupCallback', () => {
     values.set('manifestPath', 'baz');
     values.set('callback', stubFunc);
     const res = handleSetupCallback();
-    assert.isTrue(stubFunc.calledOnce);
+    assert.strictEqual(stubFunc.calledOnce, true);
     assert.deepEqual(res, {
       configDirPath: 'foo',
       shellScriptPath: 'bar',
@@ -108,15 +108,15 @@ describe('handleRegClose', () => {
     stubExit.restore();
     if (IS_WIN) {
       const reg = path.join(process.env.WINDIR, 'system32', 'reg.exe');
-      assert.isTrue(infoCalled);
-      assert.isTrue(exitCalled);
+      assert.strictEqual(infoCalled, true);
+      assert.strictEqual(exitCalled, true);
       assert.strictEqual(info, `Setup aborted: ${reg} exited with 1.`);
-      assert.isFalse(stubFunc.called);
+      assert.strictEqual(stubFunc.called, false);
     } else {
-      assert.isFalse(infoCalled);
-      assert.isFalse(exitCalled);
-      assert.isUndefined(info);
-      assert.isFalse(stubFunc.called);
+      assert.strictEqual(infoCalled, false);
+      assert.strictEqual(exitCalled, false);
+      assert.strictEqual(info, undefined);
+      assert.strictEqual(stubFunc.called, false);
     }
   });
 
@@ -137,15 +137,15 @@ describe('handleRegClose', () => {
     stubInfo.restore();
     stubExit.restore();
     if (IS_WIN) {
-      assert.isTrue(infoCalled);
-      assert.isFalse(exitCalled);
+      assert.strictEqual(infoCalled, true);
+      assert.strictEqual(exitCalled, false);
       assert.strictEqual(info, `Created: ${regKey}`);
-      assert.isTrue(stubFunc.calledOnce);
+      assert.strictEqual(stubFunc.calledOnce, true);
     } else {
-      assert.isFalse(infoCalled);
-      assert.isFalse(exitCalled);
-      assert.isUndefined(info);
-      assert.isFalse(stubFunc.called);
+      assert.strictEqual(infoCalled, false);
+      assert.strictEqual(exitCalled, false);
+      assert.strictEqual(info, undefined);
+      assert.strictEqual(stubFunc.called, false);
     }
   });
 });
@@ -168,36 +168,36 @@ describe('handleRegStdErr', () => {
     stubInfo.restore();
     stubExit.restore();
     if (IS_WIN) {
-      assert.isTrue(errCalled);
+      assert.strictEqual(errCalled, true);
       assert.strictEqual(err, 'stderr: foo');
-      assert.isTrue(infoCalled);
+      assert.strictEqual(infoCalled, true);
       assert.strictEqual(info, 'Setup aborted: Failed to create registry key.');
-      assert.isTrue(exitCalled);
+      assert.strictEqual(exitCalled, true);
     } else {
-      assert.isFalse(errCalled);
-      assert.isUndefined(err);
-      assert.isFalse(infoCalled);
-      assert.isUndefined(info);
-      assert.isFalse(exitCalled);
+      assert.strictEqual(errCalled, false);
+      assert.strictEqual(err, undefined);
+      assert.strictEqual(infoCalled, false);
+      assert.strictEqual(info, undefined);
+      assert.strictEqual(exitCalled, false);
     }
   });
 });
 
 describe('getBrowserData', () => {
   it('should get object if key matches', () => {
-    assert.isObject(getBrowserData('firefox'));
+    assert.strictEqual(typeof getBrowserData('firefox'), 'object');
   });
 
   it('should get object if key matches', () => {
-    assert.isObject(getBrowserData('chrome'));
+    assert.strictEqual(typeof getBrowserData('chrome'), 'object');
   });
 
   it('should get null if no argument given', () => {
-    assert.isNull(getBrowserData());
+    assert.deepEqual(getBrowserData(), null);
   });
 
   it('should get null if key does not match', () => {
-    assert.isNull(getBrowserData('foo'));
+    assert.deepEqual(getBrowserData('foo'), null);
   });
 });
 
@@ -206,7 +206,7 @@ describe('getConfigDir', () => {
     assert.throws(
       () => getConfigDir({
         configPath: '/foo/bar'
-      }),
+      }), Error,
       `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
     );
   });
@@ -215,7 +215,7 @@ describe('getConfigDir', () => {
     assert.throws(
       () => getConfigDir({
         configPath: path.join(DIR_HOME, '../foo')
-      }),
+      }), Error,
       `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`);
   });
 
@@ -250,7 +250,7 @@ describe('getConfigDir', () => {
 describe('Setup', () => {
   it('should create an instance', () => {
     const setup = new Setup();
-    assert.instanceOf(setup, Setup);
+    assert.strictEqual(setup instanceof Setup, true);
   });
 
   describe('constructor', () => {
@@ -331,7 +331,7 @@ describe('Setup', () => {
       const setup = new Setup({
         callback: myCallback
       });
-      assert.isFunction(setup.callback);
+      assert.strictEqual(typeof setup.callback, 'function');
       assert.strictEqual(setup.callback.name, 'myCallback');
     });
 
@@ -355,7 +355,7 @@ describe('Setup', () => {
   describe('getters', () => {
     it('should get null', () => {
       const setup = new Setup();
-      assert.isNull(setup.browser);
+      assert.deepEqual(setup.browser, null);
     });
 
     it('should get object', () => {
@@ -367,7 +367,7 @@ describe('Setup', () => {
 
     it('should get array', () => {
       const setup = new Setup();
-      assert.isArray(setup.supportedBrowsers);
+      assert.strictEqual(Array.isArray(setup.supportedBrowsers), true);
     });
 
     it('should get string', () => {
@@ -393,7 +393,7 @@ describe('Setup', () => {
 
     it('should get null', () => {
       const setup = new Setup();
-      assert.isNull(setup.hostDescription);
+      assert.deepEqual(setup.hostDescription, null);
     });
 
     it('should get string', () => {
@@ -405,7 +405,7 @@ describe('Setup', () => {
 
     it('should get null', () => {
       const setup = new Setup();
-      assert.isNull(setup.hostName);
+      assert.deepEqual(setup.hostName, null);
     });
 
     it('should get string', () => {
@@ -429,7 +429,7 @@ describe('Setup', () => {
 
     it('should get null', () => {
       const setup = new Setup();
-      assert.isNull(setup.chromeExtensionIds);
+      assert.deepEqual(setup.chromeExtensionIds, null);
     });
 
     it('should get array', () => {
@@ -441,7 +441,7 @@ describe('Setup', () => {
 
     it('should get null', () => {
       const setup = new Setup();
-      assert.isNull(setup.webExtensionIds);
+      assert.deepEqual(setup.webExtensionIds, null);
     });
 
     it('should get array', () => {
@@ -453,33 +453,33 @@ describe('Setup', () => {
 
     it('should get null', () => {
       const setup = new Setup();
-      assert.isNull(setup.callback);
+      assert.deepEqual(setup.callback, null);
     });
 
     it('should get function', () => {
       const setup = new Setup({
         callback: a => a
       });
-      assert.isFunction(setup.callback);
+      assert.strictEqual(typeof setup.callback, 'function');
     });
 
     it('should get false', () => {
       const setup = new Setup();
-      assert.isFalse(setup.overwriteConfig);
+      assert.strictEqual(setup.overwriteConfig, false);
     });
 
     it('should get false', () => {
       const setup = new Setup({
         overwriteConfig: false
       });
-      assert.isFalse(setup.overwriteConfig);
+      assert.strictEqual(setup.overwriteConfig, false);
     });
 
     it('should get true', () => {
       const setup = new Setup({
         overwriteConfig: true
       });
-      assert.isTrue(setup.overwriteConfig);
+      assert.strictEqual(setup.overwriteConfig, true);
     });
   });
 
@@ -489,7 +489,7 @@ describe('Setup', () => {
         browser: 'firefox'
       });
       setup.browser = '';
-      assert.isNull(setup.browser);
+      assert.deepEqual(setup.browser, null);
     });
 
     it('should set null', () => {
@@ -497,7 +497,7 @@ describe('Setup', () => {
         browser: 'firefox'
       });
       setup.browser = 'foo';
-      assert.isNull(setup.browser);
+      assert.deepEqual(setup.browser, null);
     });
 
     it('should set null', () => {
@@ -505,7 +505,7 @@ describe('Setup', () => {
         browser: 'firefox'
       });
       setup.browser = 1;
-      assert.isNull(setup.browser);
+      assert.deepEqual(setup.browser, null);
     });
 
     it('should set string', () => {
@@ -542,7 +542,7 @@ describe('Setup', () => {
       const myPath = '/foo/bar';
       const setup = new Setup();
       assert.throws(
-        () => { setup.configPath = myPath; },
+        () => { setup.configPath = myPath; }, Error,
         `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
       );
     });
@@ -575,7 +575,7 @@ describe('Setup', () => {
         hostDescription: 'My host description'
       });
       setup.hostDescription = 1;
-      assert.isNull(setup.hostDescription);
+      assert.deepEqual(setup.hostDescription, null);
     });
 
     it('should set string', () => {
@@ -589,7 +589,7 @@ describe('Setup', () => {
         hostName: 'myhost'
       });
       setup.hostName = 1;
-      assert.isNull(setup.hostName);
+      assert.deepEqual(setup.hostName, null);
     });
 
     it('should set string', () => {
@@ -617,7 +617,7 @@ describe('Setup', () => {
         chromeExtensionIds: ['chrome-extension://foo']
       });
       setup.chromeExtensionIds = [];
-      assert.isNull(setup.chromeExtensionIds);
+      assert.deepEqual(setup.chromeExtensionIds, null);
     });
 
     it('should set array', () => {
@@ -631,7 +631,7 @@ describe('Setup', () => {
         webExtensionIds: ['myapp@webextension']
       });
       setup.webExtensionIds = [];
-      assert.isNull(setup.webExtensionIds);
+      assert.deepEqual(setup.webExtensionIds, null);
     });
 
     it('should set array', () => {
@@ -646,21 +646,21 @@ describe('Setup', () => {
         callback: myCallback
       });
       setup.callback = 1;
-      assert.isNull(setup.callback);
+      assert.deepEqual(setup.callback, null);
     });
 
     it('should set function', () => {
       const myCallback = a => a;
       const setup = new Setup();
       setup.callback = myCallback;
-      assert.isFunction(setup.callback);
+      assert.strictEqual(typeof setup.callback, 'function');
       assert.strictEqual(setup.callback.name, 'myCallback');
     });
 
     it('should set true', () => {
       const setup = new Setup();
       setup.overwriteConfig = true;
-      assert.isTrue(setup.overwriteConfig);
+      assert.strictEqual(setup.overwriteConfig, true);
     });
 
     it('should set false', () => {
@@ -668,7 +668,7 @@ describe('Setup', () => {
         overwriteConfig: true
       });
       setup.overwriteConfig = false;
-      assert.isFalse(setup.overwriteConfig);
+      assert.strictEqual(setup.overwriteConfig, false);
     });
   });
 });
@@ -680,7 +680,7 @@ describe('_getBrowserConfigDir', () => {
       browser
     });
     const res = setup._getBrowserConfigDir();
-    assert.isNull(res);
+    assert.deepEqual(res, null);
   });
 
   it('should get string', () => {
@@ -688,7 +688,7 @@ describe('_getBrowserConfigDir', () => {
       browser: 'firefox'
     });
     const res = setup._getBrowserConfigDir();
-    assert.isString(res);
+    assert.strictEqual(typeof res, 'string');
   });
 });
 
@@ -696,8 +696,7 @@ describe('_createReg', () => {
   it('should throw', async () => {
     const setup = new Setup();
     await setup._createReg().catch(e => {
-      assert.instanceOf(e, Error);
-      assert.strictEqual(e.message, 'No such file: undefined.');
+      assert.deepStrictEqual(e, new Error('No such file: undefined.'));
     });
   });
 
@@ -706,8 +705,7 @@ describe('_createReg', () => {
       path.resolve('test', 'file', 'config', 'firefox', 'test.json');
     const setup = new Setup();
     await setup._createReg(manifestPath).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected Object but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected Object but got Null.'));
     });
   });
 
@@ -718,8 +716,7 @@ describe('_createReg', () => {
       browser: 'firefox'
     });
     await setup._createReg(manifestPath).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected String but got Null.'));
     });
   });
 
@@ -740,13 +737,15 @@ describe('_createReg', () => {
     const res = await setup._createReg(manifestPath);
     if (IS_WIN) {
       assert.strictEqual(stubSpawn.callCount, i + 1);
-      assert.isObject(res);
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'on'));
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'stderr'));
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res.stderr, 'on'));
+      assert.strictEqual(typeof res, 'object');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'on'), true);
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'stderr'),
+        true);
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res.stderr, 'on'), true);
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
-      assert.isNull(res);
+      assert.deepEqual(res, null);
     }
     stubSpawn.restore();
   });
@@ -757,10 +756,9 @@ describe('_createManifest', () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const setup = new Setup();
     await setup._createManifest().catch(e => {
-      assert.instanceOf(e, Error);
-      assert.strictEqual(e.message, 'No such file: undefined.');
+      assert.deepStrictEqual(e, new Error('No such file: undefined.'));
     });
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -769,10 +767,9 @@ describe('_createManifest', () => {
     const file = path.resolve(DIR_CWD, IS_WIN ? 'foo.cmd' : 'foo.sh');
     const setup = new Setup();
     await setup._createManifest(file).catch(e => {
-      assert.instanceOf(e, Error);
-      assert.strictEqual(e.message, `No such file: ${file}.`);
+      assert.deepStrictEqual(e, new Error(`No such file: ${file}.`));
     });
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -788,11 +785,10 @@ describe('_createManifest', () => {
     });
     if (IS_WIN) {
       await setup._createManifest(file).catch(e => {
-        assert.instanceOf(e, Error);
-        assert.strictEqual(e.message, 'No such directory: undefined.');
+        assert.deepStrictEqual(e, new Error('No such directory: undefined.'));
       });
     }
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -808,11 +804,10 @@ describe('_createManifest', () => {
     });
     if (IS_WIN) {
       await setup._createManifest(file).catch(e => {
-        assert.instanceOf(e, Error);
-        assert.strictEqual(e.message, 'No such directory: undefined.');
+        assert.deepStrictEqual(e, new Error('No such directory: undefined.'));
       });
     }
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -829,11 +824,10 @@ describe('_createManifest', () => {
     });
     if (IS_WIN) {
       await setup._createManifest(file, dir).catch(e => {
-        assert.instanceOf(e, Error);
-        assert.strictEqual(e.message, `No such directory: ${dir}.`);
+        assert.deepStrictEqual(e, new Error(`No such directory: ${dir}.`));
       });
     }
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -843,10 +837,9 @@ describe('_createManifest', () => {
       path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
     const setup = new Setup();
     await setup._createManifest(file, DIR_HOME).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected Object but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected Object but got Null.'));
     });
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -858,10 +851,9 @@ describe('_createManifest', () => {
       browser: 'firefox'
     });
     await setup._createManifest(file, DIR_HOME).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected String but got Null.'));
     });
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -874,10 +866,9 @@ describe('_createManifest', () => {
       hostDescription: 'foo bar'
     });
     await setup._createManifest(file, DIR_HOME).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected String but got Null.'));
     });
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -891,10 +882,9 @@ describe('_createManifest', () => {
       hostName: 'foo'
     });
     await setup._createManifest(file, DIR_HOME).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected Array but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected Array but got Null.'));
     });
-    assert.isFalse(stubWrite.called, 'called');
+    assert.strictEqual(stubWrite.called, false);
     stubWrite.restore();
   });
 
@@ -939,17 +929,17 @@ describe('_createManifest', () => {
       flag: 'r'
     });
     const parsedFile = JSON.parse(file);
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     if (IS_WIN) {
       assert.strictEqual(mkdirCallCount, 0);
     } else {
       assert.strictEqual(mkdirCallCount, 1);
     }
-    assert.isTrue(writeCalled);
+    assert.strictEqual(writeCalled, true);
     assert.strictEqual(info, `Created: ${manifestPath}`);
     assert.strictEqual(res, manifestPath);
-    assert.isTrue(isFile(manifestPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(manifestPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     assert.deepEqual(parsedFile, {
       allowed_extensions: ['foo@bar'],
       description: 'foo bar',
@@ -996,12 +986,12 @@ describe('_createManifest', () => {
       flag: 'r'
     });
     const parsedFile = JSON.parse(file);
-    assert.isTrue(infoCalled);
-    assert.isTrue(writeCalled);
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(writeCalled, true);
     assert.strictEqual(info, `Created: ${manifestPath}`);
     assert.strictEqual(res, manifestPath);
-    assert.isTrue(isFile(manifestPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(manifestPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     assert.deepEqual(parsedFile, {
       allowed_origins: ['chrome-extension://foo'],
       description: 'foo bar',
@@ -1016,8 +1006,7 @@ describe('_createShellScript', () => {
   it('should throw', async () => {
     const setup = new Setup();
     await setup._createShellScript().catch(e => {
-      assert.instanceOf(e, Error);
-      assert.strictEqual(e.message, 'No such directory: undefined.');
+      assert.deepStrictEqual(e, new Error('No such directory: undefined.'));
     });
   });
 
@@ -1025,8 +1014,7 @@ describe('_createShellScript', () => {
     const dir = path.resolve(DIR_CWD, 'foo');
     const setup = new Setup();
     await setup._createShellScript(dir).catch(e => {
-      assert.instanceOf(e, Error);
-      assert.strictEqual(e.message, `No such directory: ${dir}.`);
+      assert.deepStrictEqual(e, new Error(`No such directory: ${dir}.`));
     });
   });
 
@@ -1034,8 +1022,7 @@ describe('_createShellScript', () => {
     const dir = await createDirectory(path.join(TMPDIR, 'webextnativemsg'));
     const setup = new Setup();
     await setup._createShellScript(dir).catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected String but got Null.'));
     });
   });
 
@@ -1060,11 +1047,11 @@ describe('_createShellScript', () => {
       encoding: 'utf8',
       flag: 'r'
     });
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${shellPath}`);
     assert.strictEqual(res, shellPath);
-    assert.isTrue(isFile(shellPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(shellPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1099,11 +1086,11 @@ describe('_createShellScript', () => {
       encoding: 'utf8',
       flag: 'r'
     });
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${shellPath}`);
     assert.strictEqual(res, shellPath);
-    assert.isTrue(isFile(shellPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(shellPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1138,11 +1125,11 @@ describe('_createShellScript', () => {
       encoding: 'utf8',
       flag: 'r'
     });
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${shellPath}`);
     assert.strictEqual(res, shellPath);
-    assert.isTrue(isFile(shellPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(shellPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1177,11 +1164,11 @@ describe('_createShellScript', () => {
       encoding: 'utf8',
       flag: 'r'
     });
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${shellPath}`);
     assert.strictEqual(res, shellPath);
-    assert.isTrue(isFile(shellPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(shellPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1216,11 +1203,11 @@ describe('_createShellScript', () => {
       encoding: 'utf8',
       flag: 'r'
     });
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${shellPath}`);
     assert.strictEqual(res, shellPath);
-    assert.isTrue(isFile(shellPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(shellPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1254,11 +1241,11 @@ describe('_createShellScript', () => {
       encoding: 'utf8',
       flag: 'r'
     });
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${shellPath}`);
     assert.strictEqual(res, shellPath);
-    assert.isTrue(isFile(shellPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(shellPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1292,11 +1279,11 @@ describe('_createShellScript', () => {
       encoding: 'utf8',
       flag: 'r'
     });
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${shellPath}`);
     assert.strictEqual(res, shellPath);
-    assert.isTrue(isFile(shellPath));
-    assert.isTrue(file.endsWith('\n'));
+    assert.strictEqual(isFile(shellPath), true);
+    assert.strictEqual(file.endsWith('\n'), true);
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1315,8 +1302,7 @@ describe('_createConfigDir', () => {
   it('should throw', async () => {
     const setup = new Setup();
     await setup._createConfigDir().catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected String but got Null.'));
     });
   });
 
@@ -1333,10 +1319,10 @@ describe('_createConfigDir', () => {
     const res = await setup._createConfigDir();
     const { calledOnce: infoCalled } = stubInfo;
     stubInfo.restore();
-    assert.isTrue(infoCalled);
+    assert.strictEqual(infoCalled, true);
     assert.strictEqual(info, `Created: ${browserConfigDir}`);
     assert.strictEqual(res, browserConfigDir);
-    assert.isTrue(isDir(res));
+    assert.strictEqual(isDir(res), true);
   });
 });
 
@@ -1366,15 +1352,15 @@ describe('_createFiles', () => {
     const { calledOnce: exitCalled } = stubExit;
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubConfig.calledOnce);
-    assert.isTrue(stubShell.calledOnce);
-    assert.isTrue(stubManifest.calledOnce);
-    assert.isTrue(infoCalled);
-    assert.isTrue(exitCalled);
+    assert.strictEqual(stubConfig.calledOnce, true);
+    assert.strictEqual(stubShell.calledOnce, true);
+    assert.strictEqual(stubManifest.calledOnce, true);
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(exitCalled, true);
     assert.strictEqual(info, 'Setup aborted: Failed to create files.');
-    assert.isFalse(stubReg.called);
-    assert.isFalse(stubCallback.called);
-    assert.isUndefined(res);
+    assert.strictEqual(stubReg.called, false);
+    assert.strictEqual(stubCallback.called, false);
+    assert.strictEqual(res, undefined);
   });
 
   it('should call function', async () => {
@@ -1402,19 +1388,19 @@ describe('_createFiles', () => {
     const { calledOnce: exitCalled } = stubExit;
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubConfig.calledOnce);
-    assert.isTrue(stubShell.calledOnce);
-    assert.isTrue(stubManifest.calledOnce);
-    assert.isFalse(infoCalled);
-    assert.isFalse(exitCalled);
-    assert.isUndefined(info);
+    assert.strictEqual(stubConfig.calledOnce, true);
+    assert.strictEqual(stubShell.calledOnce, true);
+    assert.strictEqual(stubManifest.calledOnce, true);
+    assert.strictEqual(infoCalled, false);
+    assert.strictEqual(exitCalled, false);
+    assert.strictEqual(info, undefined);
     if (IS_WIN) {
-      assert.isTrue(stubReg.calledOnce);
-      assert.isFalse(stubCallback.called);
-      assert.isTrue(res);
+      assert.strictEqual(stubReg.calledOnce, true);
+      assert.strictEqual(stubCallback.called, false);
+      assert.strictEqual(res, true);
     } else {
-      assert.isFalse(stubReg.called);
-      assert.isTrue(stubCallback.calledOnce);
+      assert.strictEqual(stubReg.called, false);
+      assert.strictEqual(stubCallback.calledOnce, true);
       assert.deepEqual(res, {
         manifestPath,
         configDirPath: configDir,
@@ -1428,8 +1414,7 @@ describe('_handleBrowserConfigDir', () => {
   it('should throw', async () => {
     const setup = new Setup();
     await setup._handleBrowserConfigDir().catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected String but got Null.');
+      assert.deepStrictEqual(e, new TypeError('Expected String but got Null.'));
     });
   });
 
@@ -1453,12 +1438,12 @@ describe('_handleBrowserConfigDir', () => {
     const { calledOnce: exitCalled } = stubExit;
     stubInfo.restore();
     stubExit.restore();
-    assert.isFalse(stubCreateFiles.calledOnce);
+    assert.strictEqual(stubCreateFiles.called, false);
     assert.strictEqual(stubConfirm.callCount, i + 1);
-    assert.isTrue(infoCalled);
-    assert.isTrue(exitCalled);
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(exitCalled, true);
     assert.strictEqual(info, `Setup aborted: ${configPath} already exists.`);
-    assert.isUndefined(res);
+    assert.strictEqual(res, undefined);
     stubConfirm.restore();
   });
 
@@ -1481,12 +1466,12 @@ describe('_handleBrowserConfigDir', () => {
     const { calledOnce: exitCalled } = stubExit;
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubCreateFiles.calledOnce);
+    assert.strictEqual(stubCreateFiles.calledOnce, true);
     assert.strictEqual(stubConfirm.callCount, i + 1);
-    assert.isFalse(infoCalled);
-    assert.isFalse(exitCalled);
-    assert.isUndefined(info);
-    assert.isTrue(res);
+    assert.strictEqual(infoCalled, false);
+    assert.strictEqual(exitCalled, false);
+    assert.strictEqual(info, undefined);
+    assert.strictEqual(res, true);
     stubConfirm.restore();
   });
 
@@ -1509,12 +1494,12 @@ describe('_handleBrowserConfigDir', () => {
     const { calledOnce: exitCalled } = stubExit;
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubCreateFiles.calledOnce);
+    assert.strictEqual(stubCreateFiles.calledOnce, true);
     assert.strictEqual(stubConfirm.callCount, i);
-    assert.isFalse(infoCalled);
-    assert.isFalse(exitCalled);
-    assert.isUndefined(info);
-    assert.isTrue(res);
+    assert.strictEqual(infoCalled, false);
+    assert.strictEqual(exitCalled, false);
+    assert.strictEqual(info, undefined);
+    assert.strictEqual(res, true);
     stubConfirm.restore();
   });
 
@@ -1537,12 +1522,12 @@ describe('_handleBrowserConfigDir', () => {
     const { calledOnce: exitCalled } = stubExit;
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubCreateFiles.calledOnce);
+    assert.strictEqual(stubCreateFiles.calledOnce, true);
     assert.strictEqual(stubConfirm.callCount, i);
-    assert.isFalse(infoCalled);
-    assert.isFalse(exitCalled);
-    assert.isUndefined(info);
-    assert.isTrue(res);
+    assert.strictEqual(infoCalled, false);
+    assert.strictEqual(exitCalled, false);
+    assert.strictEqual(info, undefined);
+    assert.strictEqual(res, true);
     stubConfirm.restore();
   });
 });
@@ -1551,8 +1536,8 @@ describe('_handleBrowserInput', () => {
   it('should throw', async () => {
     const setup = new Setup();
     await setup._handleBrowserInput().catch(e => {
-      assert.instanceOf(e, TypeError);
-      assert.strictEqual(e.message, 'Expected Array but got Undefined.');
+      assert.deepStrictEqual(e,
+        new TypeError('Expected Array but got Undefined.'));
     });
   });
 
@@ -1573,11 +1558,11 @@ describe('_handleBrowserInput', () => {
     stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
-    assert.isFalse(stubConfigDir.called);
-    assert.isTrue(infoCalled);
-    assert.isTrue(exitCalled);
+    assert.strictEqual(stubConfigDir.called, false);
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(exitCalled, true);
     assert.strictEqual(info, 'Setup aborted: Browser is not specified.');
-    assert.isUndefined(res);
+    assert.strictEqual(res, undefined);
   });
 
   it('should call function', async () => {
@@ -1597,11 +1582,11 @@ describe('_handleBrowserInput', () => {
     stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubConfigDir.calledOnce);
-    assert.isFalse(infoCalled);
-    assert.isFalse(exitCalled);
-    assert.isUndefined(info);
-    assert.isTrue(res);
+    assert.strictEqual(stubConfigDir.calledOnce, true);
+    assert.strictEqual(infoCalled, false);
+    assert.strictEqual(exitCalled, false);
+    assert.strictEqual(info, undefined);
+    assert.strictEqual(res, true);
     assert.strictEqual(setup.browser, 'firefox');
   });
 
@@ -1622,11 +1607,11 @@ describe('_handleBrowserInput', () => {
     stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubConfigDir.calledOnce);
-    assert.isFalse(infoCalled);
-    assert.isFalse(exitCalled);
-    assert.isUndefined(info);
-    assert.isTrue(res);
+    assert.strictEqual(stubConfigDir.calledOnce, true);
+    assert.strictEqual(infoCalled, false);
+    assert.strictEqual(exitCalled, false);
+    assert.strictEqual(info, undefined);
+    assert.strictEqual(res, true);
     assert.strictEqual(setup.browser, 'chrome');
   });
 
@@ -1654,11 +1639,11 @@ describe('_handleBrowserInput', () => {
     stubSelect.restore();
     stubInfo.restore();
     stubExit.restore();
-    assert.isTrue(stubConfigDir.calledOnce);
-    assert.isFalse(infoCalled);
-    assert.isFalse(exitCalled);
-    assert.isUndefined(info);
-    assert.isTrue(res);
+    assert.strictEqual(stubConfigDir.calledOnce, true);
+    assert.strictEqual(infoCalled, false);
+    assert.strictEqual(exitCalled, false);
+    assert.strictEqual(info, undefined);
+    assert.strictEqual(res, true);
     assert.strictEqual(setup.browser, 'vivaldi');
   });
 });
@@ -1671,8 +1656,8 @@ describe('run', () => {
     const stubBrowserInput =
       sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
     const res = await setup.run();
-    assert.isFalse(stubConfigDir.called);
-    assert.isTrue(stubBrowserInput.calledOnce);
+    assert.strictEqual(stubConfigDir.called, false);
+    assert.strictEqual(stubBrowserInput.calledOnce, true);
     assert.deepEqual(res, []);
   });
 
@@ -1686,10 +1671,10 @@ describe('run', () => {
     const stubBrowserInput =
       sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
     const res = await setup.run();
-    assert.isFalse(stubConfigDir.called);
-    assert.isTrue(stubBrowserInput.calledOnce);
-    assert.isTrue(res.includes('firefox'));
-    assert.isTrue(res.includes('chrome'));
+    assert.strictEqual(stubConfigDir.called, false);
+    assert.strictEqual(stubBrowserInput.calledOnce, true);
+    assert.strictEqual(res.includes('firefox'), true);
+    assert.strictEqual(res.includes('chrome'), true);
   });
 
   it('should call function', async () => {
@@ -1701,10 +1686,10 @@ describe('run', () => {
     const stubBrowserInput =
       sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
     const res = await setup.run();
-    assert.isFalse(stubConfigDir.called);
-    assert.isTrue(stubBrowserInput.calledOnce);
-    assert.isTrue(res.includes('firefox'));
-    assert.isFalse(res.includes('chrome'));
+    assert.strictEqual(stubConfigDir.called, false);
+    assert.strictEqual(stubBrowserInput.calledOnce, true);
+    assert.strictEqual(res.includes('firefox'), true);
+    assert.strictEqual(res.includes('chrome'), false);
   });
 
   it('should call function', async () => {
@@ -1716,10 +1701,10 @@ describe('run', () => {
     const stubBrowserInput =
       sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
     const res = await setup.run();
-    assert.isFalse(stubConfigDir.called);
-    assert.isTrue(stubBrowserInput.calledOnce);
-    assert.isFalse(res.includes('firefox'));
-    assert.isTrue(res.includes('chrome'));
+    assert.strictEqual(stubConfigDir.called, false);
+    assert.strictEqual(stubBrowserInput.calledOnce, true);
+    assert.strictEqual(res.includes('firefox'), false);
+    assert.strictEqual(res.includes('chrome'), true);
   });
 
   it('should call function', async () => {
@@ -1733,9 +1718,9 @@ describe('run', () => {
     const stubBrowserInput =
       sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
     const res = await setup.run();
-    assert.isTrue(stubConfigDir.calledOnce);
-    assert.isFalse(stubBrowserInput.called);
-    assert.isTrue(res);
+    assert.strictEqual(stubConfigDir.calledOnce, true);
+    assert.strictEqual(stubBrowserInput.called, false);
+    assert.strictEqual(res, true);
   });
 
   it('should call function', async () => {
@@ -1749,8 +1734,8 @@ describe('run', () => {
     const stubBrowserInput =
       sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
     const res = await setup.run();
-    assert.isTrue(stubConfigDir.calledOnce);
-    assert.isFalse(stubBrowserInput.called);
-    assert.isTrue(res);
+    assert.strictEqual(stubConfigDir.calledOnce, true);
+    assert.strictEqual(stubBrowserInput.called, false);
+    assert.strictEqual(res, true);
   });
 });

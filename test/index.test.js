@@ -1,5 +1,5 @@
 /* api */
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { describe, it } from 'mocha';
 
 /* test */
@@ -14,27 +14,27 @@ import {
 describe('Classes', () => {
   it('should be instance of ChildProcess', () => {
     const childProcess = new ChildProcess();
-    assert.instanceOf(childProcess, ChildProcess);
+    assert.strictEqual(childProcess instanceof ChildProcess, true);
   });
 
   it('should be instance of CmdArgs', () => {
     const cmdArgs = new CmdArgs();
-    assert.instanceOf(cmdArgs, CmdArgs);
+    assert.strictEqual(cmdArgs instanceof CmdArgs, true);
   });
 
   it('should be instance of Input', () => {
     const input = new Input();
-    assert.instanceOf(input, Input);
+    assert.strictEqual(input instanceof Input, true);
   });
 
   it('should be instance of Output', () => {
     const output = new Output();
-    assert.instanceOf(output, Output);
+    assert.strictEqual(output instanceof Output, true);
   });
 
   it('should be instance of Setup', () => {
     const setup = new Setup();
-    assert.instanceOf(setup, Setup);
+    assert.strictEqual(setup instanceof Setup, true);
   });
 });
 
