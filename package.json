@@ -14,22 +14,21 @@
   "types": "types/index.d.ts",
   "dependencies": {
     "@inquirer/prompts": "^7.1.0",
-    "shell-quote": "^1.8.1"
+    "shell-quote": "^1.8.2"
   },
   "devDependencies": {
-    "@types/node": "^22.9.0",
+    "@types/node": "^22.10.1",
     "c8": "^10.1.2",
-    "chai": "^5.1.2",
-    "eslint": "^9.14.0",
-    "eslint-plugin-import-x": "^4.4.2",
-    "eslint-plugin-jsdoc": "^50.5.0",
-    "eslint-plugin-regexp": "^2.6.0",
-    "eslint-plugin-unicorn": "^56.0.0",
+    "eslint": "^9.15.0",
+    "eslint-plugin-import-x": "^4.4.3",
+    "eslint-plugin-jsdoc": "^50.6.0",
+    "eslint-plugin-regexp": "^2.7.0",
+    "eslint-plugin-unicorn": "^56.0.1",
     "globals": "^15.12.0",
     "mocha": "^10.8.2",
-    "neostandard": "^0.11.8",
+    "neostandard": "^0.11.9",
     "sinon": "^19.0.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   },
   "scripts": {
     "build": "npm run tsc && npm run lint && npm run test",
@@ -38,5 +37,5 @@
     "test-setup": "cd test/app && node setup",
     "tsc": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && npx tsc"
   },
-  "version": "8.0.5"
+  "version": "8.0.6"
 }
