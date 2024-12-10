@@ -37,12 +37,33 @@ export const values = new Map();
 /**
  * abort setup
  * @param {string} msg - message
+ * @param {number} [code] - exit code
  * @returns {void}
  */
-export const abortSetup = msg => {
+export const abortSetup = (msg, code) => {
   values.clear();
   console.info(`Setup aborted: ${msg}`);
-  process.exit();
+  if (!Number.isInteger(code)) {
+    code = 1;
+  }
+  process.exit(code);
+};
+
+/**
+ * handle inquirer error
+ * @param {object} e - Error
+ * @throws
+ * @returns {Function} - abortSetup
+ */
+export const handleInquirerError = e => {
+  if (e instanceof Error) {
+    let code = 1;
+    if (e.name === 'ExitPromptError') {
+      code = 130;
+    }
+    return abortSetup(e.message, code);
+  }
+  return abortSetup('Unknown error.', 1);
 };
 
 /**
@@ -76,7 +97,7 @@ export const handleRegClose = code => {
       func = handleSetupCallback();
     } else {
       const reg = path.join(process.env.WINDIR, 'system32', 'reg.exe');
-      func = abortSetup(`${reg} exited with ${code}.`);
+      func = abortSetup(`${reg} exited with ${code}.`, code);
     }
   }
   return func || null;
@@ -90,7 +111,7 @@ export const handleRegClose = code => {
 export const handleRegStderr = data => {
   if (IS_WIN) {
     data && console.error(`stderr: ${data.toString()}`);
-    abortSetup('Failed to create registry key.');
+    abortSetup('Failed to create registry key.', 1);
   }
 };
 
@@ -466,7 +487,7 @@ export class Setup {
       values.set('callback', this.#callback);
       func = IS_WIN ? this._createReg(manifestPath) : handleSetupCallback();
     } else {
-      func = abortSetup('Failed to create files.');
+      func = abortSetup('Failed to create files.', 1);
     }
     return func;
   }
@@ -484,11 +505,11 @@ export class Setup {
       const ans = await inquirer.confirm({
         message: `${dir} already exists. Overwrite?`,
         default: false
-      });
+      }).catch(handleInquirerError);
       if (ans) {
         func = this._createFiles();
       } else {
-        func = abortSetup(`${dir} already exists.`);
+        func = abortSetup(`${dir} already exists.`, 1);
       }
     } else {
       func = this._createFiles();
@@ -526,7 +547,7 @@ export class Setup {
     if (arr.length > 5) {
       opt.pageSize = arr.length + 2;
     }
-    const ans = await inquirer.select(opt);
+    const ans = await inquirer.select(opt).catch(handleInquirerError);
     if (ans) {
       this.#browser = getBrowserData(ans);
     }
@@ -534,7 +555,7 @@ export class Setup {
       this.#browserConfigDir = this._getBrowserConfigDir();
       func = this._handleBrowserConfigDir();
     } else {
-      func = abortSetup('Browser is not specified.');
+      func = abortSetup('Browser is not specified.', 1);
     }
     return func;
   }
