@@ -15,8 +15,8 @@ import {
 
 /* test */
 import {
-  Setup, abortSetup, getBrowserData, getConfigDir, handleRegClose,
-  handleRegStderr, handleSetupCallback, inquirer, values
+  Setup, abortSetup, getBrowserData, getConfigDir, handlePromptError,
+  handleRegClose, handleRegStderr, handleSetupCallback, inquirer, values
 } from '../modules/setup.js';
 
 /* constant */
@@ -66,6 +66,61 @@ describe('abortSetup', () => {
     const stubExit = sinon.stub(process, 'exit');
     const i = stubExit.withArgs(2).callCount;
     abortSetup('foo', 2);
+    const { calledOnce: infoCalled } = stubInfo;
+    const { callCount: exitCallCount } = stubExit;
+    stubInfo.restore();
+    stubExit.restore();
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(exitCallCount, i + 1);
+    assert.strictEqual(info, 'Setup aborted: foo');
+  });
+});
+
+describe('handlePromptError', () => {
+  it('should exit with unknown error message', () => {
+    let info;
+    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
+      info = msg;
+    });
+    const stubExit = sinon.stub(process, 'exit');
+    const i = stubExit.withArgs(1).callCount;
+    handlePromptError('foo');
+    const { calledOnce: infoCalled } = stubInfo;
+    const { callCount: exitCallCount } = stubExit;
+    stubInfo.restore();
+    stubExit.restore();
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(exitCallCount, i + 1);
+    assert.strictEqual(info, 'Setup aborted: Unknown error.');
+  });
+
+  it('should exit with message', () => {
+    let info;
+    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
+      info = msg;
+    });
+    const stubExit = sinon.stub(process, 'exit');
+    const i = stubExit.withArgs(1).callCount;
+    handlePromptError(new Error('foo'));
+    const { calledOnce: infoCalled } = stubInfo;
+    const { callCount: exitCallCount } = stubExit;
+    stubInfo.restore();
+    stubExit.restore();
+    assert.strictEqual(infoCalled, true);
+    assert.strictEqual(exitCallCount, i + 1);
+    assert.strictEqual(info, 'Setup aborted: foo');
+  });
+
+  it('should exit with message', () => {
+    let info;
+    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
+      info = msg;
+    });
+    const stubExit = sinon.stub(process, 'exit');
+    const i = stubExit.withArgs(130).callCount;
+    const e = new Error('foo');
+    e.name = 'ExitPromptError';
+    handlePromptError(e);
     const { calledOnce: infoCalled } = stubInfo;
     const { callCount: exitCallCount } = stubExit;
     stubInfo.restore();
