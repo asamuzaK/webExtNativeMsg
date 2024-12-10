@@ -15,7 +15,7 @@ import {
 
 /* test */
 import {
-  Setup, abortSetup, getBrowserData, getConfigDir, handlePromptError,
+  Setup, abortSetup, getBrowserData, getConfigDir, handleInquirerError,
   handleRegClose, handleRegStderr, handleSetupCallback, inquirer, values
 } from '../modules/setup.js';
 
@@ -76,7 +76,7 @@ describe('abortSetup', () => {
   });
 });
 
-describe('handlePromptError', () => {
+describe('handleInquirerError', () => {
   it('should exit with unknown error message', () => {
     let info;
     const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
@@ -84,7 +84,7 @@ describe('handlePromptError', () => {
     });
     const stubExit = sinon.stub(process, 'exit');
     const i = stubExit.withArgs(1).callCount;
-    handlePromptError('foo');
+    handleInquirerError('foo');
     const { calledOnce: infoCalled } = stubInfo;
     const { callCount: exitCallCount } = stubExit;
     stubInfo.restore();
@@ -101,7 +101,7 @@ describe('handlePromptError', () => {
     });
     const stubExit = sinon.stub(process, 'exit');
     const i = stubExit.withArgs(1).callCount;
-    handlePromptError(new Error('foo'));
+    handleInquirerError(new Error('foo'));
     const { calledOnce: infoCalled } = stubInfo;
     const { callCount: exitCallCount } = stubExit;
     stubInfo.restore();
@@ -120,7 +120,7 @@ describe('handlePromptError', () => {
     const i = stubExit.withArgs(130).callCount;
     const e = new Error('foo');
     e.name = 'ExitPromptError';
-    handlePromptError(e);
+    handleInquirerError(e);
     const { calledOnce: infoCalled } = stubInfo;
     const { callCount: exitCallCount } = stubExit;
     stubInfo.restore();

@@ -50,12 +50,12 @@ export const abortSetup = (msg, code) => {
 };
 
 /**
- * handle prompt error
+ * handle inquirer error
  * @param {object} e - Error
  * @throws
  * @returns {Function} - abortSetup
  */
-export const handlePromptError = e => {
+export const handleInquirerError = e => {
   if (e instanceof Error) {
     let code = 1;
     if (e.name === 'ExitPromptError') {
@@ -505,7 +505,7 @@ export class Setup {
       const ans = await inquirer.confirm({
         message: `${dir} already exists. Overwrite?`,
         default: false
-      }).catch(handlePromptError);
+      }).catch(handleInquirerError);
       if (ans) {
         func = this._createFiles();
       } else {
@@ -547,7 +547,7 @@ export class Setup {
     if (arr.length > 5) {
       opt.pageSize = arr.length + 2;
     }
-    const ans = await inquirer.select(opt).catch(handlePromptError);
+    const ans = await inquirer.select(opt).catch(handleInquirerError);
     if (ans) {
       this.#browser = getBrowserData(ans);
     }
