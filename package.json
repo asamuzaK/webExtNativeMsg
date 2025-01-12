@@ -10,7 +10,12 @@
     "url": "git+https://github.com/asamuzaK/webExtNativeMsg.git"
   },
   "type": "module",
-  "main": "index.js",
+  "exports": {
+    "default": {
+      "types": "./types/index.d.ts",
+      "default": "./index.js"
+    }
+  },
   "types": "types/index.d.ts",
   "dependencies": {
     "@inquirer/prompts": "^7.2.0",
