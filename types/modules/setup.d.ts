@@ -3,7 +3,8 @@ export namespace inquirer {
     export { select };
 }
 export const values: Map<any, any>;
-export function abortSetup(msg: string): void;
+export function abortSetup(msg: string, code?: number): void;
+export function handleInquirerError(e: object): Function;
 export function handleSetupCallback(): Function | null;
 export function handleRegClose(code: number): Function | null;
 export function handleRegStderr(data: any): void;
