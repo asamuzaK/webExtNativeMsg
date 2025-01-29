@@ -188,6 +188,7 @@ export class ChildProcess {
     if (isFile(file)) {
       this.#args.push(file);
     }
-    return childProcess.spawn(this.#cmd, this.#args, this.#opt);
+    const args = new CmdArgs(this.#args).toString();
+    return childProcess.spawn(this.#cmd, parseCmd(args), this.#opt);
   }
 }
