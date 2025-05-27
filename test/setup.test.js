@@ -811,11 +811,11 @@ describe('_createReg', () => {
     if (IS_WIN) {
       assert.strictEqual(stubSpawn.callCount, i + 1);
       assert.strictEqual(typeof res, 'object');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'on'), true);
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'stderr'),
+      assert.strictEqual(Object.hasOwn(res, 'on'), true);
+      assert.strictEqual(Object.hasOwn(res, 'stderr'),
         true);
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res.stderr, 'on'), true);
+        Object.hasOwn(res.stderr, 'on'), true);
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
       assert.deepEqual(res, null);
