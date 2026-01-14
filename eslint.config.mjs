@@ -36,6 +36,8 @@ export default [
           caseInsensitive: false
         }
       }],
+      'jsdoc/reject-any-type': 'off',
+      'jsdoc/reject-function-type': 'off',
       'no-await-in-loop': 'error',
       'no-use-before-define': ['error', {
         allowNamedExports: false,

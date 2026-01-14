@@ -52,7 +52,7 @@ export const abortSetup = (msg, code) => {
 /**
  * handle inquirer error
  * @param {object} e - Error
- * @throws
+ * @throws {Error} - Error
  * @returns {Function} - abortSetup
  */
 export const handleInquirerError = e => {
