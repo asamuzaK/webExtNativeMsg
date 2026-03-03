@@ -30,12 +30,6 @@ export default [
         asyncArrow: 'always',
         named: 'never'
       }],
-      'import-x/order': ['error', {
-        alphabetize: {
-          order: 'ignore',
-          caseInsensitive: false
-        }
-      }],
       'jsdoc/reject-any-type': 'off',
       'jsdoc/reject-function-type': 'off',
       'no-await-in-loop': 'error',

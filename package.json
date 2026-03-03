@@ -22,22 +22,23 @@
     "shell-quote": "^1.8.3"
   },
   "devDependencies": {
-    "@types/node": "^25.3.2",
+    "@types/node": "^25.3.3",
     "c8": "^11.0.0",
-    "eslint": "^9.39.2",
+    "eslint": "^9.39.3",
     "eslint-plugin-jsdoc": "^62.7.1",
     "eslint-plugin-regexp": "^3.0.0",
     "eslint-plugin-unicorn": "^63.0.0",
-    "globals": "^17.3.0",
+    "globals": "^17.4.0",
     "mocha": "^11.7.5",
-    "neostandard": "^0.12.2",
+    "neostandard": "^0.13.0",
     "sinon": "^21.0.1",
     "typescript": "^5.9.3"
   },
    "overrides": {
     "c8": {
       "yargs": "^18.0.0"
-    }
+    },
+    "serialize-javascript": "^7.0.4"
   },
   "scripts": {
     "build": "npm run tsc && npm run lint && npm run test",
