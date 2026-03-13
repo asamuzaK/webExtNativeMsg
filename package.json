@@ -11,22 +11,22 @@
   },
   "type": "module",
   "exports": {
-    "default": {
+    ".": {
       "types": "./types/index.d.ts",
       "default": "./index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
-  "types": "types/index.d.ts",
   "dependencies": {
     "@inquirer/prompts": "^8.3.0",
     "shell-quote": "^1.8.3"
   },
   "devDependencies": {
-    "@types/node": "^25.3.5",
+    "@types/node": "^25.5.0",
     "c8": "^11.0.0",
     "eslint": "^9.39.4",
-    "eslint-plugin-jsdoc": "^62.7.1",
-    "eslint-plugin-regexp": "^3.0.0",
+    "eslint-plugin-jsdoc": "^62.8.0",
+    "eslint-plugin-regexp": "^3.1.0",
     "eslint-plugin-unicorn": "^63.0.0",
     "globals": "^17.4.0",
     "mocha": "^11.7.5",
