@@ -1,6 +1,9 @@
 /* api */
 import { strict as assert } from 'node:assert';
-import { describe, it } from 'mocha';
+import os from 'node:os';
+import path from 'node:path';
+import process from 'node:process';
+import { afterEach, beforeEach, describe, it } from 'mocha';
 import { isString } from '../modules/common.js';
 
 /* test */
@@ -46,5 +49,41 @@ describe('boolean constants', () => {
     arr.forEach(i => {
       assert.strictEqual(typeof i, 'boolean');
     });
+  });
+});
+
+describe('DIR_CONFIG_WIN', () => {
+  let originalAppData;
+  beforeEach(() => {
+    originalAppData = process.env.APPDATA;
+  });
+  afterEach(() => {
+    if (originalAppData !== undefined) {
+      process.env.APPDATA = originalAppData;
+    } else {
+      delete process.env.APPDATA;
+    }
+  });
+
+  it('should evaluate to APPDATA or fallback path (Static Import)', () => {
+    const expected =
+      process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
+    assert.strictEqual(DIR_CONFIG_WIN, expected);
+  });
+
+  it('should use fallback path when APPDATA is not set', async () => {
+    delete process.env.APPDATA;
+    const { DIR_CONFIG_WIN: mockDirWin } =
+      await import(`../modules/constant.js?t=${Date.now()}`);
+    const fallback = path.join(os.homedir(), 'AppData', 'Roaming');
+    assert.strictEqual(mockDirWin, fallback);
+  });
+
+  it('should use custom APPDATA when it is set', async () => {
+    const customPath = path.join('C:', 'Custom', 'AppData');
+    process.env.APPDATA = customPath;
+    const { DIR_CONFIG_WIN: mockDirWin } =
+      await import(`../modules/constant.js?t=${Date.now() + 1}`);
+    assert.strictEqual(mockDirWin, customPath);
   });
 });

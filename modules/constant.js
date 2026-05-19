@@ -5,13 +5,14 @@
 /* api */
 import os from 'node:os';
 import path from 'node:path';
+import process from 'node:process';
 
 /* constants */
 export const CHAR = 'utf8';
 export const DIR_CONFIG_LINUX = path.join(os.homedir(), '.config');
 export const DIR_CONFIG_MAC =
   path.join(os.homedir(), 'Library', 'Application Support');
-export const DIR_CONFIG_WIN = path.join(os.homedir(), 'AppData', 'Roaming');
+export const DIR_CONFIG_WIN = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
 export const DIR_HOME = os.homedir();
 export const EXT_CHROME = 'chromeExtension';
 export const EXT_WEB = 'webExtension';
