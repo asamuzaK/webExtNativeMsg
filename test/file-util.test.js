@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { URL } from 'node:url';
+import sinon from 'sinon'; // ✨ 追加
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { IS_WIN } from '../modules/constant.js';
 
@@ -363,9 +364,31 @@ describe('getStat', () => {
     assert.deepEqual(getStat(), null);
   });
 
-  it('should get null if file does not exist', () => {
+  it('should get null if file does not exist (ENOENT)', () => {
     const p = path.resolve(path.join('test', 'file', 'foo.txt'));
     assert.deepEqual(getStat(p), null);
+  });
+
+  it('should get null if permission denied (EACCES)', () => {
+    const err = new Error('Permission denied');
+    err.code = 'EACCES';
+    const stubStat = sinon.stub(fs, 'statSync').throws(err);
+    assert.deepEqual(getStat('dummy/path'), null);
+    stubStat.restore();
+  });
+
+  it('should throw if error code is not ENOENT or EACCES', () => {
+    const err = new Error('Not a directory');
+    err.code = 'ENOTDIR';
+    const stubStat = sinon.stub(fs, 'statSync').throws(err);
+    assert.throws(
+      () => getStat('dummy/path'),
+      {
+        code: 'ENOTDIR',
+        message: 'Not a directory'
+      }
+    );
+    stubStat.restore();
   });
 });
 
