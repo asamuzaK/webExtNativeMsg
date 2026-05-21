@@ -3,10 +3,11 @@
  */
 
 /* api */
+import os from 'node:os';
 import { isString } from './common.js';
 
 /* constants */
-import { CHAR, IS_BE } from './constant.js';
+import { CHAR } from './constant.js';
 const BYTE_LEN = 4;
 
 /* Input */
@@ -32,16 +33,16 @@ export class Input {
     let arr = [];
     if (Buffer.isBuffer(this.#input)) {
       if (!this.#length && this.#input.length >= BYTE_LEN) {
-        this.#length = IS_BE
-          ? this.#input.readUIntBE(0, BYTE_LEN)
-          : this.#input.readUIntLE(0, BYTE_LEN);
-        this.#input = this.#input.slice(BYTE_LEN);
+        this.#length = os.endianness() === 'BE'
+          ? this.#input.readUInt32BE(0)
+          : this.#input.readUInt32LE(0);
+        this.#input = this.#input.subarray(BYTE_LEN);
       }
       if (this.#length && this.#input.length >= this.#length) {
-        const buf = this.#input.slice(0, this.#length);
+        const buf = this.#input.subarray(0, this.#length);
         arr.push(JSON.parse(buf.toString(CHAR)));
         this.#input = this.#input.length > this.#length
-          ? this.#input.slice(this.#length)
+          ? this.#input.subarray(this.#length)
           : null;
         this.#length = null;
         if (this.#input) {
@@ -101,8 +102,11 @@ export class Output {
     if (isString(msg)) {
       const buf = Buffer.from(msg);
       const len = Buffer.alloc(BYTE_LEN);
-      (IS_BE && len.writeUIntBE(buf.length, 0, BYTE_LEN)) ||
-      len.writeUIntLE(buf.length, 0, BYTE_LEN);
+      if (os.endianness() === 'BE') {
+        len.writeUInt32BE(buf.length, 0);
+      } else {
+        len.writeUInt32LE(buf.length, 0);
+      }
       msg = Buffer.concat([len, buf]);
     }
     this.#output = null;
