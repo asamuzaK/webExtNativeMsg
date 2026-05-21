@@ -42,6 +42,12 @@ Sample:
 ```javascript
 import { Setup } from 'web-ext-native-msg';
 
+const handlerAfterSetup = info => {
+  const { configDirPath, shellScriptPath, manifestPath } = info;
+  console.log('Setup completed successfully:', shellScriptPath);
+  // do something
+};
+
 const setup = new Setup({
   hostDescription: 'Description of the host',
   hostName: 'my_native_host',
@@ -50,13 +56,12 @@ const setup = new Setup({
   webExtensionIds: ['mywebextension@asamuzak.jp']
 });
 
-// Modern async/await approach
-try {
-  const info = await setup.run();
-  console.log('Setup completed successfully:', info);
-} catch (err) {
-  console.error('Setup failed or aborted:', err.message);
-}
+// Promise chain approach
+setup.run()
+  .then(handlerAfterSetup)
+  .catch(err => {
+    console.error('Setup failed or aborted:', err.message);
+  });
 ```
 
 Construct:
