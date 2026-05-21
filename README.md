@@ -4,7 +4,7 @@
 
 # WebExtensions native messaging
 
-Helper modules for WebExtensions native messaging host.
+Helper modules for building WebExtensions native messaging hosts.
 
 ## Supported browsers
 
@@ -23,8 +23,8 @@ Helper modules for WebExtensions native messaging host.
 |Opera           |   ✓ *2|       |   ✓ *2|
 |Vivaldi         |   ✓ *2|   ✓   |   ✓   |
 
-*1: Shares host with Firefox.
-*2: Shares host with Chrome.
+*1: Shares host with Firefox.*
+*2: Shares host with Chrome.*
 
 ## Install
 
@@ -36,63 +36,62 @@ npm i web-ext-native-msg
 
 ### Class Setup
 
-Creates shell script, application manifest for specified browser.
+Interactively creates a shell script and application manifest for the specified browser, and registers the host in the Windows Registry (if applicable).
 
 Sample:
 ```javascript
 import { Setup } from 'web-ext-native-msg';
 
-const handlerAfterSetup = info => {
-  const { configDirPath, shellScriptPath, manifestPath } = info;
-  // do something
-};
-
 const setup = new Setup({
   hostDescription: 'Description of the host',
-  hostName: 'hostname',
+  hostName: 'my_native_host',
   mainScriptFile: 'index.js',
   chromeExtensionIds: ['chrome-extension://xxxxxx'],
-  webExtensionIds: ['mywebextension@asamuzak.jp'],
-  callback: handlerAfterSetup
+  webExtensionIds: ['mywebextension@asamuzak.jp']
 });
 
-setup.run();
+// Modern async/await approach
+try {
+  const info = await setup.run();
+  console.log('Setup completed successfully:', info);
+} catch (err) {
+  console.error('Setup failed or aborted:', err.message);
+}
 ```
 
 Construct:
-* new Setup(opt)
-  * @param {Object} [opt] - options which contains optional properties below.
+* `new Setup([opt])`
+  * `@param {Object} [opt]` - Options which contain optional properties below.
 
 Properties:
-* browser: {string} - Specify the browser.
-* supportedBrowsers: {Array} - List of supported browsers.
-* configPath: {string} - Path to save config files.
+* `browser`: `{string}` - Specify the browser.
+* `supportedBrowsers`: `{Array}` - List of supported browsers.
+* `configPath`: `{string}` - Path to save config files.
   * On Windows, config path defaults to `C:\Users\[UserName]\AppData\Roaming\[hostName]\config\`.
   * On Mac, `~/Library/Application Support/[hostName]/config/`.
   * On Linux, `~/.config/[hostName]/config/`.
-* overwriteConfig: {boolean} - Overwrite config if exists. Defaults to `false`.
-* hostName: {string} - Host name.
-* hostDescription: {string} - Host description.
-* mainScriptFile: {string} - File name of the main script. Defaults to `index.js`.
-* chromeExtensionIds: {Array} - Array of chrome extension IDs.
-* webExtensionIds: {Array} - Array of web extension IDs.
-* callback: {Function} - A function that will be called when setup is done.
-  * The function will be passed an argument containing information about the paths of the created files.
-    ```
+* `overwriteConfig`: `{boolean}` - Overwrite config if it already exists. Defaults to `false`.
+* `hostName`: `{string}` - Host name.
+* `hostDescription`: `{string}` - Host description.
+* `mainScriptFile`: `{string}` - File name of the main script. Defaults to `index.js`.
+* `chromeExtensionIds`: `{Array}` - Array of Chrome extension IDs.
+* `webExtensionIds`: `{Array}` - Array of Web Extension IDs.
+* `callback`: `{Function}` - A function that will be called when setup is done (legacy approach).
+
+Methods:
+* `run()`: Runs the setup script asynchronously.
+  * `@returns {Promise.<Object>}` - An object containing information about the created files:
+    ```javascript
     {
-      configDirPath: {string} - Config dir path.
+      configDirPath: {string} - Config directory path.
       shellScriptPath: {string} - Shell script path.
       manifestPath: {string} - Application manifest path.
     }
     ```
 
-Methods:
-* run(): Runs setup script.
-  * @returns {?Promise.&lt;void&gt;}
-
 ### Class Input / Output
 
-Decode / encode native messages exchanged between browser and host.
+Decodes / encodes native messages exchanged between the browser and the host via standard input/output.
 
 Sample:
 ```javascript
@@ -111,7 +110,7 @@ const writeStdout = async msg => {
 };
 
 const handleMsg = async msg => {
-  // do something
+  // Process the received message
 };
 
 const input = new Input();
@@ -129,22 +128,22 @@ process.stdin.on('data', readStdin);
 ```
 
 Construct:
-* new Input();
-* new Output();
+* `new Input()`
+* `new Output()`
 
 Input method:
-* decode(chunk): Decodes message from buffer.
-  * @param {string|Buffer} chunk - chunk
-  * @returns {?Array} - message array, nullable
+* `decode(chunk)`: Decodes a message from the buffer.
+  * `@param {string|Buffer} chunk` - Buffer chunk
+  * `@returns {?Array}` - Decoded message array (nullable)
 
 Output method:
-* encode(msg): Encodes message to buffer.
-  * @param {Object} msg - message
-  * @returns {?Buffer} - buffered message, nullable
+* `encode(msg)`: Encodes a message to the buffer.
+  * `@param {Object} msg` - Message to encode
+  * `@returns {?Buffer}` - Buffered message (nullable)
 
 ### Class ChildProcess / CmdArgs
 
-Spawns child process.
+Safely handles command arguments and spawns child processes.
 
 Sample:
 ```javascript
@@ -163,133 +162,109 @@ const opt = {
   env: process.env
 };
 
-const proc = (new ChildProcess(app, cmdArgs, opt)).spawn(file).catch(e => {
+const proc = await (new ChildProcess(app, cmdArgs, opt)).spawn(file).catch(e => {
   throw e;
 });
 ```
 
 Construct:
-* new CmdArgs(arg)
-  * @param {string|Array} arg - argument input
-* new ChildProcess(app, args, opt)
-  * @param {string} app - application path
-  * @param {string|Array} [args] - command arguments
-  * @param {Object} [opt] - options. Defaults to `{cwd: null, env: process.env}`.
+* `new CmdArgs(arg)`
+  * `@param {string|Array} arg` - Argument input
+* `new ChildProcess(app, [args], [opt])`
+  * `@param {string} app` - Application executable path
+  * `@param {string|Array} [args]` - Command arguments
+  * `@param {Object} [opt]` - Options. Defaults to `{cwd: null, env: process.env}`.
 
 CmdArgs methods:
-* toArray(): Arguments to array.
-  * @returns {Array} - arguments array or empty array
-* toString(): Arguments array to string.
-  * @returns {string} - arguments string or empty string
+* `toArray()`: Parses arguments into an array.
+  * `@returns {Array}` - Arguments array (or empty array)
+* `toString()`: Joins the arguments array into a string.
+  * `@returns {string}` - Arguments string (or empty string)
 
 ChildProcess method:
-* spawn(file): Spawn child process. Async.
-  * @param {string} [file] - file path
-  * @returns {Object} - child process
+* `spawn([file])`: Spawns the child process. Async.
+  * `@param {string} [file]` - File path to append as the last argument
+  * `@returns {Promise.<Object>}` - Child process instance
 
-### Function convertUriToFilePath(uri)
+### Utility Functions
 
-Converts URI to native file path.
+#### `convertUriToFilePath(uri)`
+Converts a URI to a native file path.
+* `@param {string} uri` - URI
+* `@returns {?string}` - File path (nullable)
 
-* @param {string} uri - URI
-* @returns {?string} - file path, nullable
+#### `getAbsPath(file)`
+Gets the absolute path.
+* `@param {string} file` - File path
+* `@returns {?string}` - Absolute file path (nullable)
 
-### Function getAbsPath(file)
+#### `getFileNameFromFilePath(file, [subst])`
+Gets the file name from a native file path without its extension.
+* `@param {string} file` - File path
+* `@param {string} [subst]` - Substitute file name. Defaults to `'index'`
+* `@returns {string}` - File name
 
-Get absolute path.
+#### `getStat(file)`
+Gets the file stat.
+* `@param {string} file` - File path
+* `@returns {Object}` - File stat (nullable)
 
-* @param {string} file - file path
-* @returns {?string} - absolute file path, nullable
+#### `removeDirSync(dir, baseDir)`
+Synchronously removes the directory and its files.
+**Note:** `dir` must be a subdirectory of `baseDir` for safety.
+* `@param {string} dir` - Directory path
+* `@param {string} baseDir` - Base directory path
+* `@returns {void}`
 
-### Function getFileNameFromFilePath(file, subst)
+#### `removeDirectory(dir, baseDir)`
+Asynchronously removes the directory and its files.
+**Note:** `dir` must be a subdirectory of `baseDir` for safety.
+* `@param {string} dir` - Directory path
+* `@param {string} baseDir` - Base directory path
+* `@returns {Promise.<void>}`
 
-Get file name from native file path.
+#### `createDirectory(dir, [mode])`
+Asynchronously creates a directory.
+* `@param {string} dir` - Directory path to create
+* `@param {number} [mode]` - Permission mode. Defaults to `0o777`
+* `@returns {Promise.<string>}` - Created directory path
 
-* @param {string} file - file path
-* @param {string} [subst] - substitute file name. Defaults to `index`
-* @returns {string} - file name
+#### `createFile(file, value, [opt])`
+Asynchronously creates a file.
+* `@param {string} file` - File path to create
+* `@param {string|Buffer|Uint8Array} value` - Value to write
+* `@param {Object} [opt]` - Options
+* `@param {string} [opt.encoding]` - Encoding. Defaults to `null`
+* `@param {string} [opt.flag]` - File system flag. Defaults to `'w'`
+* `@param {number|string} [opt.mode]` - File permission. Defaults to `0o666`
+* `@returns {Promise.<string>}` - Created file path
 
-### Function getStat(file)
+#### `readFile(file, [opt])`
+Asynchronously reads a file.
+* `@param {string} file` - File path
+* `@param {Object} [opt]` - Options
+* `@param {string} [opt.encoding]` - Encoding. Defaults to `null`
+* `@param {string} [opt.flag]` - File system flag. Defaults to `'r'`
+* `@returns {Promise.<string|Buffer>}` - File content
 
-Get file stat.
+#### `isDir(dir)`
+Checks if the given path is a directory.
+* `@param {string} dir` - Directory path
+* `@returns {boolean}` - Result
 
-* @param {string} file - file path
-* @returns {Object} - file stat, nullable
+#### `isSubDir(dir, baseDir)`
+Checks if the directory is a subdirectory of a certain directory.
+* `@param {string} dir` - Directory path
+* `@param {string} baseDir` - Base directory path
+* `@returns {boolean}` - Result
 
-### Function removeDir(dir, baseDir)
+#### `isFile(file)`
+Checks if the given path is a file.
+* `@param {string} file` - File path
+* `@returns {boolean}` - Result
 
-Remove the directory and it's files.
-Note: `dir` should be subdirectory of `baseDir`.
-
-* @param {string} dir - directory path
-* @param {string} baseDir - base directory path
-* @returns {void}
-
-### Async Function removeDirectory(dir, baseDir)
-
-Remove the directory and it's files.
-Note: `dir` should be subdirectory of `baseDir`.
-
-* @param {string} dir - directory path
-* @param {string} baseDir - base directory path
-* @returns {void}
-
-### Async Function createDirectory(dir, mode)
-
-Create a directory.
-
-* @param {string} dir - directory path to create
-* @param {number} [mode] - permission. Defaults to `0o777`
-* @returns {string} - directory path
-
-### Async Function createFile(file, value, opt)
-
-Create a file.
-
-* @param {string} file - file path
-* @param {string|Buffer|Uint8Array} value - value to write
-* @param {Object} [opt] - options
-* @param {string} [opt.encoding] - encoding. Defaults to `null`
-* @param {string} [opt.flag] - flag. Defaults to `'w'`
-* @param {number|string} [opt.mode] - file permission. Defaults to `0o666`
-* @returns {string} - file path
-
-### Async Function readFile(file, opt)
-
-Read a file.
-
-* @param {string} file - file path
-* @param {Object} [opt] - options
-* @param {string} [opt.encoding] - encoding. Defaults to `null`
-* @param {string} [opt.flag] - flag. Defaults to `'r'`
-* @returns {string|Buffer} - file content
-
-### Function isDir(dir)
-
-The directory is a directory or not.
-
-* @param {string} dir - directory path
-* @returns {boolean} - result
-
-### Function isSubDir(dir, baseDir)
-
-The directory is a subdirectory of a certain directory or not.
-
-* @param {string} dir - directory path
-* @param {string} baseDir - base directory path
-* @returns {boolean} - result
-
-### Function isFile(file)
-
-The file is a file or not.
-
-* @param {string} file - file path
-* @returns {boolean} - result
-
-### Function isExecutable(file, mask)
-
-The file is executable or not.
-
-* @param {string} file - file path
-* @param {number} [mask] - mask bit. Defaults to `0o111`
-* @returns {boolean} - result
+#### `isExecutable(file, [mask])`
+Checks if the file is executable.
+* `@param {string} file` - File path
+* `@param {number} [mask]` - Mask bit. Defaults to `0o111`
+* `@returns {boolean}` - Result
