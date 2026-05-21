@@ -50,8 +50,19 @@ export const getAbsPath = file => {
  * @param {string} file - file path
  * @returns {object} - file stat
  */
-export const getStat = file =>
-  isString(file) && fs.existsSync(file) ? fs.statSync(file) : null;
+export const getStat = file => {
+  if (!isString(file)) {
+    return null;
+  }
+  try {
+    return fs.statSync(file);
+  } catch (e) {
+    if (e.code === 'ENOENT' || e.code === 'EACCES') {
+      return null;
+    }
+    throw e;
+  }
+};
 
 /**
  * the directory is a directory
