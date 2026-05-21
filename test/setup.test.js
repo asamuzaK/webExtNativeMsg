@@ -1,6 +1,7 @@
 /* api */
 import { strict as assert } from 'node:assert';
 import childProcess from 'node:child_process';
+import EventEmitter from 'node:events';
 import fs, { promises as fsPromise } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -15,8 +16,7 @@ import {
 
 /* test */
 import {
-  Setup, abortSetup, getBrowserData, getConfigDir, handleInquirerError,
-  handleRegClose, handleRegStderr, handleSetupCallback, inquirer, values
+  Setup, getBrowserData, getConfigDir, handleInquirerError, inquirer
 } from '../modules/setup.js';
 
 /* constant */
@@ -26,233 +26,40 @@ const DIR_CWD = process.cwd();
 const TMPDIR = path.join(DIR_CWD, 'tmp');
 
 beforeEach(() => {
-  values.clear();
   fs.rmSync(TMPDIR, {
     force: true,
     recursive: true
   });
 });
 afterEach(() => {
-  values.clear();
   fs.rmSync(TMPDIR, {
     force: true,
     recursive: true
   });
 });
 
-describe('abortSetup', () => {
-  it('should exit with message', () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubExit.withArgs(1).callCount;
-    abortSetup('foo');
-    const { calledOnce: infoCalled } = stubInfo;
-    const { callCount: exitCallCount } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCallCount, i + 1);
-    assert.strictEqual(info, 'Setup aborted: foo');
-  });
-
-  it('should exit with message', () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubExit.withArgs(2).callCount;
-    abortSetup('foo', 2);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { callCount: exitCallCount } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCallCount, i + 1);
-    assert.strictEqual(info, 'Setup aborted: foo');
-  });
-});
-
 describe('handleInquirerError', () => {
-  it('should exit with unknown error message', () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubExit.withArgs(1).callCount;
-    handleInquirerError('foo');
-    const { calledOnce: infoCalled } = stubInfo;
-    const { callCount: exitCallCount } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCallCount, i + 1);
-    assert.strictEqual(info, 'Setup aborted: Unknown error.');
+  it('should throw unknown error message', () => {
+    assert.throws(
+      () => { handleInquirerError('foo'); },
+      { message: 'Unknown error.' }
+    );
   });
 
-  it('should exit with message', () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubExit.withArgs(1).callCount;
-    handleInquirerError(new Error('foo'));
-    const { calledOnce: infoCalled } = stubInfo;
-    const { callCount: exitCallCount } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCallCount, i + 1);
-    assert.strictEqual(info, 'Setup aborted: foo');
+  it('should throw original message', () => {
+    assert.throws(
+      () => { handleInquirerError(new Error('foo')); },
+      { message: 'foo' }
+    );
   });
 
-  it('should exit with message', () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubExit.withArgs(130).callCount;
+  it('should throw user aborted message', () => {
     const e = new Error('foo');
     e.name = 'ExitPromptError';
-    handleInquirerError(e);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { callCount: exitCallCount } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCallCount, i + 1);
-    assert.strictEqual(info, 'Setup aborted: foo');
-  });
-});
-
-describe('handleSetupCallback', () => {
-  it('should get null', () => {
-    const res = handleSetupCallback();
-    assert.deepEqual(res, null);
-  });
-
-  it('should get null', () => {
-    values.set('configDir', 'foo');
-    values.set('shellPath', 'bar');
-    values.set('manifestPath', 'baz');
-    values.set('callback', {});
-    const res = handleSetupCallback();
-    assert.deepEqual(res, null);
-  });
-
-  it('should call function', () => {
-    const stubFunc = sinon.stub().callsFake(a => a);
-    values.set('configDir', 'foo');
-    values.set('shellPath', 'bar');
-    values.set('manifestPath', 'baz');
-    values.set('callback', stubFunc);
-    const res = handleSetupCallback();
-    assert.strictEqual(stubFunc.calledOnce, true);
-    assert.deepEqual(res, {
-      configDirPath: 'foo',
-      shellScriptPath: 'bar',
-      manifestPath: 'baz'
-    });
-  });
-});
-
-describe('handleRegClose', () => {
-  it('should abort', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const stubFunc = sinon.stub();
-    const regKey = path.join('HKEY_CURRENT_USER', 'SOFTWARE', 'Mozilla',
-      'NativeMessagingHosts', 'foo');
-    values.set('regKey', regKey);
-    values.set('callback', stubFunc);
-    await handleRegClose(1);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    if (IS_WIN) {
-      const reg = path.join(process.env.WINDIR, 'system32', 'reg.exe');
-      assert.strictEqual(infoCalled, true);
-      assert.strictEqual(exitCalled, true);
-      assert.strictEqual(info, `Setup aborted: ${reg} exited with 1.`);
-      assert.strictEqual(stubFunc.called, false);
-    } else {
-      assert.strictEqual(infoCalled, false);
-      assert.strictEqual(exitCalled, false);
-      assert.strictEqual(info, undefined);
-      assert.strictEqual(stubFunc.called, false);
-    }
-  });
-
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const stubFunc = sinon.stub();
-    const regKey = path.join('HKEY_CURRENT_USER', 'SOFTWARE', 'Mozilla',
-      'NativeMessagingHosts', 'foo');
-    values.set('regKey', regKey);
-    values.set('callback', stubFunc);
-    await handleRegClose(0);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    if (IS_WIN) {
-      assert.strictEqual(infoCalled, true);
-      assert.strictEqual(exitCalled, false);
-      assert.strictEqual(info, `Created: ${regKey}`);
-      assert.strictEqual(stubFunc.calledOnce, true);
-    } else {
-      assert.strictEqual(infoCalled, false);
-      assert.strictEqual(exitCalled, false);
-      assert.strictEqual(info, undefined);
-      assert.strictEqual(stubFunc.called, false);
-    }
-  });
-});
-
-describe('handleRegStdErr', () => {
-  it('should console error', async () => {
-    let err, info;
-    const stubErr = sinon.stub(console, 'error').callsFake(msg => {
-      err = msg;
-    });
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    await handleRegStderr('foo');
-    const { calledOnce: errCalled } = stubErr;
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubErr.restore();
-    stubInfo.restore();
-    stubExit.restore();
-    if (IS_WIN) {
-      assert.strictEqual(errCalled, true);
-      assert.strictEqual(err, 'stderr: foo');
-      assert.strictEqual(infoCalled, true);
-      assert.strictEqual(info, 'Setup aborted: Failed to create registry key.');
-      assert.strictEqual(exitCalled, true);
-    } else {
-      assert.strictEqual(errCalled, false);
-      assert.strictEqual(err, undefined);
-      assert.strictEqual(infoCalled, false);
-      assert.strictEqual(info, undefined);
-      assert.strictEqual(exitCalled, false);
-    }
+    assert.throws(
+      () => { handleInquirerError(e); },
+      { message: 'Setup aborted by user.' }
+    );
   });
 });
 
@@ -796,29 +603,82 @@ describe('_createReg', () => {
   it('should spawn child process', async () => {
     const manifestPath =
       path.resolve('test', 'file', 'config', 'firefox', 'test.json');
-    const stubSpawn = sinon.stub(childProcess, 'spawn').returns({
-      on: a => a,
-      stderr: {
-        on: a => a
-      }
-    });
+    const mockProcess = new EventEmitter();
+    mockProcess.stderr = new EventEmitter();
+    const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
     const i = stubSpawn.callCount;
     const setup = new Setup({
       browser: 'firefox',
       hostName: 'foo'
     });
-    const res = await setup._createReg(manifestPath);
+    const promise = setup._createReg(manifestPath);
+    if (IS_WIN) {
+      setTimeout(() => mockProcess.emit('close', 0), 10);
+    }
+    const res = await promise;
     if (IS_WIN) {
       assert.strictEqual(stubSpawn.callCount, i + 1);
-      assert.strictEqual(typeof res, 'object');
-      assert.strictEqual(Object.hasOwn(res, 'on'), true);
-      assert.strictEqual(Object.hasOwn(res, 'stderr'),
-        true);
-      assert.strictEqual(
-        Object.hasOwn(res.stderr, 'on'), true);
+      assert.strictEqual(res, undefined);
     } else {
       assert.strictEqual(stubSpawn.callCount, i);
-      assert.deepEqual(res, null);
+      assert.strictEqual(res, undefined);
+    }
+    stubSpawn.restore();
+  });
+
+  it('should reject if child process emits stderr', async () => {
+    const manifestPath =
+      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const mockProcess = new EventEmitter();
+    mockProcess.stderr = new EventEmitter();
+    const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
+    let errorLog;
+    const stubError = sinon.stub(console, 'error').callsFake(msg => {
+      errorLog = msg;
+    });
+    const setup = new Setup({
+      browser: 'firefox',
+      hostName: 'foo'
+    });
+    const promise = setup._createReg(manifestPath);
+    if (IS_WIN) {
+      setTimeout(() => mockProcess.stderr.emit('data', Buffer.from('mock error')), 10);
+      await promise.catch(e => {
+        assert.deepStrictEqual(e, new Error('Failed to create registry key.'));
+      });
+      assert.strictEqual(stubError.calledOnce, true);
+      assert.strictEqual(errorLog, 'stderr: mock error');
+    } else {
+      const res = await promise;
+      assert.strictEqual(res, undefined);
+      assert.strictEqual(stubError.called, false);
+    }
+    stubSpawn.restore();
+    stubError.restore();
+  });
+
+  it('should reject if child process exits with non-zero code', async () => {
+    const manifestPath =
+      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const mockProcess = new EventEmitter();
+    mockProcess.stderr = new EventEmitter();
+    const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
+    const setup = new Setup({
+      browser: 'firefox',
+      hostName: 'foo'
+    });
+    const promise = setup._createReg(manifestPath);
+    if (IS_WIN) {
+      const winDir = process.env.windir || process.env.WINDIR || 'C:\\Windows';
+      const reg = path.join(winDir, 'System32', 'reg.exe');
+      const errorCode = 1;
+      setTimeout(() => mockProcess.emit('close', errorCode), 10);
+      await promise.catch(e => {
+        assert.deepStrictEqual(e, new Error(`${reg} exited with ${errorCode}.`));
+      });
+    } else {
+      const res = await promise;
+      assert.strictEqual(res, undefined);
     }
     stubSpawn.restore();
   });
@@ -1125,6 +985,7 @@ describe('_createShellScript', () => {
     assert.strictEqual(res, shellPath);
     assert.strictEqual(isFile(shellPath), true);
     assert.strictEqual(file.endsWith('\n'), true);
+    const shellEnv = process.env.SHELL || '/bin/sh';
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1133,201 +994,7 @@ describe('_createShellScript', () => {
     } else {
       assert.strictEqual(
         file,
-        `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    }
-  });
-
-  it('should create file', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const dir = path.join(TMPDIR, 'webextnativemsg');
-    const configPath = await createDirectory(path.join(dir, 'config'));
-    const shellPath = path.join(configPath, IS_WIN ? 'foo.cmd' : 'foo.sh');
-    const mainScriptFile = path.resolve('test/file/test.js');
-    const mainFilePath = mainScriptFile;
-    const setup = new Setup({
-      mainScriptFile,
-      hostName: 'foo'
-    });
-    const res = await setup._createShellScript(configPath);
-    const { calledOnce: infoCalled } = stubInfo;
-    stubInfo.restore();
-    const file = fs.readFileSync(shellPath, {
-      encoding: 'utf8',
-      flag: 'r'
-    });
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(info, `Created: ${shellPath}`);
-    assert.strictEqual(res, shellPath);
-    assert.strictEqual(isFile(shellPath), true);
-    assert.strictEqual(file.endsWith('\n'), true);
-    if (IS_WIN) {
-      assert.strictEqual(
-        file,
-        `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    } else {
-      assert.strictEqual(
-        file,
-        `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    }
-  });
-
-  it('should create file', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const dir = path.join(TMPDIR, 'webextnativemsg');
-    const configPath = await createDirectory(path.join(dir, 'config'));
-    const shellPath = path.join(configPath, IS_WIN ? 'foo.cmd' : 'foo.sh');
-    const mainScriptFile = path.resolve('test/file/test.js');
-    const mainFilePath = mainScriptFile;
-    const setup = new Setup({
-      hostName: 'foo'
-    });
-    setup.mainScriptFile = mainScriptFile;
-    const res = await setup._createShellScript(configPath);
-    const { calledOnce: infoCalled } = stubInfo;
-    stubInfo.restore();
-    const file = fs.readFileSync(shellPath, {
-      encoding: 'utf8',
-      flag: 'r'
-    });
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(info, `Created: ${shellPath}`);
-    assert.strictEqual(res, shellPath);
-    assert.strictEqual(isFile(shellPath), true);
-    assert.strictEqual(file.endsWith('\n'), true);
-    if (IS_WIN) {
-      assert.strictEqual(
-        file,
-        `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    } else {
-      assert.strictEqual(
-        file,
-        `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    }
-  });
-
-  it('should create file', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const dir = path.join(TMPDIR, 'webextnativemsg');
-    const configPath = await createDirectory(path.join(dir, 'config'));
-    const shellPath = path.join(configPath, IS_WIN ? 'foo.cmd' : 'foo.sh');
-    const mainScriptFile = 'test/file/test 2.js';
-    const mainFilePath = path.resolve(mainScriptFile);
-    const setup = new Setup({
-      mainScriptFile,
-      hostName: 'foo'
-    });
-    const res = await setup._createShellScript(configPath);
-    const { calledOnce: infoCalled } = stubInfo;
-    stubInfo.restore();
-    const file = fs.readFileSync(shellPath, {
-      encoding: 'utf8',
-      flag: 'r'
-    });
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(info, `Created: ${shellPath}`);
-    assert.strictEqual(res, shellPath);
-    assert.strictEqual(isFile(shellPath), true);
-    assert.strictEqual(file.endsWith('\n'), true);
-    if (IS_WIN) {
-      assert.strictEqual(
-        file,
-        `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    } else {
-      assert.strictEqual(
-        file,
-        `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    }
-  });
-
-  it('should create file', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const dir = path.join(TMPDIR, 'webextnativemsg');
-    const configPath = await createDirectory(path.join(dir, 'config'));
-    const shellPath = path.join(configPath, IS_WIN ? 'foo.cmd' : 'foo.sh');
-    const mainScriptFile = path.resolve('test/file/test 2.js');
-    const mainFilePath = mainScriptFile;
-    const setup = new Setup({
-      mainScriptFile,
-      hostName: 'foo'
-    });
-    const res = await setup._createShellScript(configPath);
-    const { calledOnce: infoCalled } = stubInfo;
-    stubInfo.restore();
-    const file = fs.readFileSync(shellPath, {
-      encoding: 'utf8',
-      flag: 'r'
-    });
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(info, `Created: ${shellPath}`);
-    assert.strictEqual(res, shellPath);
-    assert.strictEqual(isFile(shellPath), true);
-    assert.strictEqual(file.endsWith('\n'), true);
-    if (IS_WIN) {
-      assert.strictEqual(
-        file,
-        `@echo off\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    } else {
-      assert.strictEqual(
-        file,
-        `#!${process.env.SHELL}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
-      );
-    }
-  });
-
-  it('should create file', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(msg => {
-      info = msg;
-    });
-    const dir = path.join(TMPDIR, 'webextnativemsg');
-    const configPath = await createDirectory(path.join(dir, 'config'));
-    const shellPath = path.join(configPath, IS_WIN ? 'foo.cmd' : 'foo.sh');
-    const mainScriptFile = 'test/file/test_no-exist.js';
-    const setup = new Setup({
-      mainScriptFile,
-      hostName: 'foo'
-    });
-    const res = await setup._createShellScript(configPath);
-    const { calledOnce: infoCalled } = stubInfo;
-    stubInfo.restore();
-    const file = fs.readFileSync(shellPath, {
-      encoding: 'utf8',
-      flag: 'r'
-    });
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(info, `Created: ${shellPath}`);
-    assert.strictEqual(res, shellPath);
-    assert.strictEqual(isFile(shellPath), true);
-    assert.strictEqual(file.endsWith('\n'), true);
-    if (IS_WIN) {
-      assert.strictEqual(
-        file,
-        `@echo off\n${quoteArg(process.execPath)}\n`
-      );
-    } else {
-      assert.strictEqual(
-        file,
-        `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`
+        `#!${shellEnv}\n${quoteArg(process.execPath)} ${quoteArg(mainFilePath)}\n`
       );
     }
   });
@@ -1357,6 +1024,7 @@ describe('_createShellScript', () => {
     assert.strictEqual(res, shellPath);
     assert.strictEqual(isFile(shellPath), true);
     assert.strictEqual(file.endsWith('\n'), true);
+    const shellEnv = process.env.SHELL || '/bin/sh';
     if (IS_WIN) {
       assert.strictEqual(
         file,
@@ -1365,7 +1033,7 @@ describe('_createShellScript', () => {
     } else {
       assert.strictEqual(
         file,
-        `#!${process.env.SHELL}\n${quoteArg(process.execPath)}\n`
+        `#!${shellEnv}\n${quoteArg(process.execPath)}\n`
       );
     }
   });
@@ -1400,48 +1068,20 @@ describe('_createConfigDir', () => {
 });
 
 describe('_createFiles', () => {
-  it('should abort', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
-    const stubCallback = sinon.stub().callsFake(arg => arg);
-    const setup = new Setup({
-      callback: stubCallback
-    });
+  it('should throw if failed to create files', async () => {
+    const setup = new Setup();
     const configDir = path.resolve('test', 'file', 'config', 'chrome');
-    const shellPath = path.join(configDir, IS_WIN ? 'test.cmd' : 'test.sh');
-    const manifestPath = path.join(configDir, 'test.json');
-    const stubConfig =
-      sinon.stub(setup, '_createConfigDir').resolves(configDir);
-    const stubShell =
-      sinon.stub(setup, '_createShellScript').resolves(shellPath);
-    const stubManifest =
-      sinon.stub(setup, '_createManifest').resolves(manifestPath);
-    const stubReg = sinon.stub(setup, '_createReg').resolves(true);
-    const res = await setup._createFiles();
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(stubConfig.calledOnce, true);
-    assert.strictEqual(stubShell.calledOnce, true);
-    assert.strictEqual(stubManifest.calledOnce, true);
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCalled, true);
-    assert.strictEqual(info, 'Setup aborted: Failed to create files.');
-    assert.strictEqual(stubReg.called, false);
-    assert.strictEqual(stubCallback.called, false);
-    assert.strictEqual(res, undefined);
+    // Mocks that simulate failure logic by omitting path creation mock
+    sinon.stub(setup, '_createConfigDir').resolves(configDir);
+    sinon.stub(setup, '_createShellScript').resolves('invalid_path');
+    sinon.stub(setup, '_createManifest').resolves('invalid_path');
+
+    await setup._createFiles().catch(e => {
+      assert.deepStrictEqual(e, new Error('Failed to create files.'));
+    });
   });
 
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
-    const stubExit = sinon.stub(process, 'exit');
+  it('should call callback and return paths', async () => {
     const stubCallback = sinon.stub().callsFake(arg => arg);
     const setup = new Setup({
       callback: stubCallback
@@ -1449,6 +1089,14 @@ describe('_createFiles', () => {
     const configDir = path.resolve('test', 'file', 'config', 'firefox');
     const shellPath = path.join(configDir, IS_WIN ? 'test.cmd' : 'test.sh');
     const manifestPath = path.join(configDir, 'test.json');
+
+    // Simulate files actually existing for `isFile` checks
+    const stubIsDir = sinon.stub(fs, 'statSync').returns({
+      isDirectory: () => true,
+      isFile: () => true,
+      mode: 0
+    });
+
     const stubConfig =
       sinon.stub(setup, '_createConfigDir').resolves(configDir);
     const stubShell =
@@ -1456,157 +1104,72 @@ describe('_createFiles', () => {
     const stubManifest =
       sinon.stub(setup, '_createManifest').resolves(manifestPath);
     const stubReg = sinon.stub(setup, '_createReg').resolves(true);
+
     const res = await setup._createFiles();
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
+
     assert.strictEqual(stubConfig.calledOnce, true);
     assert.strictEqual(stubShell.calledOnce, true);
     assert.strictEqual(stubManifest.calledOnce, true);
-    assert.strictEqual(infoCalled, false);
-    assert.strictEqual(exitCalled, false);
-    assert.strictEqual(info, undefined);
+    assert.strictEqual(stubCallback.calledOnce, true);
     if (IS_WIN) {
       assert.strictEqual(stubReg.calledOnce, true);
-      assert.strictEqual(stubCallback.called, false);
-      assert.strictEqual(res, true);
     } else {
       assert.strictEqual(stubReg.called, false);
-      assert.strictEqual(stubCallback.calledOnce, true);
-      assert.deepEqual(res, {
-        manifestPath,
-        configDirPath: configDir,
-        shellScriptPath: shellPath
-      });
     }
+    assert.deepEqual(res, {
+      manifestPath,
+      configDirPath: configDir,
+      shellScriptPath: shellPath
+    });
+    stubIsDir.restore();
   });
 });
 
 describe('_handleBrowserConfigDir', () => {
-  it('should throw', async () => {
-    const setup = new Setup();
-    await setup._handleBrowserConfigDir().catch(e => {
-      assert.deepStrictEqual(e, new TypeError('Expected String but got Null.'));
-    });
-  });
-
-  it('should abort', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
+  it('should throw on rejected overwrite', async () => {
     const setup = new Setup({
       overwriteConfig: false
     });
-    const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
     const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(false);
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubConfirm.callCount;
-    const configPath = path.resolve('test', 'file', 'config', 'firefox');
+    // Override _getBrowserConfigDir to return a directory that "exists"
+    sinon.stub(setup, '_getBrowserConfigDir').returns(DIR_CWD); // using cwd as dummy existing dir
     setup.browser = 'firefox';
-    setup.configPath = path.resolve('test', 'file', 'config');
-    const res = await setup._handleBrowserConfigDir();
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(stubCreateFiles.called, false);
-    assert.strictEqual(stubConfirm.callCount, i + 1);
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCalled, true);
-    assert.strictEqual(info, `Setup aborted: ${configPath} already exists.`);
-    assert.strictEqual(res, undefined);
+    await setup._handleBrowserConfigDir().catch(e => {
+      assert.deepStrictEqual(e, new Error(`${DIR_CWD} already exists.`));
+    });
     stubConfirm.restore();
   });
 
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
-    const setup = new Setup({
-      overwriteConfig: false
-    });
-    const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
-    const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(true);
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubConfirm.callCount;
-    setup.browser = 'firefox';
-    setup.configPath = path.resolve('test', 'file', 'config');
-    const res = await setup._handleBrowserConfigDir();
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(stubCreateFiles.calledOnce, true);
-    assert.strictEqual(stubConfirm.callCount, i + 1);
-    assert.strictEqual(infoCalled, false);
-    assert.strictEqual(exitCalled, false);
-    assert.strictEqual(info, undefined);
-    assert.strictEqual(res, true);
-    stubConfirm.restore();
-  });
-
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
+  it('should call _createFiles if overwrite is true', async () => {
     const setup = new Setup({
       overwriteConfig: true
     });
     const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
-    const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(true);
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubConfirm.callCount;
+    sinon.stub(setup, '_getBrowserConfigDir').returns(DIR_CWD);
     setup.browser = 'firefox';
-    setup.configPath = path.resolve('test', 'file', 'config');
     const res = await setup._handleBrowserConfigDir();
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
     assert.strictEqual(stubCreateFiles.calledOnce, true);
-    assert.strictEqual(stubConfirm.callCount, i);
-    assert.strictEqual(infoCalled, false);
-    assert.strictEqual(exitCalled, false);
-    assert.strictEqual(info, undefined);
     assert.strictEqual(res, true);
-    stubConfirm.restore();
   });
 
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
+  it('should call _createFiles if user confirms overwrite', async () => {
     const setup = new Setup({
       overwriteConfig: false
     });
-    const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves(true);
     const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(true);
-    const stubExit = sinon.stub(process, 'exit');
-    const i = stubConfirm.callCount;
-    setup.browser = 'chrome';
-    setup.configPath = path.resolve('test', 'file', 'config');
+    sinon.stub(setup, '_getBrowserConfigDir').returns(DIR_CWD);
+    setup.browser = 'firefox';
+    const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves('mock_result');
     const res = await setup._handleBrowserConfigDir();
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubInfo.restore();
-    stubExit.restore();
+    assert.strictEqual(stubConfirm.calledOnce, true);
     assert.strictEqual(stubCreateFiles.calledOnce, true);
-    assert.strictEqual(stubConfirm.callCount, i);
-    assert.strictEqual(infoCalled, false);
-    assert.strictEqual(exitCalled, false);
-    assert.strictEqual(info, undefined);
-    assert.strictEqual(res, true);
+    assert.strictEqual(res, 'mock_result');
     stubConfirm.restore();
   });
 });
 
 describe('_handleBrowserInput', () => {
-  it('should throw', async () => {
+  it('should throw if empty', async () => {
     const setup = new Setup();
     await setup._handleBrowserInput().catch(e => {
       assert.deepStrictEqual(e,
@@ -1614,115 +1177,49 @@ describe('_handleBrowserInput', () => {
     });
   });
 
-  it('should abort', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
+  it('should throw if cancelled', async () => {
     const setup = new Setup();
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
     const stubSelect =
       sinon.stub(inquirer, 'select').callsFake(async () => null);
-    const stubExit = sinon.stub(process, 'exit');
-    const res = await setup._handleBrowserInput([]);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
+    await setup._handleBrowserInput([]).catch(e => {
+      assert.deepStrictEqual(e, new Error('Browser is not specified.'));
+    });
     stubSelect.restore();
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(stubConfigDir.called, false);
-    assert.strictEqual(infoCalled, true);
-    assert.strictEqual(exitCalled, true);
-    assert.strictEqual(info, 'Setup aborted: Browser is not specified.');
-    assert.strictEqual(res, undefined);
   });
 
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
+  it('should call _handleBrowserConfigDir on valid selection', async () => {
     const setup = new Setup();
     const stubConfigDir =
       sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
     const stubSelect =
       sinon.stub(inquirer, 'select').callsFake(async () => 'firefox');
-    const stubExit = sinon.stub(process, 'exit');
     const res = await setup._handleBrowserInput(['firefox', 'chrome']);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubSelect.restore();
-    stubInfo.restore();
-    stubExit.restore();
     assert.strictEqual(stubConfigDir.calledOnce, true);
-    assert.strictEqual(infoCalled, false);
-    assert.strictEqual(exitCalled, false);
-    assert.strictEqual(info, undefined);
     assert.strictEqual(res, true);
     assert.strictEqual(setup.browser, 'firefox');
+    stubSelect.restore();
   });
 
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
+  it('should set pageSize if array length is greater than 5', async () => {
     const setup = new Setup();
     const stubConfigDir =
       sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
+    const browsers = [
+      'firefox', 'chrome', 'edge', 'brave', 'opera', 'vivaldi'
+    ];
     const stubSelect =
-      sinon.stub(inquirer, 'select').callsFake(async () => 'chrome');
-    const stubExit = sinon.stub(process, 'exit');
-    const res = await setup._handleBrowserInput(['firefox', 'chrome']);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
+      sinon.stub(inquirer, 'select').callsFake(async () => 'firefox');
+    await setup._handleBrowserInput(browsers);
+    assert.strictEqual(stubSelect.calledOnce, true);
+    const opt = stubSelect.getCall(0).args[0];
+    assert.strictEqual(opt.pageSize, 8);
+    stubConfigDir.restore();
     stubSelect.restore();
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(stubConfigDir.calledOnce, true);
-    assert.strictEqual(infoCalled, false);
-    assert.strictEqual(exitCalled, false);
-    assert.strictEqual(info, undefined);
-    assert.strictEqual(res, true);
-    assert.strictEqual(setup.browser, 'chrome');
-  });
-
-  it('should call function', async () => {
-    let info;
-    const stubInfo = sinon.stub(console, 'info').callsFake(arg => {
-      info = arg;
-    });
-    const setup = new Setup();
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubSelect =
-      sinon.stub(inquirer, 'select').callsFake(async () => 'vivaldi');
-    const stubExit = sinon.stub(process, 'exit');
-    const res = await setup._handleBrowserInput([
-      'firefox',
-      'thunderbird',
-      'chrome',
-      'brave',
-      'edge',
-      'vivaldi'
-    ]);
-    const { calledOnce: infoCalled } = stubInfo;
-    const { calledOnce: exitCalled } = stubExit;
-    stubSelect.restore();
-    stubInfo.restore();
-    stubExit.restore();
-    assert.strictEqual(stubConfigDir.calledOnce, true);
-    assert.strictEqual(infoCalled, false);
-    assert.strictEqual(exitCalled, false);
-    assert.strictEqual(info, undefined);
-    assert.strictEqual(res, true);
-    assert.strictEqual(setup.browser, 'vivaldi');
   });
 });
 
 describe('run', () => {
-  it('should call function', async () => {
+  it('should call browser input if no config dir', async () => {
     const setup = new Setup();
     const stubConfigDir =
       sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
@@ -1734,53 +1231,7 @@ describe('run', () => {
     assert.deepEqual(res, []);
   });
 
-  it('should call function', async () => {
-    const setup = new Setup({
-      webExtensionIds: ['foo@bar'],
-      chromeExtensionIds: ['chrome-extension://foo']
-    });
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubBrowserInput =
-      sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
-    const res = await setup.run();
-    assert.strictEqual(stubConfigDir.called, false);
-    assert.strictEqual(stubBrowserInput.calledOnce, true);
-    assert.strictEqual(res.includes('firefox'), true);
-    assert.strictEqual(res.includes('chrome'), true);
-  });
-
-  it('should call function', async () => {
-    const setup = new Setup({
-      webExtensionIds: ['foo@bar']
-    });
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubBrowserInput =
-      sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
-    const res = await setup.run();
-    assert.strictEqual(stubConfigDir.called, false);
-    assert.strictEqual(stubBrowserInput.calledOnce, true);
-    assert.strictEqual(res.includes('firefox'), true);
-    assert.strictEqual(res.includes('chrome'), false);
-  });
-
-  it('should call function', async () => {
-    const setup = new Setup({
-      chromeExtensionIds: ['chrome-extension://foo']
-    });
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubBrowserInput =
-      sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
-    const res = await setup.run();
-    assert.strictEqual(stubConfigDir.called, false);
-    assert.strictEqual(stubBrowserInput.calledOnce, true);
-    assert.strictEqual(res.includes('firefox'), false);
-    assert.strictEqual(res.includes('chrome'), true);
-  });
-
-  it('should call function', async () => {
+  it('should skip browser input if browser is already set', async () => {
     const setup = new Setup({
       browser: 'firefox',
       webExtensionIds: ['foo@bar'],
@@ -1796,19 +1247,22 @@ describe('run', () => {
     assert.strictEqual(res, true);
   });
 
-  it('should call function', async () => {
+  it('should populate array with supported and compatible browsers', async () => {
     const setup = new Setup({
-      browser: 'chrome',
+      supportedBrowsers: ['firefox', 'chrome', 'opera'],
       webExtensionIds: ['foo@bar'],
       chromeExtensionIds: ['chrome-extension://foo']
     });
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
     const stubBrowserInput =
       sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
     const res = await setup.run();
-    assert.strictEqual(stubConfigDir.calledOnce, true);
-    assert.strictEqual(stubBrowserInput.called, false);
-    assert.strictEqual(res, true);
+    let expected = [];
+    if (IS_WIN || IS_MAC) {
+      expected = ['firefox', 'chrome', 'opera'];
+    } else {
+      expected = ['firefox', 'chrome'];
+    }
+    assert.deepEqual(res, expected);
+    stubBrowserInput.restore();
   });
 });

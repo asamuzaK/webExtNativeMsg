@@ -8,7 +8,7 @@ import process from 'node:process';
 import { Separator, confirm, select } from '@inquirer/prompts';
 import { browserData } from './browser-data.js';
 import { ChildProcess } from './child-process.js';
-import { getType, isString, quoteArg, throwErr } from './common.js';
+import { getType, isString, quoteArg } from './common.js';
 import {
   createDirectory, createFile, getAbsPath, isDir, isFile
 } from './file-util.js';
@@ -31,88 +31,19 @@ export const inquirer = {
   select
 };
 
-/* created path values */
-export const values = new Map();
-
-/**
- * abort setup
- * @param {string} msg - message
- * @param {number} [code] - exit code
- * @returns {void}
- */
-export const abortSetup = (msg, code) => {
-  values.clear();
-  console.info(`Setup aborted: ${msg}`);
-  if (!Number.isInteger(code)) {
-    code = 1;
-  }
-  process.exit(code);
-};
-
 /**
  * handle inquirer error
  * @param {object} e - Error
  * @throws {Error} - Error
- * @returns {Function} - abortSetup
  */
 export const handleInquirerError = e => {
   if (e instanceof Error) {
-    let code = 1;
     if (e.name === 'ExitPromptError') {
-      code = 130;
+      throw new Error('Setup aborted by user.');
     }
-    return abortSetup(e.message, code);
+    throw e;
   }
-  return abortSetup('Unknown error.', 1);
-};
-
-/**
- * handle setup callback
- * @returns {?Function} - callback
- */
-export const handleSetupCallback = () => {
-  let res;
-  const func = values.get('callback');
-  if (typeof func === 'function') {
-    const configDirPath = values.get('configDir');
-    const shellScriptPath = values.get('shellPath');
-    const manifestPath = values.get('manifestPath');
-    res = func({ configDirPath, manifestPath, shellScriptPath });
-  }
-  values.clear();
-  return res || null;
-};
-
-/**
- * handle create registry close
- * @param {number} code - exit code
- * @returns {?Function} - handleSetupCallback()
- */
-export const handleRegClose = code => {
-  let func;
-  if (IS_WIN) {
-    if (code === 0) {
-      const regKey = values.get('regKey');
-      console.info(`Created: ${regKey}`);
-      func = handleSetupCallback();
-    } else {
-      const reg = path.join(process.env.WINDIR, 'system32', 'reg.exe');
-      func = abortSetup(`${reg} exited with ${code}.`, code);
-    }
-  }
-  return func || null;
-};
-
-/**
- * handle registry stderr
- * @param {*} data - data
- * @returns {void}
- */
-export const handleRegStderr = data => {
-  if (IS_WIN) {
-    data && console.error(`stderr: ${data.toString()}`);
-    abortSetup('Failed to create registry key.', 1);
-  }
+  throw new Error('Unknown error.');
 };
 
 /**
@@ -220,7 +151,7 @@ export class Setup {
     this.#browserConfigDir = null;
   }
 
-  /* getter / setter */
+  /* getters / setters */
   get browser() {
     let browser;
     if (this.#browser) {
@@ -336,7 +267,7 @@ export class Setup {
    * create registry
    * @private
    * @param {string} manifestPath - manifest path
-   * @returns {Promise.<object>} - child process
+   * @returns {Promise.<void>} - Promise
    */
   async _createReg(manifestPath) {
     if (!isFile(manifestPath)) {
@@ -348,24 +279,36 @@ export class Setup {
     if (!isString(this.#hostName)) {
       throw new TypeError(`Expected String but got ${getType(this.#hostName)}.`);
     }
-    let proc;
     if (IS_WIN) {
       const { regWin } = this.#browser;
       const regKey = path.join(...regWin, this.#hostName);
-      const reg = path.join(process.env.WINDIR, 'system32', 'reg.exe');
+      const winDir = process.env.windir || process.env.WINDIR || 'C:\\Windows';
+      const reg = path.join(winDir, 'System32', 'reg.exe');
       const args = ['add', regKey, '/ve', '/d', manifestPath, '/f'];
       const opt = {
         cwd: null,
         encoding: CHAR,
         env: process.env
       };
-      values.set('regKey', regKey);
-      proc = await new ChildProcess(reg, args, opt).spawn();
-      proc.on('error', throwErr);
-      proc.stderr.on('data', handleRegStderr);
-      proc.on('close', handleRegClose);
+      const proc = await new ChildProcess(reg, args, opt).spawn();
+      return new Promise((resolve, reject) => {
+        proc.on('error', reject);
+        proc.stderr.on('data', data => {
+          if (data) {
+            console.error(`stderr: ${data.toString()}`);
+          }
+          reject(new Error('Failed to create registry key.'));
+        });
+        proc.on('close', code => {
+          if (code === 0) {
+            console.info(`Created: ${regKey}`);
+            resolve();
+          } else {
+            reject(new Error(`${reg} exited with ${code}.`));
+          }
+        });
+      });
     }
-    return proc || null;
   }
 
   /**
@@ -444,8 +387,9 @@ export class Setup {
     const cmd =
       (isFile(filePath) && `${quoteArg(appPath)} ${quoteArg(filePath)}`) ||
       quoteArg(appPath);
+    const shell = process.env.SHELL || '/bin/sh';
     const content =
-      (IS_WIN && `@echo off\n${cmd}\n`) || `#!${process.env.SHELL}\n${cmd}\n`;
+      (IS_WIN && `@echo off\n${cmd}\n`) || `#!${shell}\n${cmd}\n`;
     const shellExt = (IS_WIN && 'cmd') || 'sh';
     const shellPath = path.join(configDir, `${this.#hostName}.${shellExt}`);
     await createFile(shellPath, content, {
@@ -473,32 +417,35 @@ export class Setup {
   /**
    * create files
    * @private
-   * @returns {Promise.<any>} - createReg(), handleSetupCallback(), abortSetup()
+   * @returns {Promise.<object>} - result object containing paths
    */
   async _createFiles() {
-    let func;
     const configDir = await this._createConfigDir();
     const shellPath = await this._createShellScript(configDir);
     const manifestPath = await this._createManifest(shellPath, configDir);
-    if (isDir(configDir) && isFile(shellPath) && isFile(manifestPath)) {
-      values.set('configDir', configDir);
-      values.set('shellPath', shellPath);
-      values.set('manifestPath', manifestPath);
-      values.set('callback', this.#callback);
-      func = IS_WIN ? this._createReg(manifestPath) : handleSetupCallback();
-    } else {
-      func = abortSetup('Failed to create files.', 1);
+    if (!isDir(configDir) || !isFile(shellPath) || !isFile(manifestPath)) {
+      throw new Error('Failed to create files.');
     }
-    return func;
+    if (IS_WIN) {
+      await this._createReg(manifestPath);
+    }
+    const result = {
+      configDirPath: configDir,
+      shellScriptPath: shellPath,
+      manifestPath
+    };
+    if (typeof this.#callback === 'function') {
+      this.#callback(result);
+    }
+    return result;
   }
 
   /**
    * handle browser config directory input
    * @private
-   * @returns {Promise.<any>} - createFiles(), abortSetup()
+   * @returns {Promise.<object>} - result object containing paths
    */
   async _handleBrowserConfigDir() {
-    let func;
     this.#browserConfigDir ??= this._getBrowserConfigDir();
     if (isDir(this.#browserConfigDir) && !this.#overwriteConfig) {
       const dir = this.#browserConfigDir;
@@ -507,27 +454,24 @@ export class Setup {
         default: false
       }).catch(handleInquirerError);
       if (ans) {
-        func = this._createFiles();
+        return this._createFiles();
       } else {
-        func = abortSetup(`${dir} already exists.`, 1);
+        throw new Error(`${dir} already exists.`);
       }
-    } else {
-      func = this._createFiles();
     }
-    return func;
+    return this._createFiles();
   }
 
   /**
    * handle browser input
    * @private
-   * @param {string} arr - browser array
-   * @returns {Promise.<any>} - handleBrowserConfigDir(), abortSetup()
+   * @param {Array.<string>} arr - browser array
+   * @returns {Promise.<object>} - result object containing paths
    */
   async _handleBrowserInput(arr) {
     if (!Array.isArray(arr)) {
       throw new TypeError(`Expected Array but got ${getType(arr)}.`);
     }
-    let func;
     const choices = [];
     for (const item of arr) {
       const choice = {
@@ -553,22 +497,20 @@ export class Setup {
     }
     if (this.#browser) {
       this.#browserConfigDir = this._getBrowserConfigDir();
-      func = this._handleBrowserConfigDir();
+      return this._handleBrowserConfigDir();
     } else {
-      func = abortSetup('Browser is not specified.', 1);
+      throw new Error('Browser is not specified.');
     }
-    return func;
   }
 
   /**
    * run setup
-   * @returns {Promise.<any>} - handleBrowserInput(), handleBrowserConfigDir()
+   * @returns {Promise.<object>} - result object containing paths
    */
-  run() {
-    let func;
+  async run() {
     this.#browserConfigDir = this._getBrowserConfigDir();
     if (this.#browserConfigDir) {
-      func = this._handleBrowserConfigDir().catch(throwErr);
+      return this._handleBrowserConfigDir();
     } else {
       const arr = [];
       const items = Object.entries(browserData);
@@ -581,8 +523,7 @@ export class Setup {
           arr.push(item);
         }
       }
-      func = this._handleBrowserInput(arr).catch(throwErr);
+      return this._handleBrowserInput(arr);
     }
-    return func;
   }
 }
