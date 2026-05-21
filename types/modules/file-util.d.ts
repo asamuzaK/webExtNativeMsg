@@ -11,11 +11,11 @@ export function removeDirSync(dir: string, baseDir: string): void;
 export function removeDirectory(dir: string, baseDir: string): Promise<void>;
 export function createDirectory(dir: string, mode?: number): Promise<string>;
 export function createFile(file: string, value: string | Buffer | Uint8Array, opt?: {
-    encoding?: string;
-    flag?: string;
-    mode?: number | string;
+    encoding?: string | undefined;
+    flag?: string | undefined;
+    mode?: string | number | undefined;
 }): Promise<string>;
 export function readFile(file: string, opt?: {
-    encoding?: string;
-    flag?: string;
+    encoding?: string | undefined;
+    flag?: string | undefined;
 }): Promise<string | Buffer>;

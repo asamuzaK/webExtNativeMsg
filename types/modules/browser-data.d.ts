@@ -34,7 +34,7 @@ export namespace browserData {
         export let aliasWin: string;
         let hostLinux_3: string[];
         export { hostLinux_3 as hostLinux };
-        let hostMac_3: any;
+        let hostMac_3: null;
         export { hostMac_3 as hostMac };
         let regWin_3: string[];
         export { regWin_3 as regWin };
@@ -69,7 +69,7 @@ export namespace browserData {
         export { alias_6 as alias };
         let aliasWin_2: string;
         export { aliasWin_2 as aliasWin };
-        let hostLinux_6: any;
+        let hostLinux_6: null;
         export { hostLinux_6 as hostLinux };
         let hostMac_6: string[];
         export { hostMac_6 as hostMac };
@@ -84,7 +84,7 @@ export namespace browserData {
         export { hostLinux_7 as hostLinux };
         let hostMac_7: string[];
         export { hostMac_7 as hostMac };
-        let regWin_7: any;
+        let regWin_7: null;
         export { regWin_7 as regWin };
         export { EXT_CHROME as type };
     }
@@ -118,7 +118,7 @@ export namespace browserData {
         export let aliasMac: string;
         let aliasWin_4: string;
         export { aliasWin_4 as aliasWin };
-        let hostLinux_10: any;
+        let hostLinux_10: null;
         export { hostLinux_10 as hostLinux };
         let hostMac_10: string[];
         export { hostMac_10 as hostMac };

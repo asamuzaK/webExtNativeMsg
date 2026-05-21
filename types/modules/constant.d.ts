@@ -6,7 +6,5 @@ export const DIR_HOME: string;
 export const EXT_CHROME: "chromeExtension";
 export const EXT_WEB: "webExtension";
 export const INDENT: 2;
-export const IS_BE: boolean;
-export const IS_LE: boolean;
 export const IS_MAC: boolean;
 export const IS_WIN: boolean;

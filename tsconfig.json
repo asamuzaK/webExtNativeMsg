@@ -10,7 +10,8 @@
     "newLine": "LF",
     "removeComments": true,
     "resolveJsonModule": true,
-    "target": "esnext"
+    "target": "esnext",
+    "types": ["node"]
   },
   "include": ["index.js"]
 }
