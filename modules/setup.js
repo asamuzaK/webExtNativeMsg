@@ -76,19 +76,24 @@ export const getBrowserData = key => {
  */
 export const getConfigDir = (opt = {}) => {
   const { configPath, hostName } = opt;
-  let dir;
   if (configPath && isString(configPath)) {
-    const dirPath = getAbsPath(configPath);
-    if (!dirPath.startsWith(DIR_HOME) && !dirPath.startsWith(DIR_CWD)) {
-      throw new Error(`${dirPath} is not sub directory of ${DIR_HOME}.`);
+    const originDirPath = getAbsPath(configPath);
+    const dirPath = path.resolve(originDirPath);
+    const homeDir = path.resolve(DIR_HOME);
+    const cwdDir = path.resolve(DIR_CWD);
+    const relToHome = path.relative(homeDir, dirPath);
+    const relToCwd = path.relative(cwdDir, dirPath);
+    const isSubOfHome =
+      !relToHome.startsWith('..') && !path.isAbsolute(relToHome);
+    const isSubOfCwd = !relToCwd.startsWith('..') && !path.isAbsolute(relToCwd);
+    if (!isSubOfHome && !isSubOfCwd) {
+      throw new Error(`${originDirPath} is not sub directory of ${DIR_HOME}.`);
     }
-    dir = dirPath;
+    return dirPath;
   } else if (hostName && isString(hostName)) {
-    dir = path.resolve(DIR_CONFIG, hostName, 'config');
-  } else {
-    dir = path.resolve(DIR_CWD, 'config');
+    return path.resolve(DIR_CONFIG, hostName, 'config');
   }
-  return dir;
+  return path.resolve(DIR_CWD, 'config');
 };
 
 /* Setup */
@@ -292,14 +297,29 @@ export class Setup {
       };
       const proc = await new ChildProcess(reg, args, opt).spawn();
       return new Promise((resolve, reject) => {
-        proc.on('error', reject);
+        let settled = false;
+        proc.on('error', err => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          reject(err);
+        });
         proc.stderr.on('data', data => {
+          if (settled) {
+            return;
+          }
+          settled = true;
           if (data) {
             console.error(`stderr: ${data.toString()}`);
           }
           reject(new Error('Failed to create registry key.'));
         });
         proc.on('close', code => {
+          if (settled) {
+            return;
+          }
+          settled = true;
           if (code === 0) {
             console.info(`Created: ${regKey}`);
             resolve();
