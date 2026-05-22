@@ -682,6 +682,93 @@ describe('_createReg', () => {
     }
     stubSpawn.restore();
   });
+
+  it('should ignore error event if already settled', async () => {
+    const manifestPath =
+      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const mockProcess = new EventEmitter();
+    mockProcess.stderr = new EventEmitter();
+    const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
+    const stubInfo = sinon.stub(console, 'info');
+    const setup = new Setup({ browser: 'firefox', hostName: 'foo' });
+    const promise = setup._createReg(manifestPath);
+    if (IS_WIN) {
+      await new Promise(resolve => {
+        setTimeout(() => {
+          mockProcess.emit('close', 0);
+          assert.doesNotThrow(() => {
+            mockProcess.emit('error', new Error('late error'));
+          });
+          resolve();
+        }, 10);
+      });
+      await promise;
+    } else {
+      const res = await promise;
+      assert.strictEqual(res, undefined);
+    }
+    stubSpawn.restore();
+    stubInfo.restore();
+  });
+
+  it('should ignore stderr data if already settled', async () => {
+    const manifestPath =
+      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const mockProcess = new EventEmitter();
+    mockProcess.stderr = new EventEmitter();
+    const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
+    const stubInfo = sinon.stub(console, 'info');
+    const stubError = sinon.stub(console, 'error');
+    const setup = new Setup({ browser: 'firefox', hostName: 'foo' });
+    const promise = setup._createReg(manifestPath);
+    if (IS_WIN) {
+      await new Promise(resolve => {
+        setTimeout(() => {
+          mockProcess.emit('close', 0);
+          mockProcess.stderr.emit('data', Buffer.from('late stderr data'));
+          resolve();
+        }, 10);
+      });
+      await promise;
+      assert.strictEqual(stubError.called, false);
+    } else {
+      const res = await promise;
+      assert.strictEqual(res, undefined);
+    }
+    stubSpawn.restore();
+    stubInfo.restore();
+    stubError.restore();
+  });
+
+  it('should ignore close event if already settled', async () => {
+    const manifestPath =
+      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const mockProcess = new EventEmitter();
+    mockProcess.stderr = new EventEmitter();
+    const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
+    const stubInfo = sinon.stub(console, 'info');
+    const setup = new Setup({ browser: 'firefox', hostName: 'foo' });
+    const promise = setup._createReg(manifestPath);
+    if (IS_WIN) {
+      const testError = new Error('early error');
+      await new Promise(resolve => {
+        setTimeout(() => {
+          mockProcess.emit('error', testError);
+          mockProcess.emit('close', 0);
+          resolve();
+        }, 10);
+      });
+      await promise.catch(e => {
+        assert.deepStrictEqual(e, testError);
+      });
+      assert.strictEqual(stubInfo.called, false);
+    } else {
+      const res = await promise;
+      assert.strictEqual(res, undefined);
+    }
+    stubSpawn.restore();
+    stubInfo.restore();
+  });
 });
 
 describe('_createManifest', () => {
@@ -1075,7 +1162,6 @@ describe('_createFiles', () => {
     sinon.stub(setup, '_createConfigDir').resolves(configDir);
     sinon.stub(setup, '_createShellScript').resolves('invalid_path');
     sinon.stub(setup, '_createManifest').resolves('invalid_path');
-
     await setup._createFiles().catch(e => {
       assert.deepStrictEqual(e, new Error('Failed to create files.'));
     });
@@ -1089,14 +1175,12 @@ describe('_createFiles', () => {
     const configDir = path.resolve('test', 'file', 'config', 'firefox');
     const shellPath = path.join(configDir, IS_WIN ? 'test.cmd' : 'test.sh');
     const manifestPath = path.join(configDir, 'test.json');
-
     // Simulate files actually existing for `isFile` checks
     const stubIsDir = sinon.stub(fs, 'statSync').returns({
       isDirectory: () => true,
       isFile: () => true,
       mode: 0
     });
-
     const stubConfig =
       sinon.stub(setup, '_createConfigDir').resolves(configDir);
     const stubShell =
@@ -1104,9 +1188,7 @@ describe('_createFiles', () => {
     const stubManifest =
       sinon.stub(setup, '_createManifest').resolves(manifestPath);
     const stubReg = sinon.stub(setup, '_createReg').resolves(true);
-
     const res = await setup._createFiles();
-
     assert.strictEqual(stubConfig.calledOnce, true);
     assert.strictEqual(stubShell.calledOnce, true);
     assert.strictEqual(stubManifest.calledOnce, true);
@@ -1132,7 +1214,7 @@ describe('_handleBrowserConfigDir', () => {
     });
     const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(false);
     // Override _getBrowserConfigDir to return a directory that "exists"
-    sinon.stub(setup, '_getBrowserConfigDir').returns(DIR_CWD); // using cwd as dummy existing dir
+    sinon.stub(setup, '_getBrowserConfigDir').returns(DIR_CWD);
     setup.browser = 'firefox';
     await setup._handleBrowserConfigDir().catch(e => {
       assert.deepStrictEqual(e, new Error(`${DIR_CWD} already exists.`));
