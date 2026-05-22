@@ -1,8 +1,8 @@
+# WebExtensions native messaging
+
 [![build](https://github.com/asamuzaK/webExtNativeMsg/workflows/build/badge.svg)](https://github.com/asamuzaK/webExtNativeMsg/actions?query=workflow%3Abuild)
 [![CodeQL](https://github.com/asamuzaK/webExtNativeMsg/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/asamuzaK/webExtNativeMsg/actions/workflows/github-code-scanning/codeql)
 [![npm](https://img.shields.io/npm/v/web-ext-native-msg)](https://www.npmjs.com/package/web-ext-native-msg)
-
-# WebExtensions native messaging
 
 Helper modules for building WebExtensions native messaging hosts.
 
