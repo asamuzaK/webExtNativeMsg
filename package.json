@@ -10,6 +10,7 @@
     "url": "git+https://github.com/asamuzaK/webExtNativeMsg.git"
   },
   "type": "module",
+  "types": "./types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
@@ -53,5 +54,5 @@
     "test:setup": "cd test/app && node setup",
     "tsc": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && npx tsc"
   },
-  "version": "9.0.1"
+  "version": "9.0.2"
 }
