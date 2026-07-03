@@ -56,5 +56,5 @@
     "test:setup": "cd test/app && node setup",
     "tsc": "node -e \"fs.rmSync('types',{recursive:true,force:true})\" && npx tsc"
   },
-  "version": "9.0.2"
+  "version": "9.0.3"
 }
