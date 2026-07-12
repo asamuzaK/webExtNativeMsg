@@ -20,13 +20,13 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^8.5.2",
-    "shell-quote": "^1.9.0"
+    "shell-quote": "^1.10.0"
   },
   "devDependencies": {
-    "@types/node": "^26.1.0",
+    "@types/node": "^26.1.1",
     "c8": "^11.0.0",
-    "eslint": "^9.39.4",
-    "eslint-plugin-jsdoc": "^63.0.10",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsdoc": "^63.0.13",
     "eslint-plugin-regexp": "^3.1.1",
     "eslint-plugin-unicorn": "^64.0.0",
     "globals": "^17.7.0",
