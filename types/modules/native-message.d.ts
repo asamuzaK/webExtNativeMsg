@@ -1,8 +1,12 @@
-export class Input {
+export declare class Input {
+    #private;
+    constructor();
+    private #decoder;
     decode(chunk: string | Buffer): Array<string> | null;
-    #private;
 }
-export class Output {
-    encode(msg: object): Buffer | null;
+export declare class Output {
     #private;
+    constructor();
+    private #encoder;
+    encode(msg: object): Buffer | null;
 }

@@ -1,43 +1,77 @@
-export namespace inquirer {
-    export { confirm };
-    export { select };
-}
-export function handleInquirerError(e: object): never;
-export function getBrowserData(key: string): object;
-export function getConfigDir(opt?: object): string;
-export class Setup {
+import { Separator } from '@inquirer/prompts';
+export declare const inquirer: {
+    confirm: import("@inquirer/type").Prompt<boolean, {
+        message: string;
+        default?: boolean;
+        transformer?: (value: boolean) => string;
+        theme?: import("@inquirer/type").PartialDeep<import("@inquirer/core").Theme>;
+    }>;
+    select: <const Value>(config: {
+        message: string;
+        choices: readonly (Separator | Value | {
+            value: Value;
+            name?: string;
+            description?: string;
+            short?: string;
+            disabled?: boolean | string;
+            type?: never;
+        })[];
+        pageSize?: number | undefined;
+        loop?: boolean | undefined;
+        default?: NoInfer<Value> | undefined;
+        theme?: import("@inquirer/type").PartialDeep<import("@inquirer/core").Theme<{
+            icon: {
+                cursor: string;
+            };
+            style: {
+                disabled: (text: string) => string;
+                description: (text: string) => string;
+                keysHelpTip: (keys: [key: string, action: string][]) => string | undefined;
+            };
+            i18n: {
+                disabledError: string;
+            };
+            indexMode: 'hidden' | 'number';
+        }>> | undefined;
+    }, context?: import("@inquirer/type").Context) => Promise<Value>;
+};
+export declare const handleInquirerError: (e: object) => never;
+export declare const getBrowserData: (key: string) => object;
+export declare const getConfigDir: (opt?: object) => string;
+export declare class Setup {
+    #private;
     constructor(opt?: {
-        browser?: string | undefined;
-        configPath?: string | undefined;
-        hostDescription?: string | undefined;
-        hostName?: string | undefined;
-        mainScriptFile?: string | undefined;
-        chromeExtensionIds?: string[] | undefined;
-        webExtensionIds?: string[] | undefined;
-        supportedBrowsers?: string[] | undefined;
-        callback?: Function | undefined;
-        overwriteConfig?: boolean | undefined;
+        browser?: string;
+        configPath?: string;
+        hostDescription?: string;
+        hostName?: string;
+        mainScriptFile?: string;
+        chromeExtensionIds?: Array<string>;
+        webExtensionIds?: Array<string>;
+        supportedBrowsers?: Array<string>;
+        callback?: Function;
+        overwriteConfig?: boolean;
     });
-    set browser(browser: any);
     get browser(): any;
-    set supportedBrowsers(arr: string[]);
+    set browser(browser: any);
     get supportedBrowsers(): string[];
-    set configPath(dir: string);
+    set supportedBrowsers(arr: string[]);
     get configPath(): string;
-    set hostDescription(desc: string | null | undefined);
+    set configPath(dir: string);
     get hostDescription(): string | null | undefined;
-    set hostName(name: string | null | undefined);
+    set hostDescription(desc: string | null | undefined);
     get hostName(): string | null | undefined;
-    set mainScriptFile(name: string | undefined);
+    set hostName(name: string | null | undefined);
     get mainScriptFile(): string | undefined;
-    set chromeExtensionIds(arr: string[] | null);
+    set mainScriptFile(name: string | undefined);
     get chromeExtensionIds(): string[] | null;
-    set webExtensionIds(arr: string[] | null);
+    set chromeExtensionIds(arr: string[] | null);
     get webExtensionIds(): string[] | null;
-    set callback(func: Function | null);
+    set webExtensionIds(arr: string[] | null);
     get callback(): Function | null;
-    set overwriteConfig(overwrite: boolean);
+    set callback(func: Function | null);
     get overwriteConfig(): boolean;
+    set overwriteConfig(overwrite: boolean);
     private _getBrowserConfigDir;
     private _createReg;
     private _createManifest;
@@ -47,7 +81,4 @@ export class Setup {
     private _handleBrowserConfigDir;
     private _handleBrowserInput;
     run(): Promise<object>;
-    #private;
 }
-import { confirm } from '@inquirer/prompts';
-import { select } from '@inquirer/prompts';
