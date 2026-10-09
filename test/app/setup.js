@@ -12,8 +12,8 @@ import { confirm } from '@inquirer/prompts';
 import sinon from 'sinon';
 import { Setup, isFile } from '../../index.js';
 
-const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
-               os.tmpdir();
+const TMPDIR =
+  process.env.TMP || process.env.TMPDIR || process.env.TEMP || os.tmpdir();
 
 const map = new Map();
 
@@ -59,16 +59,18 @@ const clean = () => {
     callback: appCallback
   });
   return setup.run();
-})().then(async () => {
-  const ans = await confirm({
-    message: 'Remove created files?'
-  });
-  if (ans) {
-    console.info('Removing created files.');
+})()
+  .then(async () => {
+    const ans = await confirm({
+      message: 'Remove created files?'
+    });
+    if (ans) {
+      console.info('Removing created files.');
+      clean();
+      console.info('Done.');
+    }
+  })
+  .catch(e => {
     clean();
-    console.info('Done.');
-  }
-}).catch(e => {
-  clean();
-  throw e;
-});
+    throw e;
+  });

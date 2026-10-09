@@ -11,17 +11,26 @@ import { afterEach, beforeEach, describe, it } from 'mocha';
 import { quoteArg } from '../modules/common.js';
 import { createDirectory, isDir, isFile } from '../modules/file-util.js';
 import {
-  DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME, IS_MAC, IS_WIN
+  DIR_CONFIG_LINUX,
+  DIR_CONFIG_MAC,
+  DIR_CONFIG_WIN,
+  DIR_HOME,
+  IS_MAC,
+  IS_WIN
 } from '../modules/constant.js';
 
 /* test */
 import {
-  Setup, getBrowserData, getConfigDir, handleInquirerError, inquirer
+  Setup,
+  getBrowserData,
+  getConfigDir,
+  handleInquirerError,
+  inquirer
 } from '../modules/setup.js';
 
 /* constant */
-const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
-                   DIR_CONFIG_LINUX;
+const DIR_CONFIG =
+  (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) || DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
 const TMPDIR = path.join(DIR_CWD, 'tmp');
 
@@ -41,14 +50,18 @@ afterEach(() => {
 describe('handleInquirerError', () => {
   it('should throw unknown error message', () => {
     assert.throws(
-      () => { handleInquirerError('foo'); },
+      () => {
+        handleInquirerError('foo');
+      },
       { message: 'Unknown error.' }
     );
   });
 
   it('should throw original message', () => {
     assert.throws(
-      () => { handleInquirerError(new Error('foo')); },
+      () => {
+        handleInquirerError(new Error('foo'));
+      },
       { message: 'foo' }
     );
   });
@@ -57,7 +70,9 @@ describe('handleInquirerError', () => {
     const e = new Error('foo');
     e.name = 'ExitPromptError';
     assert.throws(
-      () => { handleInquirerError(e); },
+      () => {
+        handleInquirerError(e);
+      },
       { message: 'Setup aborted by user.' }
     );
   });
@@ -84,19 +99,24 @@ describe('getBrowserData', () => {
 describe('getConfigDir', () => {
   it("should throw if dir is not subdirectory of user's home dir", () => {
     assert.throws(
-      () => getConfigDir({
-        configPath: '/foo/bar'
-      }), Error,
+      () =>
+        getConfigDir({
+          configPath: '/foo/bar'
+        }),
+      Error,
       `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
     );
   });
 
   it("should throw if dir is not subdirectory of user's home dir", () => {
     assert.throws(
-      () => getConfigDir({
-        configPath: path.join(DIR_HOME, '../foo')
-      }), Error,
-      `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`);
+      () =>
+        getConfigDir({
+          configPath: path.join(DIR_HOME, '../foo')
+        }),
+      Error,
+      `${path.join(DIR_HOME, '../foo')} is not sub directory of ${DIR_HOME}.`
+    );
   });
 
   it('should get dir', () => {
@@ -267,8 +287,10 @@ describe('Setup', () => {
       const setup = new Setup({
         hostName: 'myhost'
       });
-      assert.strictEqual(setup.configPath,
-        path.resolve(DIR_CONFIG, 'myhost', 'config'));
+      assert.strictEqual(
+        setup.configPath,
+        path.resolve(DIR_CONFIG, 'myhost', 'config')
+      );
     });
 
     it('should get null', () => {
@@ -422,7 +444,10 @@ describe('Setup', () => {
       const myPath = '/foo/bar';
       const setup = new Setup();
       assert.throws(
-        () => { setup.configPath = myPath; }, Error,
+        () => {
+          setup.configPath = myPath;
+        },
+        Error,
         `${path.normalize('/foo/bar')} is not sub directory of ${DIR_HOME}.`
       );
     });
@@ -446,8 +471,10 @@ describe('Setup', () => {
         hostName: 'myhost'
       });
       setup.configPath = null;
-      assert.strictEqual(setup.configPath,
-        path.resolve(DIR_CONFIG, 'myhost', 'config'));
+      assert.strictEqual(
+        setup.configPath,
+        path.resolve(DIR_CONFIG, 'myhost', 'config')
+      );
     });
 
     it('should set null', () => {
@@ -581,8 +608,13 @@ describe('_createReg', () => {
   });
 
   it('should throw', async () => {
-    const manifestPath =
-      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const manifestPath = path.resolve(
+      'test',
+      'file',
+      'config',
+      'firefox',
+      'test.json'
+    );
     const setup = new Setup();
     await setup._createReg(manifestPath).catch(e => {
       assert.deepStrictEqual(e, new TypeError('Expected Object but got Null.'));
@@ -590,8 +622,9 @@ describe('_createReg', () => {
   });
 
   it('should throw', async () => {
-    const manifestPath =
-      path.resolve(path.join('test', 'file', 'config', 'firefox', 'test.json'));
+    const manifestPath = path.resolve(
+      path.join('test', 'file', 'config', 'firefox', 'test.json')
+    );
     const setup = new Setup({
       browser: 'firefox'
     });
@@ -601,8 +634,13 @@ describe('_createReg', () => {
   });
 
   it('should spawn child process', async () => {
-    const manifestPath =
-      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const manifestPath = path.resolve(
+      'test',
+      'file',
+      'config',
+      'firefox',
+      'test.json'
+    );
     const mockProcess = new EventEmitter();
     mockProcess.stderr = new EventEmitter();
     const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
@@ -627,8 +665,13 @@ describe('_createReg', () => {
   });
 
   it('should reject if child process emits stderr', async () => {
-    const manifestPath =
-      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const manifestPath = path.resolve(
+      'test',
+      'file',
+      'config',
+      'firefox',
+      'test.json'
+    );
     const mockProcess = new EventEmitter();
     mockProcess.stderr = new EventEmitter();
     const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
@@ -642,7 +685,10 @@ describe('_createReg', () => {
     });
     const promise = setup._createReg(manifestPath);
     if (IS_WIN) {
-      setTimeout(() => mockProcess.stderr.emit('data', Buffer.from('mock error')), 10);
+      setTimeout(
+        () => mockProcess.stderr.emit('data', Buffer.from('mock error')),
+        10
+      );
       await promise.catch(e => {
         assert.deepStrictEqual(e, new Error('Failed to create registry key.'));
       });
@@ -658,8 +704,13 @@ describe('_createReg', () => {
   });
 
   it('should reject if child process exits with non-zero code', async () => {
-    const manifestPath =
-      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const manifestPath = path.resolve(
+      'test',
+      'file',
+      'config',
+      'firefox',
+      'test.json'
+    );
     const mockProcess = new EventEmitter();
     mockProcess.stderr = new EventEmitter();
     const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
@@ -674,7 +725,10 @@ describe('_createReg', () => {
       const errorCode = 1;
       setTimeout(() => mockProcess.emit('close', errorCode), 10);
       await promise.catch(e => {
-        assert.deepStrictEqual(e, new Error(`${reg} exited with ${errorCode}.`));
+        assert.deepStrictEqual(
+          e,
+          new Error(`${reg} exited with ${errorCode}.`)
+        );
       });
     } else {
       const res = await promise;
@@ -684,8 +738,13 @@ describe('_createReg', () => {
   });
 
   it('should ignore error event if already settled', async () => {
-    const manifestPath =
-      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const manifestPath = path.resolve(
+      'test',
+      'file',
+      'config',
+      'firefox',
+      'test.json'
+    );
     const mockProcess = new EventEmitter();
     mockProcess.stderr = new EventEmitter();
     const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
@@ -712,8 +771,13 @@ describe('_createReg', () => {
   });
 
   it('should ignore stderr data if already settled', async () => {
-    const manifestPath =
-      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const manifestPath = path.resolve(
+      'test',
+      'file',
+      'config',
+      'firefox',
+      'test.json'
+    );
     const mockProcess = new EventEmitter();
     mockProcess.stderr = new EventEmitter();
     const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
@@ -741,8 +805,13 @@ describe('_createReg', () => {
   });
 
   it('should ignore close event if already settled', async () => {
-    const manifestPath =
-      path.resolve('test', 'file', 'config', 'firefox', 'test.json');
+    const manifestPath = path.resolve(
+      'test',
+      'file',
+      'config',
+      'firefox',
+      'test.json'
+    );
     const mockProcess = new EventEmitter();
     mockProcess.stderr = new EventEmitter();
     const stubSpawn = sinon.stub(childProcess, 'spawn').returns(mockProcess);
@@ -795,8 +864,12 @@ describe('_createManifest', () => {
 
   it('should throw', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const file = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup({
       browser: 'firefox',
       hostDescription: 'foo bar',
@@ -814,8 +887,12 @@ describe('_createManifest', () => {
 
   it('should throw', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const file = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup({
       browser: 'chrome',
       hostDescription: 'foo bar',
@@ -833,8 +910,12 @@ describe('_createManifest', () => {
 
   it('should throw', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const file = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const dir = path.resolve(DIR_HOME, 'foo');
     const setup = new Setup({
       browser: 'firefox',
@@ -853,8 +934,12 @@ describe('_createManifest', () => {
 
   it('should throw', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const file = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup();
     await setup._createManifest(file, DIR_HOME).catch(e => {
       assert.deepStrictEqual(e, new TypeError('Expected Object but got Null.'));
@@ -865,8 +950,12 @@ describe('_createManifest', () => {
 
   it('should throw', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const file = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup({
       browser: 'firefox'
     });
@@ -879,8 +968,12 @@ describe('_createManifest', () => {
 
   it('should throw', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const file = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup({
       browser: 'firefox',
       hostDescription: 'foo bar'
@@ -894,8 +987,12 @@ describe('_createManifest', () => {
 
   it('should throw', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const file =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const file = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup({
       browser: 'firefox',
       hostDescription: 'foo bar',
@@ -919,8 +1016,12 @@ describe('_createManifest', () => {
     const configDir = fs.mkdirSync(path.join(dir, 'config', 'firefox'), {
       recursive: true
     });
-    const shellPath =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const shellPath = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup({
       browser: 'firefox',
       hostDescription: 'foo bar',
@@ -938,11 +1039,21 @@ describe('_createManifest', () => {
     if (IS_WIN) {
       manifestPath = path.join(configDir, 'foo.json');
     } else if (IS_MAC) {
-      manifestPath = path.join(os.homedir(), 'Library', 'Application Support',
-        'Mozilla', 'NativeMessagingHosts', 'foo.json');
+      manifestPath = path.join(
+        os.homedir(),
+        'Library',
+        'Application Support',
+        'Mozilla',
+        'NativeMessagingHosts',
+        'foo.json'
+      );
     } else {
-      manifestPath = path.join(os.homedir(), '.mozilla',
-        'native-messaging-hosts', 'foo.json');
+      manifestPath = path.join(
+        os.homedir(),
+        '.mozilla',
+        'native-messaging-hosts',
+        'foo.json'
+      );
     }
     const file = fs.readFileSync(manifestPath, {
       encoding: 'utf8',
@@ -976,10 +1087,13 @@ describe('_createManifest', () => {
     });
     const spyWrite = sinon.spy(fsPromise, 'writeFile');
     const dir = path.join(TMPDIR, 'webextnativemsg');
-    const configDir =
-      await createDirectory(path.join(dir, 'config', 'chrome'));
-    const shellPath =
-      path.resolve(DIR_CWD, 'test', 'file', IS_WIN ? 'test.cmd' : 'test.sh');
+    const configDir = await createDirectory(path.join(dir, 'config', 'chrome'));
+    const shellPath = path.resolve(
+      DIR_CWD,
+      'test',
+      'file',
+      IS_WIN ? 'test.cmd' : 'test.sh'
+    );
     const setup = new Setup({
       browser: 'chrome',
       hostDescription: 'foo bar',
@@ -995,11 +1109,23 @@ describe('_createManifest', () => {
     if (IS_WIN) {
       manifestPath = path.join(configDir, 'foo.json');
     } else if (IS_MAC) {
-      manifestPath = path.join(os.homedir(), 'Library', 'Application Support',
-        'Google', 'Chrome', 'NativeMessagingHosts', 'foo.json');
+      manifestPath = path.join(
+        os.homedir(),
+        'Library',
+        'Application Support',
+        'Google',
+        'Chrome',
+        'NativeMessagingHosts',
+        'foo.json'
+      );
     } else {
-      manifestPath = path.join(os.homedir(), '.config', 'google-chrome',
-        'NativeMessagingHosts', 'foo.json');
+      manifestPath = path.join(
+        os.homedir(),
+        '.config',
+        'google-chrome',
+        'NativeMessagingHosts',
+        'foo.json'
+      );
     }
     const file = fs.readFileSync(manifestPath, {
       encoding: 'utf8',
@@ -1113,10 +1239,7 @@ describe('_createShellScript', () => {
     assert.strictEqual(file.endsWith('\n'), true);
     const shellEnv = process.env.SHELL || '/bin/sh';
     if (IS_WIN) {
-      assert.strictEqual(
-        file,
-        `@echo off\n${quoteArg(process.execPath)}\n`
-      );
+      assert.strictEqual(file, `@echo off\n${quoteArg(process.execPath)}\n`);
     } else {
       assert.strictEqual(
         file,
@@ -1181,12 +1304,15 @@ describe('_createFiles', () => {
       isFile: () => true,
       mode: 0
     });
-    const stubConfig =
-      sinon.stub(setup, '_createConfigDir').resolves(configDir);
-    const stubShell =
-      sinon.stub(setup, '_createShellScript').resolves(shellPath);
-    const stubManifest =
-      sinon.stub(setup, '_createManifest').resolves(manifestPath);
+    const stubConfig = sinon
+      .stub(setup, '_createConfigDir')
+      .resolves(configDir);
+    const stubShell = sinon
+      .stub(setup, '_createShellScript')
+      .resolves(shellPath);
+    const stubManifest = sinon
+      .stub(setup, '_createManifest')
+      .resolves(manifestPath);
     const stubReg = sinon.stub(setup, '_createReg').resolves(true);
     const res = await setup._createFiles();
     assert.strictEqual(stubConfig.calledOnce, true);
@@ -1241,7 +1367,9 @@ describe('_handleBrowserConfigDir', () => {
     const stubConfirm = sinon.stub(inquirer, 'confirm').resolves(true);
     sinon.stub(setup, '_getBrowserConfigDir').returns(DIR_CWD);
     setup.browser = 'firefox';
-    const stubCreateFiles = sinon.stub(setup, '_createFiles').resolves('mock_result');
+    const stubCreateFiles = sinon
+      .stub(setup, '_createFiles')
+      .resolves('mock_result');
     const res = await setup._handleBrowserConfigDir();
     assert.strictEqual(stubConfirm.calledOnce, true);
     assert.strictEqual(stubCreateFiles.calledOnce, true);
@@ -1254,15 +1382,18 @@ describe('_handleBrowserInput', () => {
   it('should throw if empty', async () => {
     const setup = new Setup();
     await setup._handleBrowserInput().catch(e => {
-      assert.deepStrictEqual(e,
-        new TypeError('Expected Array but got Undefined.'));
+      assert.deepStrictEqual(
+        e,
+        new TypeError('Expected Array but got Undefined.')
+      );
     });
   });
 
   it('should throw if cancelled', async () => {
     const setup = new Setup();
-    const stubSelect =
-      sinon.stub(inquirer, 'select').callsFake(async () => null);
+    const stubSelect = sinon
+      .stub(inquirer, 'select')
+      .callsFake(async () => null);
     await setup._handleBrowserInput([]).catch(e => {
       assert.deepStrictEqual(e, new Error('Browser is not specified.'));
     });
@@ -1271,10 +1402,12 @@ describe('_handleBrowserInput', () => {
 
   it('should call _handleBrowserConfigDir on valid selection', async () => {
     const setup = new Setup();
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubSelect =
-      sinon.stub(inquirer, 'select').callsFake(async () => 'firefox');
+    const stubConfigDir = sinon
+      .stub(setup, '_handleBrowserConfigDir')
+      .resolves(true);
+    const stubSelect = sinon
+      .stub(inquirer, 'select')
+      .callsFake(async () => 'firefox');
     const res = await setup._handleBrowserInput(['firefox', 'chrome']);
     assert.strictEqual(stubConfigDir.calledOnce, true);
     assert.strictEqual(res, true);
@@ -1284,13 +1417,13 @@ describe('_handleBrowserInput', () => {
 
   it('should set pageSize if array length is greater than 5', async () => {
     const setup = new Setup();
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const browsers = [
-      'firefox', 'chrome', 'edge', 'brave', 'opera', 'vivaldi'
-    ];
-    const stubSelect =
-      sinon.stub(inquirer, 'select').callsFake(async () => 'firefox');
+    const stubConfigDir = sinon
+      .stub(setup, '_handleBrowserConfigDir')
+      .resolves(true);
+    const browsers = ['firefox', 'chrome', 'edge', 'brave', 'opera', 'vivaldi'];
+    const stubSelect = sinon
+      .stub(inquirer, 'select')
+      .callsFake(async () => 'firefox');
     await setup._handleBrowserInput(browsers);
     assert.strictEqual(stubSelect.calledOnce, true);
     const opt = stubSelect.getCall(0).args[0];
@@ -1303,10 +1436,12 @@ describe('_handleBrowserInput', () => {
 describe('run', () => {
   it('should call browser input if no config dir', async () => {
     const setup = new Setup();
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubBrowserInput =
-      sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
+    const stubConfigDir = sinon
+      .stub(setup, '_handleBrowserConfigDir')
+      .resolves(true);
+    const stubBrowserInput = sinon
+      .stub(setup, '_handleBrowserInput')
+      .callsFake(async arg => arg);
     const res = await setup.run();
     assert.strictEqual(stubConfigDir.called, false);
     assert.strictEqual(stubBrowserInput.calledOnce, true);
@@ -1319,10 +1454,12 @@ describe('run', () => {
       webExtensionIds: ['foo@bar'],
       chromeExtensionIds: ['chrome-extension://foo']
     });
-    const stubConfigDir =
-      sinon.stub(setup, '_handleBrowserConfigDir').resolves(true);
-    const stubBrowserInput =
-      sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
+    const stubConfigDir = sinon
+      .stub(setup, '_handleBrowserConfigDir')
+      .resolves(true);
+    const stubBrowserInput = sinon
+      .stub(setup, '_handleBrowserInput')
+      .callsFake(async arg => arg);
     const res = await setup.run();
     assert.strictEqual(stubConfigDir.calledOnce, true);
     assert.strictEqual(stubBrowserInput.called, false);
@@ -1335,8 +1472,9 @@ describe('run', () => {
       webExtensionIds: ['foo@bar'],
       chromeExtensionIds: ['chrome-extension://foo']
     });
-    const stubBrowserInput =
-      sinon.stub(setup, '_handleBrowserInput').callsFake(async arg => arg);
+    const stubBrowserInput = sinon
+      .stub(setup, '_handleBrowserInput')
+      .callsFake(async arg => arg);
     const res = await setup.run();
     let expected = [];
     if (IS_WIN || IS_MAC) {

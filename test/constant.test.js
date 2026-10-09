@@ -8,8 +8,16 @@ import { isString } from '../modules/common.js';
 
 /* test */
 import {
-  CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
-  EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN
+  CHAR,
+  DIR_CONFIG_LINUX,
+  DIR_CONFIG_MAC,
+  DIR_CONFIG_WIN,
+  DIR_HOME,
+  EXT_CHROME,
+  EXT_WEB,
+  INDENT,
+  IS_MAC,
+  IS_WIN
 } from '../modules/constant.js';
 
 describe('string constants', () => {
@@ -40,10 +48,7 @@ describe('number constants', () => {
 
 describe('boolean constants', () => {
   it('should get boolean', () => {
-    const arr = [
-      IS_MAC,
-      IS_WIN
-    ];
+    const arr = [IS_MAC, IS_WIN];
     arr.forEach(i => {
       assert.strictEqual(typeof i, 'boolean');
     });
@@ -71,8 +76,9 @@ describe('DIR_CONFIG_WIN', () => {
 
   it('should use fallback path when APPDATA is not set', async () => {
     delete process.env.APPDATA;
-    const { DIR_CONFIG_WIN: mockDirWin } =
-      await import(`../modules/constant.js?t=${Date.now()}`);
+    const { DIR_CONFIG_WIN: mockDirWin } = await import(
+      `../modules/constant.js?t=${Date.now()}`
+    );
     const fallback = path.join(os.homedir(), 'AppData', 'Roaming');
     assert.strictEqual(mockDirWin, fallback);
   });
@@ -80,8 +86,9 @@ describe('DIR_CONFIG_WIN', () => {
   it('should use custom APPDATA when it is set', async () => {
     const customPath = path.join('C:', 'Custom', 'AppData');
     process.env.APPDATA = customPath;
-    const { DIR_CONFIG_WIN: mockDirWin } =
-      await import(`../modules/constant.js?t=${Date.now() + 1}`);
+    const { DIR_CONFIG_WIN: mockDirWin } = await import(
+      `../modules/constant.js?t=${Date.now() + 1}`
+    );
     assert.strictEqual(mockDirWin, customPath);
   });
 });

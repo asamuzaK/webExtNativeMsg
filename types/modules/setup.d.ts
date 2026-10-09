@@ -8,6 +8,10 @@ export declare const inquirer: {
             keywords: {
                 yes: string;
                 no: string;
+                error: (keywords: {
+                    yes: string;
+                    no: string;
+                }) => string;
             };
             style: {
                 confirmDefault: (text: string) => string;
@@ -21,6 +25,10 @@ export declare const inquirer: {
             keywords: {
                 yes: string;
                 no: string;
+                error: (keywords: {
+                    yes: string;
+                    no: string;
+                }) => string;
             };
             style: {
                 confirmDefault: (text: string) => string;
@@ -97,7 +105,7 @@ export declare class Setup {
         chromeExtensionIds?: Array<string>;
         webExtensionIds?: Array<string>;
         supportedBrowsers?: Array<string>;
-        callback?: Function;
+        callback?: ((res: object) => void);
         overwriteConfig?: boolean;
     });
     get browser(): any;
@@ -116,8 +124,8 @@ export declare class Setup {
     set chromeExtensionIds(arr: string[] | null);
     get webExtensionIds(): string[] | null;
     set webExtensionIds(arr: string[] | null);
-    get callback(): Function | null;
-    set callback(func: Function | null);
+    get callback(): ((res: object) => void) | null;
+    set callback(func: ((res: object) => void) | null);
     get overwriteConfig(): boolean;
     set overwriteConfig(overwrite: boolean);
     private _getBrowserConfigDir;

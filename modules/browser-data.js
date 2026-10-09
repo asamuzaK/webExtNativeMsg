@@ -4,7 +4,11 @@
 
 /* constants */
 import {
-  DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_HOME, EXT_CHROME, EXT_WEB
+  DIR_CONFIG_LINUX,
+  DIR_CONFIG_MAC,
+  DIR_HOME,
+  EXT_CHROME,
+  EXT_WEB
 } from './constant.js';
 const HKCU_SOFTWARE = ['HKEY_CURRENT_USER', 'SOFTWARE'];
 const HOST = 'native-messaging-hosts';

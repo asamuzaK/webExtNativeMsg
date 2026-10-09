@@ -11,17 +11,28 @@ import { IS_WIN } from '../modules/constant.js';
 
 /* test */
 import {
-  convertUriToFilePath, createDirectory, createFile, getAbsPath,
-  getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
-  isFile, isSubDir, removeDirSync, removeDirectory, readFile
+  convertUriToFilePath,
+  createDirectory,
+  createFile,
+  getAbsPath,
+  getFileNameFromFilePath,
+  getFileTimestamp,
+  getStat,
+  isDir,
+  isExecutable,
+  isFile,
+  isSubDir,
+  removeDirSync,
+  removeDirectory,
+  readFile
 } from '../modules/file-util.js';
 
 /* constants */
 const DIR_CWD = process.cwd();
 const PERM_EXEC = 0o700;
 const PERM_FILE = 0o600;
-const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
-               os.tmpdir();
+const TMPDIR =
+  process.env.TMP || process.env.TMPDIR || process.env.TEMP || os.tmpdir();
 
 describe('convertUriToFilePath', () => {
   it('should get string', () => {
@@ -73,8 +84,11 @@ describe('convertUriToFilePath', () => {
   });
 
   it('should throw if string is not given', () => {
-    assert.throws(() => convertUriToFilePath(), TypeError,
-      'Expected String but got Undefined');
+    assert.throws(
+      () => convertUriToFilePath(),
+      TypeError,
+      'Expected String but got Undefined'
+    );
   });
 
   it('should get null if protocol does not match', () => {
@@ -110,15 +124,19 @@ describe('createDirectory', () => {
 
   it('should throw if given argument is not a string', async () => {
     await createDirectory().catch(e => {
-      assert.deepStrictEqual(e,
-        new TypeError('Expected String but got Undefined.'));
+      assert.deepStrictEqual(
+        e,
+        new TypeError('Expected String but got Undefined.')
+      );
     });
   });
 
   it('should throw if given second argument is not a number', async () => {
     await createDirectory('/foo/bar', 'baz').catch(e => {
-      assert.deepStrictEqual(e,
-        new TypeError('Expected Number but got String.'));
+      assert.deepStrictEqual(
+        e,
+        new TypeError('Expected Number but got String.')
+      );
     });
   });
 });
@@ -143,28 +161,31 @@ describe('createFile', () => {
     const filePath = path.join(dirPath, 'test.txt');
     const value = 'test file.\n';
     const file = await createFile(filePath, value, {
-      encoding: 'utf8', flag: 'w', mode: PERM_FILE
+      encoding: 'utf8',
+      flag: 'w',
+      mode: PERM_FILE
     });
     assert.strictEqual(file, filePath);
   });
 
   it('should throw if first argument is not a string', () => {
     createFile().catch(e => {
-      assert.deepStrictEqual(e,
-        new TypeError('Expected String but got Undefined.'));
+      assert.deepStrictEqual(
+        e,
+        new TypeError('Expected String but got Undefined.')
+      );
     });
   });
 
-  it(
-    'should throw if second argument is not string, buffer, uint8array',
-    () => {
-      const file = path.join(TMPDIR, 'webextnativemsg', 'test.txt');
-      createFile(file).catch(e => {
-        assert.deepStrictEqual(e,
-          new TypeError('Expected String, Buffer, Uint8Array but got Undefined.'));
-      });
-    }
-  );
+  it('should throw if second argument is not string, buffer, uint8array', () => {
+    const file = path.join(TMPDIR, 'webextnativemsg', 'test.txt');
+    createFile(file).catch(e => {
+      assert.deepStrictEqual(
+        e,
+        new TypeError('Expected String, Buffer, Uint8Array but got Undefined.')
+      );
+    });
+  });
 });
 
 describe('removeDirSync', () => {
@@ -189,7 +210,9 @@ describe('removeDirSync', () => {
     const filePath = path.join(subDirPath, 'test.txt');
     const value = 'test file.\n';
     await createFile(filePath, value, {
-      encoding: 'utf8', flag: 'w', mode: PERM_FILE
+      encoding: 'utf8',
+      flag: 'w',
+      mode: PERM_FILE
     });
     const res1 = await Promise.all([
       fs.existsSync(dirPath),
@@ -216,8 +239,11 @@ describe('removeDirSync', () => {
     const foo = path.join(TMPDIR, 'foo');
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);
-    assert.throws(() => removeDirSync(foo, dirPath), Error,
-                  `${foo} is not a subdirectory of ${dirPath}.`);
+    assert.throws(
+      () => removeDirSync(foo, dirPath),
+      Error,
+      `${foo} is not a subdirectory of ${dirPath}.`
+    );
     await fsPromise.rm(dirPath, {
       force: true,
       recursive: true
@@ -251,7 +277,9 @@ describe('removeDirectory', () => {
     const filePath = path.join(subDirPath, 'test.txt');
     const value = 'test file.\n';
     await createFile(filePath, value, {
-      encoding: 'utf8', flag: 'w', mode: PERM_FILE
+      encoding: 'utf8',
+      flag: 'w',
+      mode: PERM_FILE
     });
     const res1 = await Promise.all([
       fs.existsSync(dirPath),
@@ -281,8 +309,10 @@ describe('removeDirectory', () => {
     await fs.mkdirSync(dirPath);
     await fs.mkdirSync(foo);
     await removeDirectory(foo, dirPath).catch(e => {
-      assert.deepStrictEqual(e,
-        new Error(`${foo} is not a subdirectory of ${dirPath}.`));
+      assert.deepStrictEqual(
+        e,
+        new Error(`${foo} is not a subdirectory of ${dirPath}.`)
+      );
     });
     await fsPromise.rm(dirPath, {
       force: true,
@@ -315,8 +345,11 @@ describe('getAbsPath', () => {
   });
 
   it('should throw', () => {
-    assert.throws(() => getAbsPath(), TypeError,
-      'Expected String but got Undefined');
+    assert.throws(
+      () => getAbsPath(),
+      TypeError,
+      'Expected String but got Undefined'
+    );
   });
 });
 
@@ -381,13 +414,10 @@ describe('getStat', () => {
     const err = new Error('Not a directory');
     err.code = 'ENOTDIR';
     const stubStat = sinon.stub(fs, 'statSync').throws(err);
-    assert.throws(
-      () => getStat('dummy/path'),
-      {
-        code: 'ENOTDIR',
-        message: 'Not a directory'
-      }
-    );
+    assert.throws(() => getStat('dummy/path'), {
+      code: 'ENOTDIR',
+      message: 'Not a directory'
+    });
     stubStat.restore();
   });
 });
@@ -406,9 +436,11 @@ describe('isDir', () => {
 
 describe('isExecutable', () => {
   it('should get true if file is executable', () => {
-    const p = path.resolve(IS_WIN
-      ? path.join('test', 'file', 'test.cmd')
-      : path.join('test', 'file', 'test.sh'));
+    const p = path.resolve(
+      IS_WIN
+        ? path.join('test', 'file', 'test.cmd')
+        : path.join('test', 'file', 'test.sh')
+    );
     fs.chmodSync(p, PERM_EXEC);
     assert.strictEqual(isExecutable(p), true);
   });

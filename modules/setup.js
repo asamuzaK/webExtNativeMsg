@@ -10,16 +10,28 @@ import { browserData } from './browser-data.js';
 import { ChildProcess } from './child-process.js';
 import { getType, isString, quoteArg } from './common.js';
 import {
-  createDirectory, createFile, getAbsPath, isDir, isFile
+  createDirectory,
+  createFile,
+  getAbsPath,
+  isDir,
+  isFile
 } from './file-util.js';
 
 /* constants */
 import {
-  CHAR, DIR_CONFIG_LINUX, DIR_CONFIG_MAC, DIR_CONFIG_WIN, DIR_HOME,
-  EXT_CHROME, EXT_WEB, INDENT, IS_MAC, IS_WIN
+  CHAR,
+  DIR_CONFIG_LINUX,
+  DIR_CONFIG_MAC,
+  DIR_CONFIG_WIN,
+  DIR_HOME,
+  EXT_CHROME,
+  EXT_WEB,
+  INDENT,
+  IS_MAC,
+  IS_WIN
 } from './constant.js';
-const DIR_CONFIG = (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) ||
-                   DIR_CONFIG_LINUX;
+const DIR_CONFIG =
+  (IS_WIN && DIR_CONFIG_WIN) || (IS_MAC && DIR_CONFIG_MAC) || DIR_CONFIG_LINUX;
 const DIR_CWD = process.cwd();
 const PERM_DIR = 0o755;
 const PERM_EXEC = 0o755;
@@ -58,8 +70,11 @@ export const getBrowserData = key => {
     const items = Object.entries(browserData);
     for (const [item, obj] of items) {
       if (item === key) {
-        if ((IS_WIN && obj.regWin) || (IS_MAC && obj.hostMac) ||
-            (!IS_WIN && !IS_MAC && obj.hostLinux)) {
+        if (
+          (IS_WIN && obj.regWin) ||
+          (IS_MAC && obj.hostMac) ||
+          (!IS_WIN && !IS_MAC && obj.hostLinux)
+        ) {
           browser = browserData[item];
         }
         break;
@@ -122,18 +137,25 @@ export class Setup {
    * @param {Array.<string>} [opt.chromeExtensionIds] - chrome extension IDs
    * @param {Array.<string>} [opt.webExtensionIds] - web extension IDs
    * @param {Array.<string>} [opt.supportedBrowsers] - supported browsers
-   * @param {Function} [opt.callback] - callback after setup
+   @param {((res: object) => void)} [opt.callback] - callback after setup
    * @param {boolean} [opt.overwriteConfig] - overwrite config if exists
    */
   constructor(opt = {}) {
     const {
-      browser, callback, chromeExtensionIds, configPath, hostDescription,
-      hostName, mainScriptFile, overwriteConfig, supportedBrowsers,
+      browser,
+      callback,
+      chromeExtensionIds,
+      configPath,
+      hostDescription,
+      hostName,
+      mainScriptFile,
+      overwriteConfig,
+      supportedBrowsers,
       webExtensionIds
     } = opt;
     this.#browser = isString(browser) ? getBrowserData(browser) : null;
     this.#supportedBrowsers =
-      (Array.isArray(supportedBrowsers) && supportedBrowsers.length)
+      Array.isArray(supportedBrowsers) && supportedBrowsers.length
         ? supportedBrowsers
         : Object.keys(browserData);
     this.#configDir = getConfigDir({
@@ -144,11 +166,11 @@ export class Setup {
     this.#hostName = isString(hostName) ? hostName : null;
     this.#mainFile = isString(mainScriptFile) ? mainScriptFile : 'index.js';
     this.#chromeExtIds =
-      (Array.isArray(chromeExtensionIds) && chromeExtensionIds.length)
+      Array.isArray(chromeExtensionIds) && chromeExtensionIds.length
         ? chromeExtensionIds
         : null;
     this.#webExtIds =
-      (Array.isArray(webExtensionIds) && webExtensionIds.length)
+      Array.isArray(webExtensionIds) && webExtensionIds.length
         ? webExtensionIds
         : null;
     this.#callback = typeof callback === 'function' ? callback : null;
@@ -220,7 +242,7 @@ export class Setup {
   }
 
   set chromeExtensionIds(arr) {
-    this.#chromeExtIds = (Array.isArray(arr) && arr.length) ? arr : null;
+    this.#chromeExtIds = Array.isArray(arr) && arr.length ? arr : null;
   }
 
   get webExtensionIds() {
@@ -228,7 +250,7 @@ export class Setup {
   }
 
   set webExtensionIds(arr) {
-    this.#webExtIds = (Array.isArray(arr) && arr.length) ? arr : null;
+    this.#webExtIds = Array.isArray(arr) && arr.length ? arr : null;
   }
 
   get callback() {
@@ -256,11 +278,18 @@ export class Setup {
     let dir;
     if (this.#browser) {
       const {
-        alias, aliasLinux, aliasMac, aliasWin, hostLinux, hostMac, regWin
+        alias,
+        aliasLinux,
+        aliasMac,
+        aliasWin,
+        hostLinux,
+        hostMac,
+        regWin
       } = this.#browser;
-      const label = (IS_WIN && regWin && (aliasWin ?? alias)) ||
-                    (IS_MAC && hostMac && (aliasMac ?? alias)) ||
-                    (!IS_WIN && !IS_MAC && hostLinux && (aliasLinux ?? alias));
+      const label =
+        (IS_WIN && regWin && (aliasWin ?? alias)) ||
+        (IS_MAC && hostMac && (aliasMac ?? alias)) ||
+        (!IS_WIN && !IS_MAC && hostLinux && (aliasLinux ?? alias));
       if (this.#configDir && isString(label)) {
         dir = path.join(this.#configDir, label);
       }
@@ -282,7 +311,9 @@ export class Setup {
       throw new TypeError(`Expected Object but got ${getType(this.#browser)}.`);
     }
     if (!isString(this.#hostName)) {
-      throw new TypeError(`Expected String but got ${getType(this.#hostName)}.`);
+      throw new TypeError(
+        `Expected String but got ${getType(this.#hostName)}.`
+      );
     }
     if (IS_WIN) {
       const { regWin } = this.#browser;
@@ -349,10 +380,14 @@ export class Setup {
       throw new TypeError(`Expected Object but got ${getType(this.#browser)}.`);
     }
     if (!isString(this.#hostDesc)) {
-      throw new TypeError(`Expected String but got ${getType(this.#hostDesc)}.`);
+      throw new TypeError(
+        `Expected String but got ${getType(this.#hostDesc)}.`
+      );
     }
     if (!isString(this.#hostName)) {
-      throw new TypeError(`Expected String but got ${getType(this.#hostName)}.`);
+      throw new TypeError(
+        `Expected String but got ${getType(this.#hostName)}.`
+      );
     }
     const { hostLinux, hostMac, type } = this.#browser;
     const allowedField = {
@@ -378,12 +413,16 @@ export class Setup {
     };
     const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
     const fileName = `${this.#hostName}.json`;
-    const dir = (IS_WIN && configDir) || (IS_MAC && path.join(...hostMac)) ||
-                path.join(...hostLinux);
+    const dir =
+      (IS_WIN && configDir) ||
+      (IS_MAC && path.join(...hostMac)) ||
+      path.join(...hostLinux);
     const manifestDir = await createDirectory(dir);
     const manifestPath = path.resolve(manifestDir, fileName);
     await createFile(manifestPath, content, {
-      encoding: CHAR, flag: 'w', mode: PERM_FILE
+      encoding: CHAR,
+      flag: 'w',
+      mode: PERM_FILE
     });
     console.info(`Created: ${manifestPath}`);
     return manifestPath;
@@ -400,7 +439,9 @@ export class Setup {
       throw new Error(`No such directory: ${configDir}.`);
     }
     if (!isString(this.#hostName)) {
-      throw new TypeError(`Expected String but got ${getType(this.#hostName)}.`);
+      throw new TypeError(
+        `Expected String but got ${getType(this.#hostName)}.`
+      );
     }
     const appPath = process.execPath;
     const filePath = path.resolve(DIR_CWD, this.#mainFile);
@@ -408,12 +449,13 @@ export class Setup {
       (isFile(filePath) && `${quoteArg(appPath)} ${quoteArg(filePath)}`) ||
       quoteArg(appPath);
     const shell = process.env.SHELL || '/bin/sh';
-    const content =
-      (IS_WIN && `@echo off\n${cmd}\n`) || `#!${shell}\n${cmd}\n`;
+    const content = (IS_WIN && `@echo off\n${cmd}\n`) || `#!${shell}\n${cmd}\n`;
     const shellExt = (IS_WIN && 'cmd') || 'sh';
     const shellPath = path.join(configDir, `${this.#hostName}.${shellExt}`);
     await createFile(shellPath, content, {
-      encoding: CHAR, flag: 'w', mode: PERM_EXEC
+      encoding: CHAR,
+      flag: 'w',
+      mode: PERM_EXEC
     });
     console.info(`Created: ${shellPath}`);
     return shellPath;
@@ -427,7 +469,9 @@ export class Setup {
   async _createConfigDir() {
     this.#browserConfigDir ??= this._getBrowserConfigDir();
     if (!isString(this.#browserConfigDir)) {
-      throw new TypeError(`Expected String but got ${getType(this.#browserConfigDir)}.`);
+      throw new TypeError(
+        `Expected String but got ${getType(this.#browserConfigDir)}.`
+      );
     }
     const configDir = await createDirectory(this.#browserConfigDir, PERM_DIR);
     console.info(`Created: ${configDir}`);
@@ -469,10 +513,12 @@ export class Setup {
     this.#browserConfigDir ??= this._getBrowserConfigDir();
     if (isDir(this.#browserConfigDir) && !this.#overwriteConfig) {
       const dir = this.#browserConfigDir;
-      const ans = await inquirer.confirm({
-        message: `${dir} already exists. Overwrite?`,
-        default: false
-      }).catch(handleInquirerError);
+      const ans = await inquirer
+        .confirm({
+          message: `${dir} already exists. Overwrite?`,
+          default: false
+        })
+        .catch(handleInquirerError);
       if (ans) {
         return this._createFiles();
       } else {
@@ -535,11 +581,14 @@ export class Setup {
       const arr = [];
       const items = Object.entries(browserData);
       for (const [item, obj] of items) {
-        if (this.#supportedBrowsers.includes(item) &&
-            ((IS_WIN && obj.regWin) || (IS_MAC && obj.hostMac) ||
-             (!IS_WIN && !IS_MAC && obj.hostLinux)) &&
-            ((obj.type === EXT_CHROME && this.#chromeExtIds) ||
-             (obj.type === EXT_WEB && this.#webExtIds))) {
+        if (
+          this.#supportedBrowsers.includes(item) &&
+          ((IS_WIN && obj.regWin) ||
+            (IS_MAC && obj.hostMac) ||
+            (!IS_WIN && !IS_MAC && obj.hostLinux)) &&
+          ((obj.type === EXT_CHROME && this.#chromeExtIds) ||
+            (obj.type === EXT_WEB && this.#webExtIds))
+        ) {
           arr.push(item);
         }
       }

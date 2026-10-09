@@ -33,17 +33,19 @@ export class Input {
     let arr = [];
     if (Buffer.isBuffer(this.#input)) {
       if (!this.#length && this.#input.length >= BYTE_LEN) {
-        this.#length = os.endianness() === 'BE'
-          ? this.#input.readUInt32BE(0)
-          : this.#input.readUInt32LE(0);
+        this.#length =
+          os.endianness() === 'BE'
+            ? this.#input.readUInt32BE(0)
+            : this.#input.readUInt32LE(0);
         this.#input = this.#input.subarray(BYTE_LEN);
       }
       if (this.#length && this.#input.length >= this.#length) {
         const buf = this.#input.subarray(0, this.#length);
         arr.push(JSON.parse(buf.toString(CHAR)));
-        this.#input = this.#input.length > this.#length
-          ? this.#input.subarray(this.#length)
-          : null;
+        this.#input =
+          this.#input.length > this.#length
+            ? this.#input.subarray(this.#length)
+            : null;
         this.#length = null;
         if (this.#input) {
           const cur = this.#decoder();

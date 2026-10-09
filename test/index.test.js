@@ -4,10 +4,25 @@ import { describe, it } from 'mocha';
 
 /* test */
 import {
-  ChildProcess, CmdArgs, Input, Output, Setup,
-  convertUriToFilePath, createDirectory, createFile, getAbsPath,
-  getFileNameFromFilePath, getFileTimestamp, getStat, isDir, isExecutable,
-  isFile, isSubDir, readFile, removeDirSync, removeDirectory
+  ChildProcess,
+  CmdArgs,
+  Input,
+  Output,
+  Setup,
+  convertUriToFilePath,
+  createDirectory,
+  createFile,
+  getAbsPath,
+  getFileNameFromFilePath,
+  getFileTimestamp,
+  getStat,
+  isDir,
+  isExecutable,
+  isFile,
+  isSubDir,
+  readFile,
+  removeDirSync,
+  removeDirectory
 } from '../index.js';
 
 /* Classes */

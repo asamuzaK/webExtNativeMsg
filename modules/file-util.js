@@ -105,8 +105,9 @@ export const isExecutable = (file, mask = MASK_BIT) => {
   let res;
   const stat = getStat(file);
   if (stat) {
-    res = !!(stat.mode & mask) ||
-          (IS_WIN && /\.(?:bat|cmd|exe|ps1|wsh)$/i.test(file));
+    res =
+      !!(stat.mode & mask) ||
+      (IS_WIN && /\.(?:bat|cmd|exe|ps1|wsh)$/i.test(file));
   }
   return !!res;
 };
@@ -129,8 +130,11 @@ export const getFileTimestamp = file => {
  */
 export const getFileNameFromFilePath = (file, subst = SUBST) => {
   let name;
-  if (isString(file) && isFile(file) &&
-      /^[^.]+(?:\..+)?$/.test(path.basename(file))) {
+  if (
+    isString(file) &&
+    isFile(file) &&
+    /^[^.]+(?:\..+)?$/.test(path.basename(file))
+  ) {
     [, name] = /^([^.]+)(?:\..+)?$/.exec(path.basename(file));
   }
   return name || subst;
@@ -190,7 +194,7 @@ export const createDirectory = async (dir, mode = PERM_DIR) => {
     mode,
     recursive: true
   };
-  !isDir(dirPath) && await fsPromise.mkdir(dirPath, opt);
+  !isDir(dirPath) && (await fsPromise.mkdir(dirPath, opt));
   return dirPath;
 };
 
@@ -204,15 +208,26 @@ export const createDirectory = async (dir, mode = PERM_DIR) => {
  * @param {number|string} [opt.mode] - file permission
  * @returns {Promise.<string>} - file path
  */
-export const createFile = async (file, value, opt = {
-  encoding: null, flag: 'w', mode: PERM_FILE
-}) => {
+export const createFile = async (
+  file,
+  value,
+  opt = {
+    encoding: null,
+    flag: 'w',
+    mode: PERM_FILE
+  }
+) => {
   if (!isString(file)) {
     throw new TypeError(`Expected String but got ${getType(file)}.`);
   }
-  if (!isString(value) && !Buffer.isBuffer(value) &&
-      !(value instanceof Uint8Array)) {
-    throw new TypeError(`Expected String, Buffer, Uint8Array but got ${getType(value)}.`);
+  if (
+    !isString(value) &&
+    !Buffer.isBuffer(value) &&
+    !(value instanceof Uint8Array)
+  ) {
+    throw new TypeError(
+      `Expected String, Buffer, Uint8Array but got ${getType(value)}.`
+    );
   }
   const filePath = path.resolve(path.normalize(file));
   await fsPromise.writeFile(filePath, value, opt);

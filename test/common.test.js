@@ -5,7 +5,14 @@ import { describe, it } from 'mocha';
 
 /* test */
 import {
-  escapeChar, getType, isString, logErr, logMsg, logWarn, quoteArg, throwErr
+  escapeChar,
+  getType,
+  isString,
+  logErr,
+  logMsg,
+  logWarn,
+  quoteArg,
+  throwErr
 } from '../modules/common.js';
 
 describe('escapeChar', () => {

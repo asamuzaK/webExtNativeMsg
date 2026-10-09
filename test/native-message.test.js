@@ -97,20 +97,24 @@ describe('Input', () => {
     it('should decode two complete messages in one chunk (Little Endian)', () => {
       sinon.stub(os, 'endianness').returns('LE');
       const input = new Input();
-      const msg = input.decode(Buffer.from([
-        6, 0, 0, 0, 34, 116, 101, 115, 116, 34,
-        6, 0, 0, 0, 34, 116, 101, 115, 116, 34
-      ]));
+      const msg = input.decode(
+        Buffer.from([
+          6, 0, 0, 0, 34, 116, 101, 115, 116, 34, 6, 0, 0, 0, 34, 116, 101, 115,
+          116, 34
+        ])
+      );
       assert.deepEqual(msg, ['test', 'test']);
     });
 
     it('should decode two complete messages in one chunk (Big Endian)', () => {
       sinon.stub(os, 'endianness').returns('BE');
       const input = new Input();
-      const msg = input.decode(Buffer.from([
-        0, 0, 0, 6, 34, 116, 101, 115, 116, 34,
-        0, 0, 0, 6, 34, 116, 101, 115, 116, 34
-      ]));
+      const msg = input.decode(
+        Buffer.from([
+          0, 0, 0, 6, 34, 116, 101, 115, 116, 34, 0, 0, 0, 6, 34, 116, 101, 115,
+          116, 34
+        ])
+      );
       assert.deepEqual(msg, ['test', 'test']);
     });
   });
@@ -142,7 +146,10 @@ describe('Output', () => {
 
     it('should get null for function', () => {
       const output = new Output();
-      assert.deepEqual(output.encode(a => a), null);
+      assert.deepEqual(
+        output.encode(a => a),
+        null
+      );
     });
 
     it('should encode message to buffer (Little Endian)', () => {

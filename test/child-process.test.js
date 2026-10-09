@@ -11,7 +11,12 @@ import { IS_WIN } from '../modules/constant.js';
 
 /* test */
 import {
-  ChildProcess, CmdArgs, concatArray, correctArg, extractArg, stringifyArg
+  ChildProcess,
+  CmdArgs,
+  concatArray,
+  correctArg,
+  extractArg,
+  stringifyArg
 } from '../modules/child-process.js';
 
 /* constants */
@@ -20,13 +25,19 @@ const PERM_FILE = 0o600;
 
 describe('concatArray', () => {
   it('should throw', () => {
-    assert.throws(() => concatArray(),
-      TypeError, 'Expected Array but got Undefined.');
+    assert.throws(
+      () => concatArray(),
+      TypeError,
+      'Expected Array but got Undefined.'
+    );
   });
 
   it('should throw', () => {
-    assert.throws(() => concatArray([]),
-      TypeError, 'Expected Array but got Undefined.');
+    assert.throws(
+      () => concatArray([]),
+      TypeError,
+      'Expected Array but got Undefined.'
+    );
   });
 
   it('should get empty array', () => {
@@ -52,8 +63,11 @@ describe('concatArray', () => {
 
 describe('correctArg', () => {
   it('should throw', () => {
-    assert.throws(() => correctArg(),
-      TypeError, 'Expected String but got Undefined.');
+    assert.throws(
+      () => correctArg(),
+      TypeError,
+      'Expected String but got Undefined.'
+    );
   });
 
   it('should get string', () => {
@@ -109,8 +123,11 @@ describe('correctArg', () => {
 
 describe('extractArg', () => {
   it('should throw', () => {
-    assert.throws(() => extractArg(),
-      TypeError, 'Expected String but got Undefined.');
+    assert.throws(
+      () => extractArg(),
+      TypeError,
+      'Expected String but got Undefined.'
+    );
   });
 
   it('should get empty array', () => {
@@ -125,26 +142,17 @@ describe('extractArg', () => {
 
   it('should get array', () => {
     const res = extractArg('foo "bar baz"');
-    assert.deepEqual(res, [
-      'foo',
-      'bar baz'
-    ]);
+    assert.deepEqual(res, ['foo', 'bar baz']);
   });
 
   it('should get array', () => {
     const res = extractArg("foo 'bar baz'");
-    assert.deepEqual(res, [
-      'foo',
-      'bar baz'
-    ]);
+    assert.deepEqual(res, ['foo', 'bar baz']);
   });
 
   it('should get array', () => {
     const res = extractArg('foo bar\\baz');
-    assert.deepEqual(res, [
-      'foo',
-      'bar\\baz'
-    ]);
+    assert.deepEqual(res, ['foo', 'bar\\baz']);
   });
 });
 
@@ -162,7 +170,7 @@ describe('stringifyArg', () => {
   });
 
   it('should get quoted string', () => {
-    assert.strictEqual(stringifyArg("''"), "\"''\"");
+    assert.strictEqual(stringifyArg("''"), '"\'\'"');
   });
 
   it('should get quoted string', () => {
@@ -170,8 +178,10 @@ describe('stringifyArg', () => {
   });
 
   it('should get string', () => {
-    assert.strictEqual(stringifyArg('foo "bar baz" qux\\quux'),
-      '"foo \\"bar baz\\" qux\\\\quux"');
+    assert.strictEqual(
+      stringifyArg('foo "bar baz" qux\\quux'),
+      '"foo \\"bar baz\\" qux\\\\quux"'
+    );
   });
 });
 
@@ -353,7 +363,7 @@ describe('ChildProcess', () => {
   it('should set option', () => {
     const opt = { cwd: null, env: process.env, encoding: 'utf8' };
     const proc = new ChildProcess(null, null, opt);
-    const [,, res] = proc._getSpawnArgs();
+    const [, , res] = proc._getSpawnArgs();
     assert.deepEqual(res, opt);
   });
 
@@ -366,9 +376,11 @@ describe('ChildProcess', () => {
     });
 
     it('should spawn child process', async () => {
-      const app = path.resolve(IS_WIN
-        ? path.join('test', 'file', 'test.cmd')
-        : path.join('test', 'file', 'test.sh'));
+      const app = path.resolve(
+        IS_WIN
+          ? path.join('test', 'file', 'test.cmd')
+          : path.join('test', 'file', 'test.sh')
+      );
       await fs.chmodSync(app, PERM_EXEC);
       const proc = await new ChildProcess(app).spawn();
       proc.on('close', code => {
@@ -377,9 +389,11 @@ describe('ChildProcess', () => {
     });
 
     it('should spawn child process', async () => {
-      const app = path.resolve(IS_WIN
-        ? path.join('test', 'file', 'test 2.cmd')
-        : path.join('test', 'file', 'test 2.sh'));
+      const app = path.resolve(
+        IS_WIN
+          ? path.join('test', 'file', 'test 2.cmd')
+          : path.join('test', 'file', 'test 2.sh')
+      );
       await fs.chmodSync(app, PERM_EXEC);
       const proc = await new ChildProcess(app).spawn();
       proc.on('close', code => {
@@ -388,9 +402,11 @@ describe('ChildProcess', () => {
     });
 
     it('should spawn with file path as first argument', async () => {
-      const app = path.resolve(IS_WIN
-        ? path.join('test', 'file', 'test.cmd')
-        : path.join('test', 'file', 'test.sh'));
+      const app = path.resolve(
+        IS_WIN
+          ? path.join('test', 'file', 'test.cmd')
+          : path.join('test', 'file', 'test.sh')
+      );
       const file = path.resolve(path.join('test', 'file', 'test.txt'));
       await fs.chmodSync(app, PERM_EXEC);
       await fs.chmodSync(file, PERM_FILE);
@@ -407,9 +423,11 @@ describe('ChildProcess', () => {
     });
 
     it('should spawn with file path as first argument', async () => {
-      const app = path.resolve(IS_WIN
-        ? path.join('test', 'file', 'test.cmd')
-        : path.join('test', 'file', 'test.sh'));
+      const app = path.resolve(
+        IS_WIN
+          ? path.join('test', 'file', 'test.cmd')
+          : path.join('test', 'file', 'test.sh')
+      );
       const file = path.resolve(path.join('test', 'file', 'test.txt'));
       await fs.chmodSync(app, PERM_EXEC);
       await fs.chmodSync(file, PERM_FILE);
@@ -426,9 +444,11 @@ describe('ChildProcess', () => {
     });
 
     it('should spawn with file path as last argument', async () => {
-      const app = path.resolve(IS_WIN
-        ? path.join('test', 'file', 'test.cmd')
-        : path.join('test', 'file', 'test.sh'));
+      const app = path.resolve(
+        IS_WIN
+          ? path.join('test', 'file', 'test.cmd')
+          : path.join('test', 'file', 'test.sh')
+      );
       const arg = ['-a', '-b'];
       const file = path.resolve(path.join('test', 'file', 'test.txt'));
       await fs.chmodSync(app, PERM_EXEC);
@@ -448,9 +468,11 @@ describe('ChildProcess', () => {
     });
 
     it('should spawn with file path as last argument', async () => {
-      const app = path.resolve(IS_WIN
-        ? path.join('test', 'file', 'test.cmd')
-        : path.join('test', 'file', 'test.sh'));
+      const app = path.resolve(
+        IS_WIN
+          ? path.join('test', 'file', 'test.cmd')
+          : path.join('test', 'file', 'test.sh')
+      );
       const arg = ['-a', '--b="c d\\e"'];
       const file = path.resolve(path.join('test', 'file', 'test.txt'));
       await fs.chmodSync(app, PERM_EXEC);
@@ -470,9 +492,11 @@ describe('ChildProcess', () => {
     });
 
     it('should spawn with file path as last argument', async () => {
-      const app = path.resolve(IS_WIN
-        ? path.join('test', 'file', 'test.cmd')
-        : path.join('test', 'file', 'test.sh'));
+      const app = path.resolve(
+        IS_WIN
+          ? path.join('test', 'file', 'test.cmd')
+          : path.join('test', 'file', 'test.sh')
+      );
       const arg = '-a --b="c d\\e"';
       const file = path.resolve(path.join('test', 'file', 'test.txt'));
       await fs.chmodSync(app, PERM_EXEC);
